@@ -34,6 +34,7 @@ import copilot from "eslint-plugin-copilot";
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import deMorgan from "eslint-plugin-de-morgan";
 import depend from "eslint-plugin-depend";
+import docusaurus2 from "eslint-plugin-docusaurus-2";
 import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
 import etcMisc from "eslint-plugin-etc-misc";
 import progress from "eslint-plugin-file-progress-2";
@@ -155,6 +156,8 @@ const fileProgressOverridesConfig = {
         // The preset already auto-hides on CI, but we also support explicit
         // local toggles.
         "file-progress/activate": DISABLE_PROGRESS ? 0 : 1,
+        "file-progress/compact": "off",
+        "file-progress/summary-only": "off",
     },
     settings: {
         progress: {
@@ -296,6 +299,15 @@ export default defineConfig([
         ...importX.flatConfigs.typescript,
         files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}"],
         name: "Import-X TypeScript (code files only)",
+    },
+    {
+        ...docusaurus2.configs.all,
+        rules: {
+            ...docusaurus2.configs.all.rules,
+            ...docusaurus2.configs["strict-mdx-upgrade"].rules,
+            ...docusaurus2.configs.content.rules,
+            "docusaurus-2/local-search-will-not-work-in-dev": "off",
+        },
     },
     progress.configs["recommended-ci"],
     copilot.configs.all,
