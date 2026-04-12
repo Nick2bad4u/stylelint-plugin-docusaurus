@@ -123,15 +123,9 @@ function assertStylelintMajor(expectedMajor) {
     );
 }
 
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
+/**
+ * Validate the public built plugin surface before running runtime smoke tests.
+ */
 function assertPluginSurface() {
     if (!Array.isArray(plugin)) {
         throw new TypeError(

@@ -138,6 +138,7 @@ applyTo: "**"
 - **Custom Syntax Awareness:** When a rule depends on syntax that does not exist in plain CSS, scope it carefully and document the expected `customSyntax` or file context.
 - **Utility Usage:** Before writing a helper function, check whether the standard library, existing repository helpers, or already-installed dependencies already provide it. Do not reinvent the wheel, and do not add or assume repo-specific helper dependencies without confirming they exist.
 - **Internal utility libraries are allowed:** Using libraries such as `type-fest` for this repository's own implementation code is fine when they clearly improve type safety or readability. The prohibition is only against dragging unrelated old plugin rule concepts into the new Stylelint rule surface.
+- **Repo-internal ESLint usage can also be intentional:** This repository may still use `eslint-plugin-typefest` inside its own `eslint.config.mjs` for repo-internal authoring rules. Do not remove that setup unless the user explicitly asks for its removal. That repo-internal ESLint usage is separate from the public Stylelint plugin runtime.
 - **Template-aware changes:** When changing rule metadata, docs, configs, package exports, or generated tables, check whether the repository already derives or validates those surfaces through sync scripts or runtime metadata helpers.
 - **Documentation:**
   - Every new rule must have a matching docs page in the repository's rule-docs location (commonly `docs/rules/<rule-id>.md`).

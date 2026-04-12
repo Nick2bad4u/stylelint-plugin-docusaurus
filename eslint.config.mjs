@@ -73,6 +73,9 @@ import eslintPluginToml from "eslint-plugin-toml";
 import pluginTsdoc from "eslint-plugin-tsdoc";
 import tsdocRequire from "eslint-plugin-tsdoc-require-2";
 import typedocPlugin from "eslint-plugin-typedoc";
+// Intentional: this repository still uses eslint-plugin-typefest for
+// repository-internal TS/ESLint authoring rules. Do not remove unless the user
+// explicitly asks to stop using it in the repo's ESLint setup.
 import typefest from "eslint-plugin-typefest";
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
@@ -722,6 +725,8 @@ export default defineConfig([
             "src/**/*.{ts,tsx,mts,cts}",
             //    "test/**/*.{ts,tsx,mts,cts}"
         ],
+        // Intentional repo-internal ESLint usage; this is not public package
+        // runtime wiring for the Stylelint plugin.
         name: "Typefest Rules for Source",
         plugins: {
             typefest: typefest,

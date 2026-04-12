@@ -168,7 +168,6 @@ const futureConfig = {
 } satisfies Config["future"];
 
 /** Full Docusaurus site configuration exported to the build/runtime. */
-// eslint-disable-next-line docusaurus-2/require-theme-config-image -- The social image is configured explicitly both at the top level and within themeConfig below.
 const config = {
     storage: {
         type: "localStorage",
@@ -430,14 +429,6 @@ const config = {
             {
                 content: "stylelint-plugin-docusaurus",
                 property: "og:site_name",
-            },
-            {
-                content: socialCardImageUrl,
-                property: "og:image",
-            },
-            {
-                content: socialCardImageUrl,
-                name: "twitter:image",
             },
         ],
         footer: {

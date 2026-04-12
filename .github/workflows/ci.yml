@@ -65,6 +65,9 @@ jobs:
             - name: Verify README rules table sync
               run: npm run sync:readme-rules-table
 
+            - name: Verify config docs sync
+              run: npm run sync:configs-rules-matrix
+
             - name: Typecheck
               run: npm run typecheck
 
@@ -114,22 +117,12 @@ jobs:
                   disable_search: true
                   verbose: true
 
-    eslint9-compat:
-        name: ESLint 9 Compatibility (${{ matrix.label }})
+    verify:
+        name: Verify pipeline
         runs-on: ubuntu-latest
-        timeout-minutes: 20
+        timeout-minutes: 60
         permissions:
             contents: read
-        strategy:
-            fail-fast: true
-            matrix:
-                include:
-                    - eslint-js-version: 9.0.0
-                      eslint-version: 9.0.0
-                      label: 9.0.0
-                    - eslint-js-version: ^9.39.1
-                      eslint-version: ^9.39.1
-                      label: 9.latest
         defaults:
             run:
                 shell: bash
@@ -153,11 +146,5 @@ jobs:
             - name: Install dependencies
               run: npm ci --force
 
-            - name: Build package
-              run: npm run build
-
-            - name: Install ESLint 9 runtime for compatibility smoke checks
-              run: npm install --no-save --force eslint@${{ matrix.eslint-version }} @eslint/js@${{ matrix.eslint-js-version }}
-
-            - name: Run ESLint 9 compatibility smoke checks
-              run: npm run lint:compat:eslint9 -- --expect-eslint-major=9
+            - name: Run full verification pipeline
+              run: npm run release:verify

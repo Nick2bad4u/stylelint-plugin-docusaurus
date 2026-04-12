@@ -2,12 +2,13 @@
  * @packageDocumentation
  * Shared helper for authoring statically typed Stylelint rules in this template.
  */
+import type { Except } from "type-fest";
+
 import stylelint, {
     type Rule,
     type RuleMessages,
     type RuleMeta,
 } from "stylelint";
-import type { Except } from "type-fest";
 
 /** Input contract for the shared Stylelint rule creator. */
 export type CreateStylelintRuleOptions<

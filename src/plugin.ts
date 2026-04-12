@@ -5,7 +5,7 @@
  */
 import type { Config, Plugin as StylelintPlugin } from "stylelint";
 
-import { objectKeys } from "ts-extras";
+import { isDefined, objectKeys } from "ts-extras";
 
 import type { StylelintPluginRule } from "./_internal/create-stylelint-rule.js";
 
@@ -80,7 +80,7 @@ const docusaurusRuleEntries: readonly DocusaurusRuleEntry[] = (() => {
     for (const ruleName of ruleNames) {
         const rule = rules[ruleName];
 
-        if (rule === undefined) {
+        if (!isDefined(rule)) {
             continue;
         }
 
