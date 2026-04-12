@@ -50,6 +50,29 @@
  */
 // eslint-disable-next-line import-x/no-named-as-default -- Rule wants packages not in dev, doesn't apply here
 import defineConfig from "stylelint-define-config";
+import localDocusaurusPlugin from "./plugin.mjs";
+
+/**
+ * Local dogfood rule set for validating the repository's own Docusaurus site
+ * against the built plugin runtime.
+ *
+ * @remarks
+ * This duplicates the current public rule catalog on purpose so the root
+ * Stylelint config can depend only on the stable local `plugin.mjs` entrypoint
+ * instead of importing internal TypeScript source files. The build hooks on
+ * `lint:css` and `lint:css:fix` ensure `dist/` exists before Stylelint loads
+ * this config.
+ */
+const localDocusaurusDogfoodRules = Object.freeze({
+    "docusaurus/no-invalid-theme-custom-property-scope": true,
+    "docusaurus/no-mobile-navbar-backdrop-filter": true,
+    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+    "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
+    "docusaurus/prefer-data-theme-color-mode": true,
+    "docusaurus/prefer-data-theme-docsearch-overrides": true,
+    "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
+    "docusaurus/require-ifm-color-primary-scale": true,
+});
 
 /**
  * Complete Stylelint configuration object defining all linting rules and
@@ -270,6 +293,9 @@ const config = defineConfig({
                 "**/docs/docusaurus/**/*.module.{css,scss}",
             ],
             rules: {
+                // Dogfood the local plugin against the repository's own
+                // Docusaurus site styles.
+                ...localDocusaurusDogfoodRules,
                 // Relax accessibility rules for documentation UI elements
                 "a11y/content-property-no-static-value": null,
                 "a11y/font-size-is-readable": null,
@@ -344,6 +370,9 @@ const config = defineConfig({
      * @see {@link https://stylelint.io/user-guide/configure/#plugins | plugins Documentation}
      */
     plugins: [
+        // Local plugin dogfooding through the built public runtime.
+        ...localDocusaurusPlugin,
+
         /**
          * Accessibility-focused linting rules for inclusive CSS.
          *
