@@ -6,6 +6,7 @@ import type { StylelintPluginRuleContract } from "./create-stylelint-rule.js";
 
 import * as noInvalidThemeCustomPropertyScopeModule from "../rules/no-invalid-theme-custom-property-scope.js";
 import * as noMobileNavbarBackdropFilterModule from "../rules/no-mobile-navbar-backdrop-filter.js";
+import * as noMobileNavbarStackingContextTrapsModule from "../rules/no-mobile-navbar-stacking-context-traps.js";
 import * as noUnstableDocusaurusGeneratedClassSelectorsModule from "../rules/no-unstable-docusaurus-generated-class-selectors.js";
 import * as preferDataThemeColorModeModule from "../rules/prefer-data-theme-color-mode.js";
 import * as preferDataThemeDocsearchOverridesModule from "../rules/prefer-data-theme-docsearch-overrides.js";
@@ -26,6 +27,8 @@ export const docusaurusRules: Readonly<
         noInvalidThemeCustomPropertyScopeModule.default,
     "no-mobile-navbar-backdrop-filter":
         noMobileNavbarBackdropFilterModule.default,
+    "no-mobile-navbar-stacking-context-traps":
+        noMobileNavbarStackingContextTrapsModule.default,
     "no-unstable-docusaurus-generated-class-selectors":
         noUnstableDocusaurusGeneratedClassSelectorsModule.default,
     "prefer-data-theme-color-mode": preferDataThemeColorModeModule.default,

@@ -43,6 +43,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(ruleNames).toStrictEqual([
             "no-invalid-theme-custom-property-scope",
             "no-mobile-navbar-backdrop-filter",
+            "no-mobile-navbar-stacking-context-traps",
             "no-unstable-docusaurus-generated-class-selectors",
             "prefer-data-theme-color-mode",
             "prefer-data-theme-docsearch-overrides",
@@ -52,6 +53,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(ruleIds).toStrictEqual([
             "docusaurus/no-invalid-theme-custom-property-scope",
             "docusaurus/no-mobile-navbar-backdrop-filter",
+            "docusaurus/no-mobile-navbar-stacking-context-traps",
             "docusaurus/no-unstable-docusaurus-generated-class-selectors",
             "docusaurus/prefer-data-theme-color-mode",
             "docusaurus/prefer-data-theme-docsearch-overrides",
@@ -93,6 +95,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(configs.all.rules).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
             "docusaurus/no-mobile-navbar-backdrop-filter": true,
+            "docusaurus/no-mobile-navbar-stacking-context-traps": true,
             "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
             "docusaurus/prefer-data-theme-color-mode": true,
             "docusaurus/prefer-data-theme-docsearch-overrides": true,

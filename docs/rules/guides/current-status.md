@@ -13,6 +13,7 @@ The first public rules are now in place:
 
 - `docusaurus/no-invalid-theme-custom-property-scope`
 - `docusaurus/no-mobile-navbar-backdrop-filter`
+- `docusaurus/no-mobile-navbar-stacking-context-traps`
 - `docusaurus/no-unstable-docusaurus-generated-class-selectors`
 - `docusaurus/require-ifm-color-primary-scale`
 - `docusaurus/prefer-data-theme-color-mode`

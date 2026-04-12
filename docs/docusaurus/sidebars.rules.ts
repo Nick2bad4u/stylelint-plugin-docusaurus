@@ -106,6 +106,11 @@ const sidebars = {
                     label: "R007 prefer-stable-docusaurus-theme-class-names",
                     type: "doc",
                 },
+                {
+                    id: "no-mobile-navbar-stacking-context-traps",
+                    label: "R008 no-mobile-navbar-stacking-context-traps",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {
