@@ -132,7 +132,7 @@
         "require-config": "off",
         "require-contributors": "error",
         "require-cpu": "off",
-        "require-dependencies": "error",
+        "require-dependencies": "off",
         "require-description": "error",
         "require-devDependencies": "error",
         "require-directories": "off",

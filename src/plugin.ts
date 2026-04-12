@@ -5,6 +5,8 @@
  */
 import type { Config, Plugin as StylelintPlugin } from "stylelint";
 
+import { objectKeys, safeCastTo  } from "ts-extras";
+
 import type { StylelintPluginRule } from "./_internal/create-stylelint-rule.js";
 
 import {
@@ -67,7 +69,7 @@ export const meta: Readonly<{
 export const rules: DocusaurusRulesMap = runtimeRules;
 
 /** Stable ordered unqualified rule names. */
-export const ruleNames: readonly string[] = Object.keys(rules).toSorted(
+export const ruleNames: readonly string[] = objectKeys(rules).toSorted(
     (left, right) => left.localeCompare(right)
 );
 
@@ -89,9 +91,9 @@ const docusaurusRuleEntries: readonly DocusaurusRuleEntry[] = (() => {
 })();
 
 /** Default plugin-pack export consumed by Stylelint. */
-export const plugins = docusaurusRuleEntries.map(
+export const plugins = safeCastTo<readonly StylelintPlugin[]>(docusaurusRuleEntries.map(
     ([, rule]) => rule
-) as readonly StylelintPlugin[];
+));
 
 /** Stable ordered fully qualified rule ids. */
 export const ruleIds: readonly DocusaurusRuleId[] = docusaurusRuleEntries.map(

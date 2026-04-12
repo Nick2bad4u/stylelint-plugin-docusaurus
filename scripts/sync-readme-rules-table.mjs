@@ -105,25 +105,6 @@ export const generateReadmeRulesSectionFromRules = (rules) => {
     ].join("\n");
 };
 
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
 async function main() {
     const shouldWrite = process.argv.includes("--write");
     const readmeMarkdown = await readFile(readmePath, "utf8");

@@ -172,7 +172,13 @@ const replaceSection = (markdown, sectionText) => {
 
 /**/
 
-/**/
+/**
+ *
+ */
+
+/**
+ *
+ */
 async function main() {
     const shouldWrite = process.argv.includes("--write");
 

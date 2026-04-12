@@ -147,8 +147,6 @@ const fileProgressOverridesConfig = {
         // The preset already auto-hides on CI, but we also support explicit
         // local toggles.
         "file-progress/activate": DISABLE_PROGRESS ? 0 : 1,
-        "file-progress/compact": "off",
-        "file-progress/summary-only": "off",
     },
     settings: {
         progress: {
@@ -2078,7 +2076,7 @@ export default defineConfig([
             // Optional metadata for this repository.
             "package-json/require-contributors": "warn",
             "package-json/require-cpu": "off",
-            "package-json/require-dependencies": "warn",
+            "package-json/require-dependencies": "off",
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             // Optional and currently uncommon metadata field.
