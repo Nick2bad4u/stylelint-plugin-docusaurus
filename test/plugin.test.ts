@@ -42,11 +42,13 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
 
         expect(ruleNames).toStrictEqual([
             "no-invalid-theme-custom-property-scope",
+            "no-mobile-navbar-backdrop-filter",
             "prefer-data-theme-color-mode",
             "require-ifm-color-primary-scale",
         ]);
         expect(ruleIds).toStrictEqual([
             "docusaurus/no-invalid-theme-custom-property-scope",
+            "docusaurus/no-mobile-navbar-backdrop-filter",
             "docusaurus/prefer-data-theme-color-mode",
             "docusaurus/require-ifm-color-primary-scale",
         ]);
@@ -72,17 +74,19 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(result.warnings).toHaveLength(0);
     });
 
-    it("keeps `recommended` and `all` aligned while the public rule catalog is empty", () => {
+    it("keeps `recommended` and `all` aligned with the shipped public rule catalog", () => {
         expect.hasAssertions();
 
         expect(configs.recommended.plugins).toStrictEqual([...plugins]);
         expect(configs.all.plugins).toStrictEqual([...plugins]);
         expect(configs.recommended.rules).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
+            "docusaurus/no-mobile-navbar-backdrop-filter": true,
             "docusaurus/prefer-data-theme-color-mode": true,
         });
         expect(configs.all.rules).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
+            "docusaurus/no-mobile-navbar-backdrop-filter": true,
             "docusaurus/prefer-data-theme-color-mode": true,
             "docusaurus/require-ifm-color-primary-scale": true,
         });

@@ -19,9 +19,10 @@ The repository is intentionally being converted from a mature ESLint-plugin temp
 
 ## Current rule status
 
-The public rule catalog now includes the first three Docusaurus-specific rules:
+The public rule catalog now includes the first four Docusaurus-specific rules:
 
 - `no-invalid-theme-custom-property-scope`
+- `no-mobile-navbar-backdrop-filter`
 - `require-ifm-color-primary-scale`
 - `prefer-data-theme-color-mode`
 

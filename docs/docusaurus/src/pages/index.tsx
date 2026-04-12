@@ -49,8 +49,8 @@ const heroBadges = [
 const heroStats = [
     {
         description:
-            "The runtime scaffold is ready even though the public rule catalog is intentionally empty.",
-        headline: "\uf0ca 0 Public Rules (for now)",
+            "The plugin now ships focused guardrails for theme scopes, color mode, navbar mobile behavior, and Infima color scales.",
+        headline: "\uf0ca 4 Public Rules",
     },
     {
         description:
@@ -98,7 +98,7 @@ const homeCards = [
     },
     {
         description:
-            "Compare the exported configs and understand why `recommended` and `all` are currently equivalent.",
+            "Compare the exported configs and understand why `recommended` stays conservative while `all` adds stricter opt-in rules.",
         icon: "\ue690",
         title: "Configs",
         to: "/docs/rules/configs",

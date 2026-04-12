@@ -14,4 +14,6 @@ description: Shareable Stylelint configs exported by stylelint-plugin-docusaurus
 
 The template keeps both config entrypoints from day one so new rules can be categorized cleanly without needing another runtime or docs reshuffle later.
 
-Right now the public rule catalog is empty, so the configs are equivalent. That is expected while the template conversion is still in its bootstrap phase.
+The configs are no longer equivalent.
+
+`recommended` stays focused on broadly applicable, low-noise Docusaurus guardrails, while `all` additionally enables stricter opt-in rules such as `docusaurus/require-ifm-color-primary-scale`.

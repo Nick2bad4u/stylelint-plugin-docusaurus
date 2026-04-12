@@ -5,6 +5,7 @@
 import type { StylelintPluginRuleContract } from "./create-stylelint-rule.js";
 
 import * as noInvalidThemeCustomPropertyScopeModule from "../rules/no-invalid-theme-custom-property-scope.js";
+import * as noMobileNavbarBackdropFilterModule from "../rules/no-mobile-navbar-backdrop-filter.js";
 import * as preferDataThemeColorModeModule from "../rules/prefer-data-theme-color-mode.js";
 import * as requireIfmColorPrimaryScaleModule from "../rules/require-ifm-color-primary-scale.js";
 
@@ -20,6 +21,8 @@ export const docusaurusRules: Readonly<
 > = {
     "no-invalid-theme-custom-property-scope":
         noInvalidThemeCustomPropertyScopeModule.default,
+    "no-mobile-navbar-backdrop-filter":
+        noMobileNavbarBackdropFilterModule.default,
     "prefer-data-theme-color-mode": preferDataThemeColorModeModule.default,
     "require-ifm-color-primary-scale":
         requireIfmColorPrimaryScaleModule.default,

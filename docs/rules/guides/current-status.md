@@ -12,6 +12,7 @@ The public `docusaurus/*` rule catalog is no longer empty.
 The first public rules are now in place:
 
 - `docusaurus/no-invalid-theme-custom-property-scope`
+- `docusaurus/no-mobile-navbar-backdrop-filter`
 - `docusaurus/require-ifm-color-primary-scale`
 - `docusaurus/prefer-data-theme-color-mode`
 
@@ -23,7 +24,7 @@ The previous repository content contained a large amount of utility-library-spec
 
 ## What is already ready
 
-Even without public rules yet, the repository already includes the important long-term pieces:
+Even with a still-small public rule catalog, the repository already includes the important long-term pieces:
 
 - typed Stylelint plugin runtime scaffolding
 - package exports and CJS/ESM build output

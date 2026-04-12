@@ -86,6 +86,11 @@ const sidebars = {
                     label: "R003 prefer-data-theme-color-mode",
                     type: "doc",
                 },
+                {
+                    id: "no-mobile-navbar-backdrop-filter",
+                    label: "R004 no-mobile-navbar-backdrop-filter",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {

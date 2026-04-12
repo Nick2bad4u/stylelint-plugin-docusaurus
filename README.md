@@ -67,15 +67,16 @@ This package intentionally exports two configs from the start:
 | `configs.recommended` | Default low-noise config for broadly applicable Docusaurus rules. |
 | `configs.all`         | Exhaustive stable config for every public `docusaurus/*` rule.    |
 
-`configs.recommended` currently enables the two lower-noise baseline rules, while `configs.all` includes those rules plus the stricter primary-color-scale rule.
+`configs.recommended` currently enables three lower-noise baseline rules, while `configs.all` includes those rules plus the stricter primary-color-scale rule.
 
 ## Rules
 
-| Rule                                                                                                                                                   | Fix | Configs          | Description                                                                                  |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | ---------------- | -------------------------------------------------------------------------------------------- |
-| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) |  —  | recommended, all | Disallow declaring Docusaurus theme custom properties outside global theme scopes.           |
-| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                     |  🔧 | recommended, all | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes.           |
-| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale)               |  —  | all              | Require the full recommended Infima primary color scale when overriding --ifm-color-primary. |
+| Rule                                                                                                                                                   | Fix | Configs          | Description                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) |  —  | recommended, all | Disallow declaring Docusaurus theme custom properties outside global theme scopes.                          |
+| [`no-mobile-navbar-backdrop-filter`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-backdrop-filter)             |  —  | recommended, all | Disallow backdrop-filter on Docusaurus navbar selectors unless it is guarded behind the desktop breakpoint. |
+| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                     |  🔧 | recommended, all | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes.                          |
+| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale)               |  —  | all              | Require the full recommended Infima primary color scale when overriding --ifm-color-primary.                |
 
 ## Documentation
 
