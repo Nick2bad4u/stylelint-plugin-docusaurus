@@ -49,8 +49,8 @@ const heroBadges = [
 const heroStats = [
     {
         description:
-            "The plugin now ships focused guardrails for theme scopes, color mode, navbar mobile behavior, and Infima color scales.",
-        headline: "\uf0ca 4 Public Rules",
+            "The plugin now ships focused guardrails for theme scopes, color mode, stable theme class usage, unstable generated selectors, DocSearch overrides, navbar mobile behavior, and Infima color scales.",
+        headline: "\uf0ca 7 Public Rules",
     },
     {
         description:

@@ -13,8 +13,11 @@ The first public rules are now in place:
 
 - `docusaurus/no-invalid-theme-custom-property-scope`
 - `docusaurus/no-mobile-navbar-backdrop-filter`
+- `docusaurus/no-unstable-docusaurus-generated-class-selectors`
 - `docusaurus/require-ifm-color-primary-scale`
 - `docusaurus/prefer-data-theme-color-mode`
+- `docusaurus/prefer-data-theme-docsearch-overrides`
+- `docusaurus/prefer-stable-docusaurus-theme-class-names`
 
 ## Why the catalog still starts small
 

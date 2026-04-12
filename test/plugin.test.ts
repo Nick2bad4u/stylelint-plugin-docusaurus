@@ -43,13 +43,19 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(ruleNames).toStrictEqual([
             "no-invalid-theme-custom-property-scope",
             "no-mobile-navbar-backdrop-filter",
+            "no-unstable-docusaurus-generated-class-selectors",
             "prefer-data-theme-color-mode",
+            "prefer-data-theme-docsearch-overrides",
+            "prefer-stable-docusaurus-theme-class-names",
             "require-ifm-color-primary-scale",
         ]);
         expect(ruleIds).toStrictEqual([
             "docusaurus/no-invalid-theme-custom-property-scope",
             "docusaurus/no-mobile-navbar-backdrop-filter",
+            "docusaurus/no-unstable-docusaurus-generated-class-selectors",
             "docusaurus/prefer-data-theme-color-mode",
+            "docusaurus/prefer-data-theme-docsearch-overrides",
+            "docusaurus/prefer-stable-docusaurus-theme-class-names",
             "docusaurus/require-ifm-color-primary-scale",
         ]);
     });
@@ -87,7 +93,10 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(configs.all.rules).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
             "docusaurus/no-mobile-navbar-backdrop-filter": true,
+            "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
             "docusaurus/prefer-data-theme-color-mode": true,
+            "docusaurus/prefer-data-theme-docsearch-overrides": true,
+            "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
             "docusaurus/require-ifm-color-primary-scale": true,
         });
     });

@@ -91,6 +91,21 @@ const sidebars = {
                     label: "R004 no-mobile-navbar-backdrop-filter",
                     type: "doc",
                 },
+                {
+                    id: "prefer-data-theme-docsearch-overrides",
+                    label: "R005 prefer-data-theme-docsearch-overrides",
+                    type: "doc",
+                },
+                {
+                    id: "no-unstable-docusaurus-generated-class-selectors",
+                    label: "R006 no-unstable-docusaurus-generated-class-selectors",
+                    type: "doc",
+                },
+                {
+                    id: "prefer-stable-docusaurus-theme-class-names",
+                    label: "R007 prefer-stable-docusaurus-theme-class-names",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {
