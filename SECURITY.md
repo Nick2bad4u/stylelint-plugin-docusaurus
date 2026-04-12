@@ -5,17 +5,17 @@
 If you discover a vulnerability in this repository, report it privately using one
 of these channels:
 
-- GitHub Security Advisory draft: <https://github.com/Nick2bad4u/eslint-plugin-typefest/security/advisories/new>
+- GitHub Security Advisory draft: <https://github.com/Nick2bad4u/stylelint-plugin-docusaurus/security/advisories/new>
 - Maintainer email: <20943337+Nick2bad4u@users.noreply.github.com>
 
 Please do **not** open public issues for unpatched vulnerabilities.
 
 Include as much detail as possible:
 
-- Affected version(s)
-- Reproduction steps or proof of concept
-- Security impact
-- Any known mitigations
+- affected version(s)
+- reproduction steps or proof of concept
+- security impact
+- any known mitigations
 
 ## Supported Versions
 
@@ -35,11 +35,10 @@ fixes.
 
 ## Security Best Practices for Users
 
-- Keep `eslint-plugin-typefest`, ESLint, TypeScript, and dependencies updated.
+- Keep `stylelint-plugin-docusaurus`, Stylelint, and dependencies updated.
 - Run linting in CI on trusted code only.
-- Review new rule autofixes before applying at scale.
+- Review new autofixes before applying them at scale.
 
 ## Credits
 
-Responsible disclosure is appreciated. We can credit reporters in release notes
-if requested.
+Responsible disclosure is appreciated. Reporters can be credited in release notes if requested.

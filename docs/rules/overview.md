@@ -1,50 +1,35 @@
 ---
 title: Overview
-description: README-style overview for eslint-plugin-typefest.
+description: Overview of stylelint-plugin-docusaurus and its current package surface.
 ---
 
-# eslint-plugin-typefest
+# stylelint-plugin-docusaurus
 
-ESLint plugin for teams that want consistent TypeScript-first conventions based on:
+`stylelint-plugin-docusaurus` is a Stylelint plugin scaffold focused on Docusaurus styling conventions, theme-token hygiene, and future Docusaurus-specific CSS rules.
 
-- [`type-fest`](https://github.com/sindresorhus/type-fest)
-- [`ts-extras`](https://github.com/sindresorhus/ts-extras)
+The repository is intentionally being converted from a mature ESLint-plugin template into a Stylelint-first template. That means the infrastructure is already high quality, but the public Stylelint rule catalog is intentionally minimal while the new rule families are designed.
 
-The plugin ships focused rule sets for modern Flat Config usage, with parser setup included in each preset.
+## What the package currently exports
 
-## Installation
+- A default Stylelint plugin pack export.
+- Two shareable configs:
+  - `configs.recommended`
+  - `configs.all`
+- Static runtime metadata and typed helper infrastructure for future rule authoring.
 
-```bash
-npm install --save-dev eslint-plugin-typefest typescript
-```
+## Current rule status
 
-> `@typescript-eslint/parser` is loaded automatically by plugin presets.
+The public rule catalog is currently empty on purpose.
 
-## Quick start (Flat Config)
+That is not an omission or a placeholder trick. The goal is to ship a clean, coherent Stylelint template rather than invent speculative rules copied from the previous ESLint template.
 
-```ts
-import typefest from "eslint-plugin-typefest";
+## What comes next
 
-export default [typefest.configs.recommended];
-```
+Future public rules are expected to focus on Docusaurus-specific authoring concerns such as:
 
-That is enough for TypeScript files (`**/*.{ts,tsx,mts,cts}`).
+- safe use of Infima and Docusaurus custom properties
+- color-mode-aware selectors and theme boundaries
+- component-scoped token aliasing
+- stylesheet patterns that interact cleanly with swizzled components and generated theme CSS
 
-## Presets
-
-| Preset                                            | Preset page                                                         |
-| ------------------------------------------------- | ------------------------------------------------------------------- |
-| 🟢 `typefest.configs.minimal`                     | [Minimal](./presets/minimal.md)                                     |
-| 🟡 `typefest.configs.recommended`                 | [Recommended](./presets/recommended.md)                             |
-| 🟠 `typefest.configs["recommended-type-checked"]` | [Recommended (type-checked)](./presets/recommended-type-checked.md) |
-| 🔴 `typefest.configs.strict`                      | [Strict](./presets/strict.md)                                       |
-| 🟣 `typefest.configs.all`                         | [All](./presets/all.md)                                             |
-| 🧪 `typefest.configs.experimental`                | [Experimental](./presets/experimental.md)                           |
-| 💠 `typefest.configs["type-fest/types"]`          | [type-fest/types](./presets/type-fest-types.md)                     |
-| ✴️ `typefest.configs["ts-extras/type-guards"]`    | [ts-extras/type-guards](./presets/ts-extras-type-guards.md)         |
-
-## Next steps
-
-- Open **Getting Started** in this sidebar.
-- Browse [**Presets**](./presets/index.md) for preset-by-preset guidance.
-- Use **Rules** to review every rule with examples.
+Until those rules are added, the package surface stays intentionally small and accurate.

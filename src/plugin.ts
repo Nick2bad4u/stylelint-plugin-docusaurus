@@ -1,406 +1,140 @@
 /**
  * @packageDocumentation
- * Public plugin entrypoint for eslint-plugin-typefest exports and preset wiring.
+ * Public plugin entrypoint for `stylelint-plugin-docusaurus` exports and
+ * shareable config wiring.
  */
-import type { ESLint, Linter } from "eslint";
-import type { Except } from "type-fest";
+import type { Config, Plugin as StylelintPlugin } from "stylelint";
 
-import typeScriptParser from "@typescript-eslint/parser";
+import type { StylelintPluginRule } from "./_internal/create-stylelint-rule.js";
+
 import {
-    isDefined,
-    isEmpty,
-    objectEntries,
-    objectHasIn,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+    CONFIG_NAMES as configNamesValue,
+    type DocusaurusConfigName as InternalDocusaurusConfigName,
+    PACKAGE_NAME as packageNameValue,
+    PACKAGE_VERSION as packageVersionValue,
+    PLUGIN_NAMESPACE as pluginNamespaceValue,
+} from "./_internal/plugin-constants.js";
+import { docusaurusRules as docusaurusRulesValue } from "./_internal/rules-registry.js";
 
-import packageJson from "../package.json" with { type: "json" };
-import {
-    deriveRuleDocsMetadataByName,
-    deriveRulePresetMembershipByRuleName,
-    deriveTypeCheckedRuleNameSet,
-} from "./_internal/rule-docs-metadata.js";
-import { typefestRules } from "./_internal/rules-registry.js";
-import {
-    type TypefestConfigName as InternalTypefestConfigName,
-    typefestConfigMetadataByName,
-    typefestConfigNames,
-} from "./_internal/typefest-config-references.js";
+/** Public shareable config map exported by this package. */
+export type DocusaurusConfigMap = Record<
+    DocusaurusConfigName,
+    DocusaurusShareableConfig
+>;
+/** Shareable config names exposed by this package. */
+export type DocusaurusConfigName = InternalDocusaurusConfigName;
+/** Public fully-qualified rule ids supported by this package. */
+export type DocusaurusRuleId = `${typeof pluginNamespaceValue}/${string}`;
 
-/** ESLint severity used by generated preset rule maps. */
-const ERROR_SEVERITY = "error" as const;
+/** Public unqualified rule names supported by this package. */
+export type DocusaurusRuleName = Extract<
+    keyof typeof docusaurusRulesValue,
+    string
+>;
 
-/** Default file globs targeted by plugin presets when `files` is omitted. */
-const TYPE_SCRIPT_FILES = ["**/*.{ts,tsx,mts,cts}"] as const;
-
-/**
- * Canonical flat-config preset keys exposed through `plugin.configs`.
- *
- * @remarks
- * These names are used by consumers when composing presets in ESLint flat
- * config arrays.
- */
-export type TypefestConfigName = InternalTypefestConfigName;
-
-/**
- * Flat-config preset shape produced by this plugin.
- *
- * @remarks
- * The `rules` map is required so preset composition can always merge concrete
- * rule severity entries without additional null checks.
- */
-export type TypefestPresetConfig = Linter.Config & {
-    rules: NonNullable<Linter.Config["rules"]>;
+/** Shareable config shape exported by this package. */
+export type DocusaurusShareableConfig = Config & {
+    plugins: (string | StylelintPlugin)[];
+    rules: NonNullable<Config["rules"]>;
 };
 
-/** Internal alias for flat config objects handled by preset builders. */
-type FlatConfig = Linter.Config;
+/** Internal ordered registry entry tuple. */
+type DocusaurusRuleEntry = readonly [string, StylelintPluginRule];
+/** Internal runtime rule registry shape. */
+type DocusaurusRulesMap = Readonly<Record<string, StylelintPluginRule>>;
 
-/** Normalized language-options shape for preset composition helpers. */
-type FlatLanguageOptions = NonNullable<FlatConfig["languageOptions"]>;
+/** Local package metadata values used to avoid import re-export warnings. */
+const packageMetaName = packageNameValue;
+const packageMetaNamespace = pluginNamespaceValue;
+const packageMetaVersion = packageVersionValue;
+/** Local rule registry alias used to avoid import re-export warnings. */
+const runtimeRules = docusaurusRulesValue;
+/** Local config-name alias used to avoid import re-export warnings. */
+const publicConfigNames = configNamesValue;
 
-/** Normalized parser-options shape for preset composition helpers. */
-type FlatParserOptions = NonNullable<FlatLanguageOptions["parserOptions"]>;
-
-/** Rule-map type used by preset rule-list expansion helpers. */
-type RulesConfig = TypefestPresetConfig["rules"];
-
-/** Contract for the `configs` object exported by this plugin. */
-type TypefestConfigsContract = Record<TypefestConfigName, TypefestPresetConfig>;
-
-/** Fully assembled plugin contract used by the runtime default export. */
-type TypefestPluginContract = Except<ESLint.Plugin, "configs" | "rules"> & {
-    configs: TypefestConfigsContract;
-    meta: {
-        name: string;
-        namespace: string;
-        version: string;
-    };
-    processors: NonNullable<ESLint.Plugin["processors"]>;
-    rules: NonNullable<ESLint.Plugin["rules"]>;
+/** Public package metadata exported alongside the plugin pack. */
+export const meta: Readonly<{
+    name: string;
+    namespace: string;
+    version: string;
+}> = {
+    name: packageMetaName,
+    namespace: packageMetaNamespace,
+    version: packageMetaVersion,
 };
 
-/**
- * Resolve package version from package.json data.
- *
- * @param pkg - Parsed package metadata value.
- *
- * @returns The package version, or `0.0.0` when unavailable.
- */
-function getPackageVersion(pkg: unknown): string {
-    if (typeof pkg !== "object" || pkg === null) {
-        return "0.0.0";
-    }
+/** Public rule registry keyed by unqualified rule name. */
+export const rules: DocusaurusRulesMap = runtimeRules;
 
-    const version = Reflect.get(pkg, "version");
+/** Stable ordered unqualified rule names. */
+export const ruleNames: readonly string[] = Object.keys(rules).toSorted(
+    (left, right) => left.localeCompare(right)
+);
 
-    return typeof version === "string" ? version : "0.0.0";
-}
+/** Stable ordered registry entries used to derive configs and ids. */
+const docusaurusRuleEntries: readonly DocusaurusRuleEntry[] = (() => {
+    const entries: DocusaurusRuleEntry[] = [];
 
-/** Package metadata used to populate plugin runtime `meta.version`. */
-const packageJsonValue = safeCastTo<unknown>(packageJson);
+    for (const ruleName of ruleNames) {
+        const rule = rules[ruleName];
 
-/** Parser module reused across preset construction. */
-const typeScriptParserValue: FlatLanguageOptions["parser"] = typeScriptParser;
-
-/** Default parser options applied when a preset omits parser options. */
-const defaultParserOptions = {
-    ecmaVersion: "latest",
-    sourceType: "module",
-} satisfies FlatParserOptions;
-
-/**
- * Normalize unknown parser options into a mutable parser-options object.
- */
-const normalizeParserOptions = (
-    parserOptions: FlatLanguageOptions["parserOptions"]
-): FlatParserOptions =>
-    parserOptions !== null &&
-    typeof parserOptions === "object" &&
-    !Array.isArray(parserOptions)
-        ? { ...parserOptions }
-        : { ...defaultParserOptions };
-
-/**
- * Fully-qualified ESLint rule id used by this plugin.
- *
- * @remarks
- * Consumers typically use this when building strongly typed rule maps or helper
- * utilities that require namespaced rule identifiers.
- */
-export type TypefestRuleId = `typefest/${TypefestRuleName}`;
-
-/** Unqualified rule name supported by `eslint-plugin-typefest`. */
-export type TypefestRuleName = keyof typeof typefestRules;
-
-/**
- * ESLint-compatible rule map view of the strongly typed internal rule record.
- */
-const typefestEslintRules: NonNullable<ESLint.Plugin["rules"]> &
-    typeof typefestRules = typefestRules as NonNullable<
-    ESLint.Plugin["rules"]
-> &
-    typeof typefestRules;
-
-const isTypefestRuleName = (value: string): value is TypefestRuleName =>
-    objectHasIn(typefestRules, value);
-
-const typefestRuleEntries: readonly (readonly [
-    TypefestRuleName,
-    (typeof typefestRules)[TypefestRuleName],
-])[] = (() => {
-    const entries: (readonly [
-        TypefestRuleName,
-        (typeof typefestRules)[TypefestRuleName],
-    ])[] = [];
-
-    for (const [ruleName] of objectEntries(typefestRules)) {
-        if (!isTypefestRuleName(ruleName)) {
+        if (rule === undefined) {
             continue;
         }
 
-        const ruleDefinition = typefestRules[ruleName];
-
-        if (ruleDefinition === undefined) {
-            continue;
-        }
-
-        entries.push([ruleName, ruleDefinition]);
+        entries.push([ruleName, rule]);
     }
 
     return entries;
 })();
 
-const ruleDocsMetadataByRuleName = deriveRuleDocsMetadataByName(typefestRules);
-const rulePresetMembership = deriveRulePresetMembershipByRuleName(
-    ruleDocsMetadataByRuleName
+/** Default plugin-pack export consumed by Stylelint. */
+export const plugins = docusaurusRuleEntries.map(
+    ([, rule]) => rule
+) as readonly StylelintPlugin[];
+
+/** Stable ordered fully qualified rule ids. */
+export const ruleIds: readonly DocusaurusRuleId[] = docusaurusRuleEntries.map(
+    ([, rule]) => rule.ruleName as DocusaurusRuleId
 );
-const typeCheckedRuleNames = deriveTypeCheckedRuleNameSet(
-    ruleDocsMetadataByRuleName
-);
 
-const createEmptyPresetRuleMap = (): Record<
-    TypefestConfigName,
-    TypefestRuleName[]
-> => {
-    const presetRuleMap = {} as Record<TypefestConfigName, TypefestRuleName[]>;
+/** Rule ids included in the recommended shareable config. */
+const recommendedRuleIds: readonly DocusaurusRuleId[] = docusaurusRuleEntries
+    .filter(([, rule]) => rule.docs.recommended)
+    .map(([, rule]) => rule.ruleName as DocusaurusRuleId);
 
-    for (const configName of typefestConfigNames) {
-        presetRuleMap[configName] = [];
-    }
-
-    return presetRuleMap;
-};
-
-const dedupeRuleNames = (
-    ruleNames: readonly TypefestRuleName[]
-): TypefestRuleName[] => [...new Set(ruleNames)];
-
-const derivePresetRuleNamesByConfig = (): Readonly<
-    Record<TypefestConfigName, readonly TypefestRuleName[]>
-> => {
-    const presetRuleNamesByConfig = createEmptyPresetRuleMap();
-
-    for (const [ruleName] of typefestRuleEntries) {
-        const configNames = rulePresetMembership[ruleName];
-
-        if (!isDefined(configNames) || isEmpty(configNames)) {
-            throw new TypeError(
-                `Rule '${ruleName}' is missing preset membership metadata.`
-            );
-        }
-
-        for (const configName of configNames) {
-            presetRuleNamesByConfig[configName].push(ruleName);
-        }
-    }
-
+/**
+ * Build one shareable Stylelint config.
+ *
+ * @param enabledRuleIds - Rule ids to enable in the config.
+ *
+ * @returns Shareable Stylelint config.
+ */
+function createConfig(
+    enabledRuleIds: readonly DocusaurusRuleId[]
+): DocusaurusShareableConfig {
     return {
-        all: dedupeRuleNames(presetRuleNamesByConfig.all),
-        experimental: dedupeRuleNames(presetRuleNamesByConfig.experimental),
-        minimal: dedupeRuleNames(presetRuleNamesByConfig.minimal),
-        recommended: dedupeRuleNames(presetRuleNamesByConfig.recommended),
-        "recommended-type-checked": dedupeRuleNames(
-            presetRuleNamesByConfig["recommended-type-checked"]
-        ),
-        strict: dedupeRuleNames(presetRuleNamesByConfig.strict),
-        "ts-extras/type-guards": dedupeRuleNames(
-            presetRuleNamesByConfig["ts-extras/type-guards"]
-        ),
-        "type-fest/types": dedupeRuleNames(
-            presetRuleNamesByConfig["type-fest/types"]
-        ),
-    };
-};
+        plugins: [...plugins],
+        rules: (() => {
+            const rulesConfig: NonNullable<Config["rules"]> = {};
 
-/**
- * Build an ESLint rules map that enables each provided rule at error level.
- *
- * @param ruleNames - Rule names to enable.
- *
- * @returns Rules config object compatible with flat config.
- */
-function errorRulesFor(ruleNames: readonly TypefestRuleName[]): RulesConfig {
-    const rules: RulesConfig = {};
-
-    for (const ruleName of ruleNames) {
-        rules[`typefest/${ruleName}`] = ERROR_SEVERITY;
-    }
-
-    return rules;
-}
-
-/**
- * Remove duplicates while preserving first-seen ordering.
- *
- * @param ruleNames - Candidate rule list.
- *
- * @returns Deduplicated rule list.
- */
-const presetRuleNamesByConfig = derivePresetRuleNamesByConfig();
-
-/** Recommended preset rule list for zero-type-info usage. */
-const recommendedRuleNames: TypefestRuleName[] = [];
-
-for (const ruleName of presetRuleNamesByConfig.recommended) {
-    if (setHas(typeCheckedRuleNames, ruleName)) {
-        continue;
-    }
-
-    recommendedRuleNames.push(ruleName);
-}
-
-/** Type-aware recommended preset rule list. */
-const recommendedTypeCheckedRuleNames = dedupeRuleNames([
-    ...recommendedRuleNames,
-    ...presetRuleNamesByConfig["recommended-type-checked"],
-]);
-
-/** Effective per-preset rule lists after applying derived policy overlays. */
-const effectivePresetRuleNamesByConfig: Readonly<
-    Record<TypefestConfigName, readonly TypefestRuleName[]>
-> = {
-    ...presetRuleNamesByConfig,
-    experimental: dedupeRuleNames([
-        ...presetRuleNamesByConfig.all,
-        ...presetRuleNamesByConfig.experimental,
-    ]),
-    recommended: recommendedRuleNames,
-    "recommended-type-checked": recommendedTypeCheckedRuleNames,
-};
-
-/**
- * Apply parser and plugin metadata required by all plugin presets.
- *
- * @param config - Preset-specific config fragment.
- * @param plugin - Plugin object registered under the `typefest` namespace.
- * @param options - Preset-level wiring options.
- *
- * @returns Normalized preset config.
- */
-function withTypefestPlugin(
-    config: Readonly<TypefestPresetConfig>,
-    plugin: Readonly<ESLint.Plugin>,
-    options: Readonly<{ requiresTypeChecking: boolean }>
-): TypefestPresetConfig {
-    const existingLanguageOptions = config.languageOptions ?? {};
-    const existingParserOptions = existingLanguageOptions["parserOptions"];
-    const parserOptions = normalizeParserOptions(existingParserOptions);
-
-    if (
-        options.requiresTypeChecking &&
-        !objectHasIn(parserOptions, "projectService")
-    ) {
-        Reflect.set(parserOptions, "projectService", true);
-    }
-
-    const languageOptions: FlatLanguageOptions = {
-        ...existingLanguageOptions,
-        parser: existingLanguageOptions["parser"] ?? typeScriptParserValue,
-        parserOptions,
-    };
-
-    return {
-        ...config,
-        files: config.files ?? [...TYPE_SCRIPT_FILES],
-        languageOptions,
-        plugins: {
-            ...config.plugins,
-            typefest: plugin,
-        },
-    };
-}
-
-/** Minimal plugin object used when assembling flat-config presets. */
-const pluginForConfigs: ESLint.Plugin = {
-    rules: typefestEslintRules,
-};
-
-/**
- * Flat config presets distributed by eslint-plugin-typefest.
- */
-const createTypefestConfigsDefinition = (): TypefestConfigsContract => {
-    const configs = {} as TypefestConfigsContract;
-
-    for (const configName of typefestConfigNames) {
-        const configMetadata = typefestConfigMetadataByName[configName];
-
-        configs[configName] = withTypefestPlugin(
-            {
-                name: configMetadata.presetName,
-                rules: errorRulesFor(
-                    effectivePresetRuleNamesByConfig[configName]
-                ),
-            },
-            pluginForConfigs,
-            {
-                requiresTypeChecking: configMetadata.requiresTypeChecking,
+            for (const ruleId of enabledRuleIds) {
+                rulesConfig[ruleId] = true;
             }
-        );
-    }
 
-    return configs;
+            return rulesConfig;
+        })(),
+    };
+}
+
+/** Shareable config exports exposed by the package. */
+export const configs: DocusaurusConfigMap = {
+    all: createConfig(ruleIds),
+    recommended: createConfig(recommendedRuleIds),
 };
 
-const typefestConfigsDefinition = createTypefestConfigsDefinition();
+/** Stable ordered shareable config names. */
+export const configNames: readonly DocusaurusConfigName[] = publicConfigNames;
 
-/** Finalized typed view of all exported preset configurations. */
-const typefestConfigs: TypefestConfigsContract = typefestConfigsDefinition;
-
-/**
- * Runtime type for the plugin's generated config presets.
- *
- * @remarks
- * Mirrors `plugin.configs` and is useful when composing typed preset-aware
- * tooling in external integrations.
- */
-export type TypefestConfigs = typeof typefestConfigs;
-
-/**
- * Main plugin object exported for ESLint consumption.
- */
-const typefestPlugin: TypefestPluginContract = {
-    configs: typefestConfigs,
-    meta: {
-        name: "eslint-plugin-typefest",
-        namespace: "typefest",
-        version: getPackageVersion(packageJsonValue),
-    },
-    processors: {},
-    rules: typefestEslintRules,
-};
-
-/**
- * Runtime type for the plugin object exported as default.
- *
- * @remarks
- * Includes resolved `meta`, `rules`, and `configs` contracts after plugin
- * assembly.
- */
-export type TypefestPlugin = typeof typefestPlugin;
-
-/**
- * Default plugin export consumed by ESLint flat config.
- */
-export default typefestPlugin;
+/** Default export consumed by Stylelint when the package is used as a plugin. */
+export default plugins;

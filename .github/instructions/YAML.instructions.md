@@ -6,7 +6,7 @@ applyTo: "**/*.{yml,yaml}"
 
 # YAML
 
-Practical guidelines for authoring YAML that works well with this repository’s tooling, especially ESLint-based YAML linting, GitHub Actions workflows, actionlint, and CI/security scanners. The goals are:
+Practical guidelines for authoring YAML that works well with this repository’s tooling, especially repository-managed YAML linting, GitHub Actions workflows, actionlint, and CI/security scanners. The goals are:
 
 1. **Be predictable.** YAML is flexible; these rules make parsing and tooling behavior consistent.
 2. **Be readable.** Prefer structure and clarity over clever tricks.

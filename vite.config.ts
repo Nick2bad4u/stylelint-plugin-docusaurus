@@ -22,7 +22,9 @@ const maxWorkerCount =
         : 1;
 /** Raw flag controlling optional hanging-process reporter activation. */
 const rawHangingReporterFlag =
-    process.env["TYPEFEST_VITEST_HANGING_PROCESS_REPORTER"] ??
+    process.env[
+        "STYLELINT_PLUGIN_DOCUSAURUS_VITEST_HANGING_PROCESS_REPORTER"
+    ] ??
     process.env["VITEST_HANGING_PROCESS_REPORTER"] ??
     "false";
 /** Raw flag controlling optional Vitest typecheck execution. */
@@ -62,7 +64,7 @@ const typecheckTestFilePatterns = [
 ];
 
 /**
- * Vitest configuration for eslint-plugin-typefest.
+ * Vitest configuration for stylelint-plugin-docusaurus.
  */
 const vitestConfig: ReturnType<typeof defineConfig> = defineConfig({
     cacheDir: "./.cache/vitest",

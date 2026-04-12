@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible bug in eslint-plugin-typefest
+about: Report a reproducible bug in stylelint-plugin-docusaurus
 title: "Bug: "
 labels:
     - bug
@@ -14,26 +14,26 @@ assignees: []
 
 ## Rule / Area
 
-<!-- Example: prefer-ts-extras-array-find, docs/docusaurus, presets, runtime API docs -->
+<!-- Example: docs/docusaurus, configs, homepage, runtime API docs -->
 
 ## Reproduction
 
-### Flat config snippet
+### Stylelint config snippet
 
 ```mjs
-// Minimal eslint.config.mjs (or relevant excerpt)
+// Minimal stylelint.config.mjs (or relevant excerpt)
 ```
 
 ### Minimal code sample
 
-```ts
-// Minimal reproducible input
+```css
+/* Minimal reproducible input */
 ```
 
 ### Command and output
 
 ```bash
-# Example: npm run test -- test/prefer-ts-extras-array-find.test.ts
+# Example: npm run test -- test/plugin.test.ts
 ```
 
 ## Steps to reproduce
@@ -50,10 +50,8 @@ assignees: []
 
 - Node.js version:
 - npm version:
-- ESLint version:
-- TypeScript version:
-- `@typescript-eslint/*` version:
-- `eslint-plugin-typefest` version/commit:
+- Stylelint version:
+- `stylelint-plugin-docusaurus` version/commit:
 - OS:
 
 ## Additional context

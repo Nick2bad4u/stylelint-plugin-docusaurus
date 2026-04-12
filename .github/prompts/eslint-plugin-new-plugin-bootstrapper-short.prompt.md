@@ -1,26 +1,9 @@
 ---
-name: eslint-plugin-new-plugin-bootstrapper-short
-description: "🤖🤖 Use this to quickly scaffold a new ESLint plugin repository from my modern template"
-argument-hint: "Provide the name of the new plugin (for example, `eslint-plugin-foo`) and a brief description of its purpose. The generated repository will be a high-quality ESLint plugin with comprehensive documentation, tests, and best practices for linting <NEW_PLUGIN> usage."
+name: stylelint-plugin-new-plugin-bootstrapper-short
+description: "🤖🤖 Use this to quickly scaffold a new Stylelint plugin repository from this modern template."
+argument-hint: "Provide the new package name (for example, `stylelint-plugin-foo`) and a brief description of its purpose."
 ---
 
-/eslint-plugin-new-plugin-bootstrapper The new eslint plugin were making is called "eslint-plugin-<NEW_PLUGIN>". You are in a clone of my other high quality eslint plugin we use as a "template" follow the prompt instructions carefully.
+/stylelint-plugin-new-plugin-bootstrapper The new Stylelint plugin we are making is called "stylelint-plugin-<NEW_PLUGIN>". You are in a clone of a high-quality Stylelint plugin template. Follow the full bootstrapper prompt carefully.
 
-Its an eslint plugin to lint ALL things to do with <NEW_PLUGIN>. We must have quality rules related to <NEW_PLUGIN> usage, and we must have a high quality repository with great documentation, tests, and developer experience.
-
-Critical migration constraint (non-negotiable):
-
-- Adapt existing mature files in place.
-- Do NOT cheat by deleting and recreating entire configs/docs/scripts with tiny replacements.
-- Do NOT replace rich files with placeholders/stubs just to pass checks.
-- Preserve template infrastructure quality gates and only remove obsolete plugin-specific rule artifacts surgically.
-
-Lots of documentaion can be found online I suggest you read it and go through as much as possible to get everything nailed down perfectly.
-
-https://example.com/docs
-https://example.com/api
-https://example.com/guides
-
-Theres 100s of docs and guides online to scan through online. Use #tavily-remote-mcp-system as needed.
-
-This will repeat multiple times to give you plenty of time.
+It is a Stylelint plugin to lint CSS authoring patterns related to <NEW_PLUGIN>. We want excellent documentation, tests, packaging, and developer experience.

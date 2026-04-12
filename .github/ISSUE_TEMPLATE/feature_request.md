@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest a new rule or improvement for eslint-plugin-typefest
+about: Suggest a new rule or improvement for stylelint-plugin-docusaurus
 title: "Feature: "
 labels:
     - enhancement
@@ -18,9 +18,9 @@ assignees: []
 
 ## Scope
 
-- Type: New rule / Rule enhancement / Config preset / Docs / Tooling
+- Type: New rule / Rule enhancement / Shareable config / Docs / Tooling
 - Affected rule IDs (if any):
-- Requires type checking?: Yes / No / Unsure
+- Requires custom syntax or selector/value parsing?: Yes / No / Unsure
 
 ## Alternatives considered
 
@@ -28,19 +28,19 @@ assignees: []
 
 ### Before
 
-```ts
-// Code that should be reported (if applicable)
+```css
+/* Code that should be reported (if applicable) */
 ```
 
 ### After
 
-```ts
-// Desired code after fix/suggestion
+```css
+/* Desired code after fix (if applicable) */
 ```
 
 ## Acceptance criteria
 
 - [ ] Clear, actionable diagnostic message(s)
-- [ ] Safe autofix or suggestion behavior defined
+- [ ] Safe autofix behavior defined (or report-only behavior justified)
 - [ ] Test coverage plan (valid/invalid/edge/fixer)
 - [ ] Documentation impact identified (`docs/rules/<rule-id>.md` if rule-related)

@@ -1,8 +1,6 @@
 import builtPlugin from "./dist/plugin.js";
 
-/** @type {import("eslint").ESLint.Plugin} */
-const plugin = {
-    ...builtPlugin,
-};
+/** @type {readonly import("stylelint").Plugin[]} */
+const plugin = builtPlugin;
 
 export default plugin;

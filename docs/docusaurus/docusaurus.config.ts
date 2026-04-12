@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 /** Route base path where docs site is deployed (GitHub Pages project path). */
 const baseUrl =
-    process.env["DOCUSAURUS_BASE_URL"] ?? "/eslint-plugin-typefest/";
+    process.env["DOCUSAURUS_BASE_URL"] ?? "/stylelint-plugin-docusaurus/";
 /** Opt-in flag for experimental Docusaurus performance features. */
 const enableExperimentalFaster =
     process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
@@ -16,14 +16,14 @@ const enableExperimentalFaster =
 /** GitHub organization used for edit links and project metadata. */
 const organizationName = "Nick2bad4u";
 /** Repository name used for edit links and project metadata. */
-const projectName = "eslint-plugin-typefest";
+const projectName = "stylelint-plugin-docusaurus";
 /** Public origin for the published documentation site. */
 const siteOrigin = "https://nick2bad4u.github.io";
 /** Canonical public site URL including the GitHub Pages project path. */
 const siteUrl = `${siteOrigin}${baseUrl}`;
 /** Global site description used for SEO and social cards. */
 const siteDescription =
-    "Type-safe ESLint rules for adopting type-fest and ts-extras patterns in modern TypeScript codebases.";
+    "Stylelint rules and shareable configs for Docusaurus stylesheets, theme tokens, and component styling conventions.";
 /** Social preview image used for Open Graph and Twitter cards. */
 const socialCardImagePath = "img/logo.png";
 /** Absolute social preview image URL. */
@@ -168,7 +168,8 @@ const futureConfig = {
 } satisfies Config["future"];
 
 /** Full Docusaurus site configuration exported to the build/runtime. */
-const config: Config = {
+// eslint-disable-next-line docusaurus-2/require-theme-config-image -- The social image is configured explicitly both at the top level and within themeConfig below.
+const config = {
     storage: {
         type: "localStorage",
         namespace: true,
@@ -204,7 +205,7 @@ const config: Config = {
                 "@type": "WebSite",
                 description: siteDescription,
                 image: socialCardImageUrl,
-                name: "eslint-plugin-typefest",
+                name: "stylelint-plugin-docusaurus",
                 publisher: {
                     "@type": "Person",
                     name: "Nick2bad4u",
@@ -312,18 +313,18 @@ const config: Config = {
             {
                 blog: {
                     blogDescription:
-                        "Updates, architecture notes, and practical guidance for eslint-plugin-typefest users.",
+                        "Updates, architecture notes, and practical guidance for stylelint-plugin-docusaurus users.",
                     blogSidebarCount: "ALL",
                     blogSidebarTitle: "All posts",
-                    blogTitle: "eslint-plugin-typefest Blog",
+                    blogTitle: "stylelint-plugin-docusaurus Blog",
                     editUrl: `https://github.com/${organizationName}/${projectName}/blob/main/docs/docusaurus/`,
                     feedOptions: {
                         type: ["rss", "atom"],
                         xslt: true,
-                        title: "eslint-plugin-typefest Blog",
+                        title: "stylelint-plugin-docusaurus Blog",
                         copyright: `© ${new Date().getFullYear()} Nick2bad4u`,
                         description:
-                            "Updates, architecture notes, and practical guidance for eslint-plugin-typefest users.",
+                            "Updates, architecture notes, and practical guidance for stylelint-plugin-docusaurus users.",
                         language: "en",
                     },
                     onInlineAuthors: "warn",
@@ -409,8 +410,7 @@ const config: Config = {
         ],
     ],
     projectName,
-    tagline:
-        "Type-safe ESLint rules for preferring type-fest and ts-extras patterns.",
+    tagline: "Stylelint rules and shareable configs for Docusaurus styling.",
     themeConfig: {
         colorMode: {
             defaultMode: "dark",
@@ -420,7 +420,7 @@ const config: Config = {
         metadata: [
             {
                 content:
-                    "eslint, eslint-plugin, type-fest, ts-extras, typescript, flat config, static analysis",
+                    "stylelint, stylelint-plugin, docusaurus, infima, css, postcss, docs tooling",
                 name: "keywords",
             },
             {
@@ -428,7 +428,7 @@ const config: Config = {
                 name: "twitter:card",
             },
             {
-                content: "eslint-plugin-typefest",
+                content: "stylelint-plugin-docusaurus",
                 property: "og:site_name",
             },
             {
@@ -454,12 +454,12 @@ const config: Config = {
                             to: "/docs/rules/getting-started",
                         },
                         {
-                            label: "🛠️ Presets",
-                            to: "/docs/rules/presets",
+                            label: "🎛️ Configs",
+                            to: "/docs/rules/configs",
                         },
                         {
-                            label: "📏 Rule Reference",
-                            to: "/docs/rules",
+                            label: "🧭 Current Status",
+                            to: "/docs/rules/guides/current-status",
                         },
                     ],
                     title: "📚 Explore",
@@ -471,16 +471,16 @@ const config: Config = {
                             label: "\ueb09 Releases",
                         },
                         {
-                            href: `https://nick2bad4u.github.io/eslint-plugin-typefest/eslint-inspector/`,
-                            label: "\ue7d2 ESLint Inspector",
+                            href: `https://nick2bad4u.github.io/stylelint-plugin-docusaurus/stylelint-inspector/`,
+                            label: "\ue7d2 Stylelint Inspector",
                         },
                         {
-                            href: `https://www.npmjs.com/package/ts-extras`,
-                            label: "\uf113 ts-extras",
+                            href: "https://docusaurus.io/docs/styling-layout",
+                            label: "\uf02d Docusaurus Styling",
                         },
                         {
-                            href: `https://www.npmjs.com/package/type-fest`,
-                            label: "\ue65b type-fest",
+                            href: "https://infima.dev/",
+                            label: "\ue65b Infima",
                         },
                     ],
                     title: "📁 Project",
@@ -492,8 +492,8 @@ const config: Config = {
                             label: "\uea84 GitHub Repository",
                         },
                         {
-                            href: `https://nick2bad4u.github.io/eslint-plugin-typefest/stylelint-inspector/`,
-                            label: "\ue7d2 Stylelint Inspector",
+                            href: `https://nick2bad4u.github.io/stylelint-plugin-docusaurus/eslint-inspector/`,
+                            label: "\ue7d2 ESLint Inspector",
                         },
                         {
                             href: `https://github.com/${organizationName}/${projectName}/issues`,
@@ -508,7 +508,7 @@ const config: Config = {
                 },
             ],
             logo: {
-                alt: "eslint-plugin-typefest logo",
+                alt: "stylelint-plugin-docusaurus logo",
                 href: `https://github.com/${organizationName}/${projectName}`,
                 src: "img/logo.svg",
                 width: 60,
@@ -516,7 +516,7 @@ const config: Config = {
             },
             style: "dark",
         },
-        image: socialCardImagePath,
+        image: "img/logo.png",
         navbar: {
             style: "dark",
             hideOnScroll: true,
@@ -537,70 +537,29 @@ const config: Config = {
                             to: "/docs/rules/getting-started",
                         },
                         {
-                            label: "• Adoption & Rollout",
-                            to: "/docs/rules/category/-adoption--rollout",
+                            label: "• Current Status",
+                            to: "/docs/rules/guides/current-status",
                         },
                     ],
                 },
                 {
-                    activeBaseRegex: "^/docs/rules(?:/(?!presets(?:/|$)).*)?$",
-                    label: "📜 Rules",
+                    activeBaseRegex: "^/docs/rules/configs(?:/.*)?$",
+                    label: "🎛️ Configs",
                     position: "left",
-                    to: "/docs/rules",
+                    to: "/docs/rules/configs",
                     type: "dropdown",
                     items: [
                         {
-                            label: "• Rule Reference",
-                            to: "/docs/rules",
+                            label: "• Config Overview",
+                            to: "/docs/rules/configs",
                         },
                         {
-                            label: "💠 Rules for ts-extras",
-                            to: "/docs/rules/category/ts-extras",
+                            label: "🟡 recommended",
+                            to: "/docs/rules/configs/recommended",
                         },
                         {
-                            label: "✴️ Rules for type-fest",
-                            to: "/docs/rules/category/type-fest",
-                        },
-                    ],
-                },
-                {
-                    activeBaseRegex: "^/docs/rules/presets(?:/.*)?$",
-                    label: "🛠️ Presets",
-                    position: "left",
-                    to: "/docs/rules/presets",
-                    type: "dropdown",
-                    items: [
-                        {
-                            label: "• Preset Reference",
-                            to: "/docs/rules/presets",
-                        },
-                        {
-                            label: "🟢 Minimal",
-                            to: "/docs/rules/presets/minimal",
-                        },
-                        {
-                            label: "🟡 Recommended",
-                            to: "/docs/rules/presets/recommended",
-                        },
-                        {
-                            label: "🔴 Strict",
-                            to: "/docs/rules/presets/strict",
-                        },
-                        {
-                            label: "🟣 All",
-                            to: "/docs/rules/presets/all",
-                        },
-                        {
-                            label: "🧪 Experimental",
-                            to: "/docs/rules/presets/experimental",
-                        },
-                        {
-                            label: "💠 type-fest",
-                            to: "/docs/rules/presets/type-fest-types",
-                        },
-                        {
-                            label: "✴️ ts-extras",
-                            to: "/docs/rules/presets/ts-extras-type-guards",
+                            label: "🟣 all",
+                            to: "/docs/rules/configs/all",
                         },
                     ],
                 },
@@ -619,22 +578,18 @@ const config: Config = {
                             label: "• \ue616 NPM",
                         },
                         {
-                            href: `https://github.com/sindresorhus/type-fest`,
+                            href: "https://stylelint.io/developer-guide/plugins/",
                             className: "navbar-dropdown-divider-before",
-                            label: "💠 \ue709 type-fest",
+                            label: "🧪 \ue709 Stylelint Plugin Guide",
                         },
                         {
-                            href: `https://www.npmjs.com/package/type-fest`,
-                            label: "💠 \ue616 type-fest",
+                            href: "https://docusaurus.io/docs/styling-layout",
+                            label: "🎨 \ue616 Docusaurus Styling",
                         },
                         {
-                            href: `https://github.com/sindresorhus/ts-extras`,
+                            href: "https://infima.dev/",
                             className: "navbar-dropdown-divider-before",
-                            label: "✴️ \ue709 ts-extras",
-                        },
-                        {
-                            href: `https://www.npmjs.com/package/ts-extras`,
-                            label: "✴️ \ue616 ts-extras",
+                            label: "📐 \ue709 Infima",
                         },
                     ],
                 },
@@ -688,13 +643,13 @@ const config: Config = {
                 },
             ],
             logo: {
-                alt: "eslint-plugin-typefest logo",
+                alt: "stylelint-plugin-docusaurus logo",
                 height: 48,
                 href: baseUrl,
                 src: "img/logo.svg",
                 width: 48,
             },
-            title: "eslint-plugin-typefest",
+            title: "stylelint-plugin-docusaurus",
         },
         prism: {
             additionalLanguages: [
@@ -753,9 +708,9 @@ const config: Config = {
             },
         ],
     ],
-    title: "eslint-plugin-typefest",
+    title: "stylelint-plugin-docusaurus",
     trailingSlash: false,
     url: siteOrigin,
-};
+} satisfies Config;
 
 export default config;

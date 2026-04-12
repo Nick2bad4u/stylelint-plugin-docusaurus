@@ -16,7 +16,7 @@ Repeat the following until you run out of meaningful coverage improvements:
 2. Identify missing or insufficiently tested code paths, including:
    - untested branches, error cases, or edge conditions
    - complex logic, fixers, or suggestion code not covered by existing tests
-   - integration points between rules, presets, and plugin exports
+   - integration points between rules, configs, and plugin exports
    - areas with only superficial or snapshot tests
 3. Add or improve tests to cover the missing logic, prioritizing high-value and high-risk paths.
 4. If any bugs or unexpected behaviors are discovered during testing, fix them as part of the same batch.

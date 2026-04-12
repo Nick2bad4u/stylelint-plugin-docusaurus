@@ -1,24 +1,23 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
-    "name": "@eslint-plugin-typefest/docs",
+    "name": "@stylelint-plugin-docusaurus/docs",
     "version": "0.1.0",
     "private": true,
-    "description": "Docusaurus documentation site for eslint-plugin-typefest.",
+    "description": "Docusaurus documentation site for stylelint-plugin-docusaurus.",
     "keywords": [
         "docusaurus",
         "documentation",
-        "eslint",
-        "eslint-plugin",
-        "type-fest",
-        "typescript"
+        "stylelint",
+        "stylelint-plugin",
+        "css"
     ],
-    "homepage": "https://nick2bad4u.github.io/eslint-plugin-typefest/",
+    "homepage": "https://nick2bad4u.github.io/stylelint-plugin-docusaurus/",
     "bugs": {
-        "url": "https://github.com/Nick2bad4u/eslint-plugin-typefest/issues"
+        "url": "https://github.com/Nick2bad4u/stylelint-plugin-docusaurus/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Nick2bad4u/eslint-plugin-typefest.git"
+        "url": "git+https://github.com/Nick2bad4u/stylelint-plugin-docusaurus.git"
     },
     "license": "MIT",
     "author": "Nick2bad4u",
@@ -26,7 +25,7 @@
         {
             "name": "Nick2bad4u",
             "email": "20943337+Nick2bad4u@users.noreply.github.com",
-            "url": "https://nick2bad4u.github.io/eslint-plugin-typefest"
+            "url": "https://nick2bad4u.github.io/stylelint-plugin-docusaurus"
         }
     ],
     "sideEffects": false,

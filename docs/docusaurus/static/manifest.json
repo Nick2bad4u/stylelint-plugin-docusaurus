@@ -7,7 +7,7 @@
         "education",
         "productivity"
     ],
-    "description": "Documentation site for eslint-plugin-typefest, including rule reference, presets, architecture notes, and API docs.",
+    "description": "Documentation site for stylelint-plugin-docusaurus, including config guidance, template status, and API docs.",
     "dir": "ltr",
     "display": "standalone",
     "display_override": [
@@ -43,14 +43,14 @@
     ],
     "id": "./",
     "lang": "en",
-    "name": "eslint-plugin-typefest Documentation",
+    "name": "stylelint-plugin-docusaurus Documentation",
     "orientation": "any",
     "prefer_related_applications": false,
     "scope": ".",
-    "short_name": "Typefest Docs",
+    "short_name": "Docusaurus Stylelint Docs",
     "shortcuts": [
         {
-            "description": "Browse the full eslint-plugin-typefest rule catalog.",
+            "description": "Read the overview and setup guidance for stylelint-plugin-docusaurus.",
             "icons": [
                 {
                     "sizes": "192x192",
@@ -58,12 +58,12 @@
                     "type": "image/png"
                 }
             ],
-            "name": "Rule Reference",
-            "short_name": "Rules",
-            "url": "./docs/rules"
+            "name": "Getting Started",
+            "short_name": "Start",
+            "url": "./docs/rules/getting-started"
         },
         {
-            "description": "Compare the shipped preset bundles and included rules.",
+            "description": "Review the exported shareable configs and their current scope.",
             "icons": [
                 {
                     "sizes": "192x192",
@@ -71,9 +71,9 @@
                     "type": "image/png"
                 }
             ],
-            "name": "Preset Matrix",
-            "short_name": "Presets",
-            "url": "./docs/rules/presets"
+            "name": "Configs",
+            "short_name": "Configs",
+            "url": "./docs/rules/configs"
         },
         {
             "description": "Open maintainer and architecture documentation for the docs site and plugin internals.",

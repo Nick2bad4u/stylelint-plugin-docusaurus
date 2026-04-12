@@ -1,12 +1,12 @@
 ---
-name: audit-rule-docs-tests-preset-sync
-description: "🤖🤖 Use this prompt to audit the full rule surface for drift between implementation, docs, tests, presets, and public plugin metadata."
-argument-hint: Provide any rule families, preset names, docs areas, or generated surfaces to prioritize, if applicable.
+name: audit-rule-docs-tests-config-sync
+description: "🤖🤖 Use this prompt to audit the full rule surface for drift between implementation, docs, tests, configs, and public plugin metadata."
+argument-hint: Provide any rule families, config names, docs areas, or generated surfaces to prioritize, if applicable.
 ---
 
 # Task: Looping Rule Surface Sync Audit
 
-Audit the entire plugin surface so that rule implementations, docs, tests, presets, README tables, site docs, and public metadata remain synchronized.
+Audit the entire plugin surface so that rule implementations, docs, tests, configs, README tables, site docs, and public metadata remain synchronized.
 
 Use any user-provided focus areas first; otherwise inspect the full repo.
 
@@ -20,7 +20,7 @@ Repeat the following until you run out of high-confidence sync fixes:
    - rule docs page and docs URL metadata
    - tests, fixtures, and integrity coverage
    - README rule tables and generated docs outputs
-   - preset inclusion or exclusion
+   - config inclusion or exclusion
    - Docusaurus or site-doc references
    - snapshots, contract tests, and metadata tests
 3. Fix drift, missing pieces, stale examples, or mismatched metadata.
@@ -31,7 +31,7 @@ Repeat the following until you run out of high-confidence sync fixes:
 
 - missing docs or tests for existing rules
 - stale examples, wrong `messageId`s, or incorrect options documentation
-- preset/config surfaces that do not match actual rule metadata
+- config surfaces that do not match actual rule metadata
 - generated README or site drift
 - public API or package-level inconsistencies that affect users
 

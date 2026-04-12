@@ -21,6 +21,7 @@ import * as htmlParser from "@html-eslint/parser";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
+import typefest from "eslint-plugin-typefest";
 import vite from "@typpi/eslint-plugin-vite";
 import vitest from "@vitest/eslint-plugin";
 import gitignore from "eslint-config-flat-gitignore";
@@ -85,16 +86,6 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as tomlEslintParser from "toml-eslint-parser";
 import * as yamlEslintParser from "yaml-eslint-parser";
-
-/**
- * @remarks
- * When bootstrapping a new ESLint plugin, do the following:
- *
- * 1. Import `typefest` from the npm package and add it above
- * 2. Change the `typefest` local import below to be the new plugin's name and path
- * 3. Setup the `🚢 Local Plugin Import` section below for new plugin
- */
-import typefest from "./plugin.mjs";
 
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
@@ -723,24 +714,6 @@ export default defineConfig([
             ...eslintReactPlugin.configs["strict-type-checked"]?.settings,
         },
     },
-    // #endregion
-    // #region 🚢 Local Plugin Import
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // SECTION: 🚢 Local Plugin Import
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // {
-    //     files: [
-    //         "src/**/*.{ts,tsx,mts,cts}",
-    //         //    "test/**/*.{ts,tsx,mts,cts}"
-    //     ],
-    //     name: "Local Plugin Rules from Source",
-    //     plugins: {
-    //         typefest: typefest,
-    //     },
-    //     rules: {
-    //         ...typefest.configs.all.rules,
-    //     },
-    // },
     // #endregion
     // #region ⌨️ Typefest
     // ═══════════════════════════════════════════════════════════════════════════════

@@ -96,10 +96,10 @@ applyTo: "docs/docusaurus/**"
 - They should modify doc generation behavior, not become a second general-purpose scripts folder.
 - When adding or removing a local TypeDoc plugin, update the TypeDoc config and verify the docs pipeline end-to-end.
 
-## ESLint Config Inspector integration
+## Lint config inspector integration
 
-- If the repository includes ESLint Config Inspector integration, build it using the repository's inspector script and keep its generated output under `docs/docusaurus/static/eslint-inspector` (or the configured equivalent).
-- For local inspection, prefer the repository's local inspector build script if one exists.
+- If the repository includes lint-config inspector integration (for example ESLint config inspector, Stylelint config inspector, or both), build it using the repository's inspector scripts and keep generated output under the configured `docs/docusaurus/static/*-inspector` paths.
+- For local inspection, prefer the repository's local inspector build scripts if they exist.
 - Do not modify generated inspector files by hand.
 
 ## Copying this template to another repository

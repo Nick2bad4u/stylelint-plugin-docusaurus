@@ -3,8 +3,8 @@ import Link from "@docusaurus/Link";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
-import GitHubStats from "../components/GitHubStats";
 
+import GitHubStats from "../components/GitHubStats";
 import styles from "./index.module.css";
 
 type HeroBadge = {
@@ -25,120 +25,101 @@ type HomeCard = {
     readonly to: string;
 };
 
-/**
- * Hero badges Note: These icons are from the "Nerd Font Symbols" font.
- *
- * @see https://www.nerdfonts.com/cheat-sheet for available icons in the "Nerd Font Symbols" font
- */
 const heroBadges = [
     {
-        description: "Drop-in config for ESLint v9+ and modern repos.",
+        description:
+            "Built around Stylelint's native plugin-pack model and ESM config authoring.",
         icon: "\uf013",
-        label: "Flat Config native",
+        label: "Stylelint-native",
     },
     {
-        description: "Type-aware guidance without sacrificing readability.",
-        icon: "\ue628",
-        label: "TypeScript-first",
+        description:
+            "Focused on Docusaurus theme tokens, Infima usage, and component CSS boundaries.",
+        icon: "\uf5fd",
+        label: "Docusaurus-aware",
     },
     {
-        description: "Clear diagnostics with safe autofixes and suggestions.",
+        description:
+            "Template-first infrastructure for rules, docs, sync scripts, and tests.",
         icon: "\uf0ad",
-        label: "Actionable rule docs",
+        label: "Template-ready",
     },
 ] as const satisfies readonly HeroBadge[];
 
-/**
- * Hero stats Note: These icons are from the "Nerd Font Symbols" font.
- *
- * @see https://www.nerdfonts.com/cheat-sheet for available icons in the "Nerd Font Symbols" font
- */
 const heroStats = [
     {
-        description: "Type-safe patterns from type-fest and ts-extras.",
-        headline: "\uf0ca 70+ Rules",
+        description:
+            "The runtime scaffold is ready even though the public rule catalog is intentionally empty.",
+        headline: "\uf0ca 0 Public Rules (for now)",
     },
     {
-        description: "Start small, then scale to stricter coverage.",
-        headline: "\ue690 6 Presets",
+        description:
+            "Start with a conservative default or opt into the full stable catalog later.",
+        headline: "\ue690 2 Shareable Configs",
     },
     {
-        description: "Safe rewrites where semantics are preserved.",
-        headline: "\udb80\udc68 DX-first Autofix & Suggestions",
+        description:
+            "Typed helper scaffolding, docs sync, and Vitest integration are already in place.",
+        headline: "\udb80\udc68 DX-first Template",
     },
 ] as const satisfies readonly HeroStat[];
 
-/**
- * Button icons Note: These icons are from the "Nerd Font Symbols" font.
- *
- * @see https://www.nerdfonts.com/cheat-sheet for available icons in the "Nerd Font Symbols" font
- */
 const overviewButtonIcon = "\udb81\udf1d";
-const comparePresetsButtonIcon = "\udb85\udc92";
+const compareConfigsButtonIcon = "\udb85\udc92";
 const heroKickerIcon = "\uf0ad";
 const heroKickerIcon2 = "\uf135";
 const homepageDescription =
-    "Explore eslint-plugin-typefest documentation, presets, and rule references for adopting type-fest and ts-extras patterns in modern TypeScript projects.";
+    "Explore stylelint-plugin-docusaurus documentation, configs, and template guidance for Docusaurus-focused CSS linting.";
 const homepageKeywords =
-    "eslint-plugin-typefest, type-fest, ts-extras, eslint rules, typescript linting, flat config";
+    "stylelint-plugin-docusaurus, stylelint, docusaurus, infima, css linting, postcss, docs tooling";
 const homepageStructuredData = {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
-    codeRepository: "https://github.com/Nick2bad4u/eslint-plugin-typefest",
+    codeRepository: "https://github.com/Nick2bad4u/stylelint-plugin-docusaurus",
     description: homepageDescription,
-    image: "https://nick2bad4u.github.io/eslint-plugin-typefest/img/logo.png",
+    image: "https://nick2bad4u.github.io/stylelint-plugin-docusaurus/img/logo.png",
     license:
-        "https://github.com/Nick2bad4u/eslint-plugin-typefest/blob/main/LICENSE",
-    name: "eslint-plugin-typefest",
+        "https://github.com/Nick2bad4u/stylelint-plugin-docusaurus/blob/main/LICENSE",
+    name: "stylelint-plugin-docusaurus",
     programmingLanguage: "TypeScript",
     runtimePlatform: "Node.js",
-    url: "https://nick2bad4u.github.io/eslint-plugin-typefest/",
+    url: "https://nick2bad4u.github.io/stylelint-plugin-docusaurus/",
 } as const;
 const homepageSocialImageUrl =
-    "https://nick2bad4u.github.io/eslint-plugin-typefest/img/logo.png";
+    "https://nick2bad4u.github.io/stylelint-plugin-docusaurus/img/logo.png";
 
-/**
- * Home card icons Note: These icons are from the "Nerd Font Symbols" font,
- * which is included in the site styles. If you change these icons, make sure to
- * choose ones that exist in that font or adjust the font-family in the CSS
- * accordingly.
- *
- * @see https://www.nerdfonts.com/cheat-sheet for available icons in the "Nerd Font Symbols" font
- */
 const homeCards = [
     {
+        description:
+            "Install the package, enable a shareable config, and understand the plugin-pack export shape.",
         icon: "\uf135",
         title: "Get Started",
-        description:
-            "Install the plugin, enable a preset, and start enforcing type-safe ts-extras and type-fest patterns.",
         to: "/docs/rules/getting-started",
     },
     {
-        icon: "\ue690",
-        title: "Presets",
         description:
-            "Choose the right preset for your team, from minimal baseline to full strict coverage.",
-        to: "/docs/rules/presets",
+            "Compare the exported configs and understand why `recommended` and `all` are currently equivalent.",
+        icon: "\ue690",
+        title: "Configs",
+        to: "/docs/rules/configs",
     },
     {
-        icon: "\uf02d",
-        title: "Rule Reference",
         description:
-            "Browse every rule with concrete incorrect/correct examples and migration guidance.",
-        to: "/docs/rules",
+            "Read the migration status and template roadmap before designing the first public Docusaurus rules.",
+        icon: "\uf02d",
+        title: "Current Status",
+        to: "/docs/rules/guides/current-status",
     },
 ] as const satisfies readonly HomeCard[];
 
-/**
- * Render the Docusaurus landing page for the documentation site.
- */
+/** Render the Docusaurus landing page for the documentation site. */
 export default function Home() {
     const logoSrc = useBaseUrl("/img/logo.svg");
 
     return (
         <Layout
-            title="Type-safe ESLint rules for type-fest and ts-extras"
             description={homepageDescription}
+            title="Stylelint rules for Docusaurus styles"
         >
             <Head>
                 <meta content={homepageKeywords} name="keywords" />
@@ -154,32 +135,32 @@ export default function Home() {
                     <div className={styles.heroGrid}>
                         <div>
                             <p className={styles.heroKicker}>
-                                {`${heroKickerIcon} ESLint plugin for modern TypeScript teams ${heroKickerIcon2}`}
+                                {`${heroKickerIcon} Stylelint template for Docusaurus teams ${heroKickerIcon2}`}
                             </p>
                             <Heading as="h1" className={styles.heroTitle}>
-                                eslint-plugin-typefest
+                                stylelint-plugin-docusaurus
                             </Heading>
                             <p className={styles.heroSubtitle}>
-                                ESLint rules that recommend safer, clearer
-                                TypeScript types, type guards, and other
-                                patterns by utilizing{" "}
+                                A Stylelint-first plugin scaffold for Docusaurus
+                                stylesheets, built around{" "}
                                 <Link
-                                    className={`${styles.heroInlineLink} ${styles.heroInlineLinkTypeFest}`}
-                                    href="https://github.com/sindresorhus/type-fest"
-                                    target="_blank"
+                                    className={`${styles.heroInlineLink} ${styles.heroInlineLinkStylelint}`}
+                                    href="https://stylelint.io/developer-guide/plugins/"
                                     rel="noopener noreferrer"
+                                    target="_blank"
                                 >
-                                    type-fest
+                                    Stylelint
                                 </Link>{" "}
                                 and{" "}
                                 <Link
-                                    className={`${styles.heroInlineLink} ${styles.heroInlineLinkTsExtras}`}
-                                    href="https://github.com/sindresorhus/ts-extras"
-                                    target="_blank"
+                                    className={`${styles.heroInlineLink} ${styles.heroInlineLinkDocusaurus}`}
+                                    href="https://docusaurus.io/docs/styling-layout"
                                     rel="noopener noreferrer"
+                                    target="_blank"
                                 >
-                                    ts-extras
+                                    Docusaurus styling
                                 </Link>
+                                .
                             </p>
 
                             <div className={styles.heroBadgeRow}>
@@ -217,16 +198,16 @@ export default function Home() {
                                 </Link>
                                 <Link
                                     className={`button button--lg ${styles.heroActionButton} ${styles.heroActionSecondary}`}
-                                    to="/docs/rules/presets"
+                                    to="/docs/rules/configs"
                                 >
-                                    {comparePresetsButtonIcon} Compare Presets
+                                    {compareConfigsButtonIcon} Explore Configs
                                 </Link>
                             </div>
                         </div>
 
                         <aside className={styles.heroPanel}>
                             <img
-                                alt="eslint-plugin-typefest logo"
+                                alt="stylelint-plugin-docusaurus logo"
                                 className={styles.heroPanelLogo}
                                 decoding="async"
                                 height="240"

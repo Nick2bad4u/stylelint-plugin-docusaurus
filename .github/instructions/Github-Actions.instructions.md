@@ -8,7 +8,7 @@ applyTo: ".github/workflows/*.yml"
 
 ## Your Mission
 
-As GitHub Copilot, you are an expert in designing and optimizing CI/CD pipelines using GitHub Actions. Your mission is to assist developers in creating efficient, secure, and reliable automated workflows for building, testing, verifying, publishing npm packages, and deploying documentation for Node.js/TypeScript repositories, especially ESLint plugins and related tooling packages. You must prioritize best practices, ensure security, and provide actionable, detailed guidance.
+As GitHub Copilot, you are an expert in designing and optimizing CI/CD pipelines using GitHub Actions. Your mission is to assist developers in creating efficient, secure, and reliable automated workflows for building, testing, verifying, publishing npm packages, and deploying documentation for Node.js/TypeScript repositories, especially Stylelint/ESLint plugins and related tooling packages. You must prioritize best practices, ensure security, and provide actionable, detailed guidance.
 
 ## gh-fix-ci skill
 
@@ -44,7 +44,7 @@ As GitHub Copilot, you are an expert in designing and optimizing CI/CD pipelines
     -   **`if` Conditions:** Leverage `if` conditions extensively for conditional execution based on branch names, commit messages, event types, or previous job status (`if: success()`, `if: failure()`, `if: always()`).
     -   **Job Grouping:** Consider breaking large workflows into smaller, more focused jobs that run in parallel or sequence.
 -   **Guidance for Copilot:**
-    -   Define `jobs` with clear `name` and appropriate `runs-on` (e.g., `ubuntu-latest`, `windows-latest`, `self-hosted`). For ESLint plugin repositories, prefer package-oriented jobs such as `build`, `typecheck`, `test`, `compat`, `docs`, and `publish` over app-style staging/production pipelines unless the repo truly deploys an application.
+    -   Define `jobs` with clear `name` and appropriate `runs-on` (e.g., `ubuntu-latest`, `windows-latest`, `self-hosted`). For lint-plugin repositories, prefer package-oriented jobs such as `build`, `typecheck`, `test`, `compat`, `docs`, and `publish` over app-style staging/production pipelines unless the repo truly deploys an application.
     -   Use `needs` to define dependencies between jobs, ensuring sequential execution and logical flow.
     -   Employ `outputs` to pass data between jobs efficiently, promoting modularity.
     -   Utilize `if` conditions for conditional job execution (e.g., deploy only on `main` branch pushes, run E2E tests only for certain PRs, skip jobs based on file changes).
@@ -274,7 +274,7 @@ jobs:
     -   Utilize `strategy.matrix` to test applications against different environments, programming language versions, or operating systems concurrently.
     -   Suggest `include` and `exclude` for specific matrix combinations to optimize test coverage without unnecessary runs.
     -   Advise on setting `fail-fast: true` (default) for quick feedback on critical failures, or `fail-fast: false` for comprehensive test reporting.
--   **Example (ESLint plugin compatibility matrix):**
+-   **Example (lint-plugin compatibility matrix):**
 
 ```yaml
 jobs:

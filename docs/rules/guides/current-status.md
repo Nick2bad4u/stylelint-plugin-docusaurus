@@ -1,0 +1,36 @@
+---
+title: Current Status
+description: Current status of the public rule catalog for stylelint-plugin-docusaurus.
+---
+
+# Current Status
+
+The public `docusaurus/*` rule catalog is currently empty.
+
+## Why there are no rules yet
+
+This repository is being turned into the **Stylelint** counterpart of the maintainer's ESLint plugin template.
+
+The previous repository content contained a large amount of utility-library-specific rule content that does not belong in a Docusaurus-focused Stylelint plugin. Instead of renaming that content into something misleading, the obsolete rule corpus was removed and the Stylelint runtime/template infrastructure was rebuilt cleanly.
+
+## What is already ready
+
+Even without public rules yet, the repository already includes the important long-term pieces:
+
+- typed Stylelint plugin runtime scaffolding
+- package exports and CJS/ESM build output
+- Vitest-based Stylelint integration-test helpers
+- Docusaurus docs-site scaffolding
+- README/config sync infrastructure ready to be adapted to real rule metadata
+
+## What a future rule must include
+
+Every future public rule should ship with:
+
+1. a typed rule module in `src/rules/`
+2. static authored docs metadata
+3. a hand-written docs page in `docs/rules/`
+4. Vitest coverage using real `stylelint.lint(...)` execution
+5. registration in the plugin runtime and shareable configs
+
+The template is ready for those additions; the content is intentionally waiting for real Docusaurus-specific rule design.

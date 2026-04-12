@@ -1,44 +1,38 @@
 ---
-name: audit-eslint-plugin-best-practices
-description: "🤖🤖 Use this prompt to audit the repository against modern ESLint plugin authoring best practices and official guidance."
-argument-hint: Provide any surfaces to compare first, such as rule metadata, presets, docs, tests, or plugin exports.
+name: audit-stylelint-plugin-best-practices
+description: "🤖🤖 Use this prompt to audit the repository against modern Stylelint plugin authoring best practices and official guidance."
+argument-hint: Provide any focus areas such as custom syntax support, rule metadata, shareable configs, docs, tests, or package validation.
 ---
 
-# Task: Looping ESLint Plugin Best-Practices Audit
+# Task: Looping Stylelint Plugin Best-Practices Audit
 
-Compare this repository against modern ESLint plugin authoring and rule-authoring best practices, especially official ESLint guidance and relevant `typescript-eslint` guidance where applicable.
+Compare this repository against modern Stylelint plugin authoring and rule-authoring best practices, especially official Stylelint guidance and current PostCSS/Stylelint ecosystem conventions.
 
-Use any user-provided focus areas first. Use web or documentation tools when available.
+## Audit areas
 
-## Operating loop
+Prioritize the following surfaces:
 
-Repeat the following until you run out of high-confidence improvements:
+1. plugin runtime shape and package exports
+2. rule metadata (`ruleName`, `messages`, `meta.url`, `meta.fixable`, docs metadata)
+3. shareable config ergonomics and namespace consistency
+4. PostCSS traversal strategy and performance
+5. custom-syntax handling and failure behavior
+6. tests, fixer coverage, and config-level integration tests
+7. docs quality and Docusaurus/site consistency
+8. package-validation and publish readiness
 
-1. Compare one surface at a time, such as:
-   - plugin entrypoints and exports
-   - flat config presets and config ergonomics
-   - rule metadata (`meta`, schema, docs, messages, `defaultOptions`)
-   - typed rule patterns and parser-service usage
-   - fixer safety, suggestions, and report quality
-   - docs URLs, docs structure, and installation guidance
-   - test coverage, RuleTester setup, and contract tests
-   - compatibility claims for ESLint, TypeScript, Node.js, and Flat Config
-2. Identify gaps, outdated patterns, or deviations from best practice.
-3. Fix the high-confidence issues directly when safe.
-4. Validate with diagnostics, tests, and the relevant repo scripts.
-5. Continue until the remaining items are either already acceptable, too speculative, or better suited for a separate design discussion.
+## Expectations
 
-## Standards
+- Prefer official Stylelint guidance over local habit when they conflict.
+- Call out unsafe autofixers, repeated whole-root rescans, and hidden syntax assumptions.
+- Recommend concrete code or docs changes, not vague observations.
+- If the repo is a template, audit the template quality as well as the current implementation.
 
-- Favor official ESLint and `typescript-eslint` guidance over local habit when they conflict.
-- Do not cargo-cult best practices that do not fit this plugin's scope or architecture.
-- Distinguish must-fix issues from optional polish in the final summary.
-
-## Deliverables
+## Deliverable
 
 At the end, provide:
 
-- the best-practice gaps you found
-- what you changed to align the repo
-- how you validated the work
-- any recommendations that should be discussed before implementation
+- the highest-priority problems you found
+- what you changed or recommend changing
+- how you validated the improvements
+- any follow-up work that should happen in later prompts

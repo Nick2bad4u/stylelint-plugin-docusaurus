@@ -1,5 +1,5 @@
 /**
- * Commitlint configuration for eslint-plugin-typefest.
+ * Commitlint configuration for stylelint-plugin-docusaurus.
  *
  * Enforces the repository's hybrid Gitmoji format, e.g.:
  *

@@ -1,25 +1,25 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
-    "name": "eslint-plugin-typefest",
-    "version": "1.0.10",
+    "name": "stylelint-plugin-docusaurus",
+    "version": "0.1.0",
     "private": false,
-    "description": "ESLint rules for adopting type-fest and ts-extras conventions.",
+    "description": "Stylelint rules and shareable configs for Docusaurus stylesheets.",
     "keywords": [
-        "eslint",
-        "eslint-plugin",
-        "eslintplugin",
-        "type-fest",
-        "ts-extras",
-        "typescript"
+        "stylelint",
+        "stylelint-plugin",
+        "docusaurus",
+        "infima",
+        "css",
+        "postcss"
     ],
-    "homepage": "https://github.com/Nick2bad4u/eslint-plugin-typefest",
+    "homepage": "https://github.com/Nick2bad4u/stylelint-plugin-docusaurus",
     "bugs": {
-        "url": "https://github.com/Nick2bad4u/eslint-plugin-typefest/issues",
+        "url": "https://github.com/Nick2bad4u/stylelint-plugin-docusaurus/issues",
         "email": "20943337+Nick2bad4u@users.noreply.github.com"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Nick2bad4u/eslint-plugin-typefest.git"
+        "url": "git+https://github.com/Nick2bad4u/stylelint-plugin-docusaurus.git"
     },
     "license": "MIT",
     "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://github.com/Nick2bad4u)",
@@ -74,9 +74,9 @@
         "build": "tsc -b tsconfig.build.json --force && npm run build:types:cjs && npm run build:cjs",
         "build:cjs": "esbuild dist/plugin.js --bundle --format=cjs --platform=node --packages=external --sourcemap --outfile=dist/plugin.cjs --footer:js=\"module.exports = module.exports.default;\"",
         "build:clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
-        "build:eslint-inspector": "npx -y @eslint/config-inspector@1.4.2 build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/eslint-plugin-typefest/eslint-inspector/\"",
+        "build:eslint-inspector": "npx -y @eslint/config-inspector@1.4.2 build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/stylelint-plugin-docusaurus/eslint-inspector/\"",
         "build:eslint-inspector:local": "npx @eslint/config-inspector",
-        "build:stylelint-inspector": "npx -y stylelint-config-inspector@latest build --outDir \"docs/docusaurus/static/stylelint-inspector\" --base \"/eslint-plugin-typefest/stylelint-inspector/\"",
+        "build:stylelint-inspector": "npx -y stylelint-config-inspector@latest build --outDir \"docs/docusaurus/static/stylelint-inspector\" --base \"/stylelint-plugin-docusaurus/stylelint-inspector/\"",
         "build:stylelint-inspector:local": "npx stylelint-config-inspector@latest",
         "build:types:cjs": "node -e \"require('node:fs').copyFileSync('dist/plugin.d.ts','dist/plugin.d.cts')\"",
         "changelog:generate": "git-cliff --config cliff.toml --output CHANGELOG.md",
@@ -97,7 +97,7 @@
         "clean:docs": "rimraf docs/docusaurus/.docusaurus/** docs/docusaurus/build/** docs/docusaurus/site-docs/developer/api/**",
         "clean:docusaurus": "npm run clean:docs && npm run --workspace docs/docusaurus clear",
         "cognitive-complexity": "cognitive-complexity-ts --threshold 10",
-        "precommit": "npm run sync:readme-rules-table:write && npm run sync:presets-rules-matrix",
+        "precommit": "npm run sync:readme-rules-table:write && npm run sync:configs-rules-matrix",
         "commit": "git-cz",
         "contrib": "all-contributors",
         "contrib:add": "all-contributors add",
@@ -127,7 +127,6 @@
         "lint:all:fix": "npm run lint:fix && npm run lint:css:fix && npm run lint:prettier:fix && npm run lint:remark && npm run lint:package && npm run lint:secretlint && npm run lint:yaml:fix && npm run lint:actions && npm run lint:circular",
         "lint:all:fix:quiet": "npm run lint:fix:quiet && npm run lint:css:fix && npm run lint:prettier:fix && npm run lint:remark && npm run lint:package && npm run lint:secretlint && npm run lint:yaml:fix && npm run lint:actions && npm run lint:circular",
         "lint:circular": "npm run madge:circular",
-        "lint:compat:eslint9": "node scripts/eslint9-compat-smoke.mjs",
         "lint:config:build": "npm run build:eslint-inspector",
         "lint:config:inspect": "npx eslint --inspect-config",
         "lint:css": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .cache/stylelintcache src/ docs/ --custom-formatter stylelint-formatter-pretty && echo \"Stylelint done!\"",
@@ -142,7 +141,7 @@
         "lint:exports": "ts-unused-exports tsconfig.json src/plugin.ts --excludePathsFromReport=plugin.ts",
         "lint:fix": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --fix",
         "lint:fix:quiet": "cross-env ESLINT_PROGRESS=off NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --fix && echo \"Eslint fix done!\"",
-        "lint:grype": "grype . -c .grype.yaml --name eslint-plugin-typefest",
+        "lint:grype": "grype . -c .grype.yaml --name stylelint-plugin-docusaurus",
         "lint:knip": "npm run knip",
         "lint:knip:exports": "npm run knip -- --include exports,nsExports,classMembers,types,nsTypes,enumMembers,duplicates",
         "lint:knip:unused:exports": "npm run knip -- --dependencies --exports",
@@ -169,25 +168,22 @@
         "lint:unused-deps": "depcheck --ignores='@types/*,@testing-library/*,@vitest/*'",
         "lint:yaml": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache \"**/*.{yml,yaml}\" && echo \"YAML lint done!\"",
         "lint:yaml:fix": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --fix \"**/*.{yml,yaml}\" && echo \"YAML lint (fix) done!\"",
-        "madge:circular": "madge --circular --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts ./src --exclude \"(^|[\\/])(test|dist|node_modules|cache|.cache|coverage|build|eslint-inspector|temp|.docusaurus)($|[\\/])|\\.css$\"",
+        "madge:circular": "node scripts/check-circular-deps.mjs",
         "madge:leaves": "madge --leaves --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts ./src --exclude \"(^|[\\/])(test|dist|node_modules|cache|.cache|coverage|build|eslint-inspector|temp|.docusaurus)($|[\\/])|\\.css$\"",
         "madge:orphans": "madge --orphans --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts ./src --exclude \"(^|[\\/])(test|dist|node_modules|cache|.cache|coverage|build|eslint-inspector|temp|.docusaurus)($|[\\/])|\\.css$\"",
         "open:coverage": "open-cli coverage/index.html",
         "prepublishOnly": "npm run release:check",
         "release:check": "npm run release:verify",
-        "release:verify": "cross-env NODE_OPTIONS= npm run build && cross-env NODE_OPTIONS= npm run lint && cross-env NODE_OPTIONS= npm run typecheck && cross-env NODE_OPTIONS= VITEST_TYPECHECK=false npm run test && cross-env NODE_OPTIONS= npm run sync:readme-rules-table && cross-env NODE_OPTIONS= npm run sync:presets-rules-matrix && cross-env NODE_OPTIONS= npm run docs:check-links && npm run lint:package:strict",
+        "release:verify": "cross-env NODE_OPTIONS= npm run build && cross-env NODE_OPTIONS= npm run lint && cross-env NODE_OPTIONS= npm run typecheck && cross-env NODE_OPTIONS= VITEST_TYPECHECK=false npm run test && cross-env NODE_OPTIONS= npm run sync:readme-rules-table && cross-env NODE_OPTIONS= npm run sync:configs-rules-matrix && cross-env NODE_OPTIONS= npm run docs:check-links && npm run lint:package:strict",
         "remark:fix": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail --quiet --output -- \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\"",
         "remark:test-config": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail \"README.md\"",
+        "sync:configs-rules-matrix": "node scripts/sync-configs-rules-matrix.mjs",
         "sync:node-version-files": "node scripts/sync-node-version-files.mjs",
-        "sync:peer-eslint-range": "node scripts/sync-peer-eslint-range.mjs",
-        "sync:presets-rules-matrix": "node scripts/sync-presets-rules-matrix.mjs",
         "sync:readme-rules-table": "node scripts/sync-readme-rules-table.mjs",
-        "sync:readme-rules-table:update": "npm run build && cross-env TYPEFEST_UPDATE_GENERATED_DOCS=1 vitest run test/readme-rules-table-sync.test.ts -u",
+        "sync:readme-rules-table:update": "node scripts/sync-readme-rules-table.mjs --write",
         "sync:readme-rules-table:write": "node scripts/sync-readme-rules-table.mjs --write",
         "pretest": "npm run build",
         "test": "vitest run",
-        "test:autofix:fixtures": "cross-env TYPEFEST_AUTOFIX_SMOKE=1 vitest run test/autofix-fixtures-all-rules-smoke.test.ts",
-        "test:autofix:fixtures:typed": "cross-env TYPEFEST_AUTOFIX_SMOKE=1 TYPEFEST_AUTOFIX_FIXTURE_DIR=test/fixtures/typed vitest run test/autofix-fixtures-all-rules-smoke.test.ts",
         "test:ci": "cross-env CI=true vitest run --reporter=default",
         "test:coverage": "vitest run --coverage --reporter=default",
         "test:coverage:detailed": "vitest run --coverage --reporter=verbose",
@@ -209,18 +205,14 @@
         "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.build.json --noEmit && tsc -p tsconfig.eslint.json --noEmit && tsc -p tsconfig.js.json --noEmit && npm run --workspace docs/docusaurus typecheck",
         "typecheck:all": "npm run typecheck",
         "types:update": "typesync",
-        "update-deps": "npx ncu -i --install never && npm run sync:peer-eslint-range && npm install --force",
+        "update-deps": "npx ncu -i --install never && npm install --force",
         "verify:readme-rules-table": "npm run build && npm run sync:readme-rules-table"
     },
     "overrides": {
         "jsonc-eslint-parser": "$jsonc-eslint-parser"
     },
     "dependencies": {
-        "@typescript-eslint/parser": "^8.58.1",
-        "@typescript-eslint/type-utils": "^8.58.1",
-        "@typescript-eslint/utils": "^8.58.1",
-        "ts-extras": "^0.19.0",
-        "type-fest": "^5.5.0"
+        "postcss": "^8.5.9"
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.2",
@@ -276,6 +268,7 @@
         "@types/postcss-reporter": "^7.0.5",
         "@types/sloc": "^0.2.3",
         "@typescript-eslint/eslint-plugin": "^8.58.1",
+        "@typescript-eslint/parser": "^8.58.1",
         "@typescript-eslint/rule-tester": "^8.58.1",
         "@typpi/eslint-plugin-vite": "^1.0.12",
         "@vitest/coverage-v8": "^4.1.4",
@@ -362,7 +355,6 @@
         "npm-check-updates": "^20.0.1",
         "npm-package-json-lint": "^10.2.0",
         "picocolors": "^1.1.1",
-        "postcss": "^8.5.9",
         "postcss-assets": "^6.0.0",
         "postcss-clamp": "^4.1.0",
         "postcss-combine-duplicated-selectors": "^10.0.3",
@@ -554,8 +546,7 @@
         "yamllint-js": "^0.2.4"
     },
     "peerDependencies": {
-        "eslint": "^9.0.0 || ^10.2.0",
-        "typescript": "^5.0.0 || ^6.0.2"
+        "stylelint": "^17.6.0"
     },
     "packageManager": "npm@11.12.1",
     "engines": {

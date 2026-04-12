@@ -69,7 +69,7 @@ const config = {
     extends: ["./typedoc.config.json"],
     name: `${repositoryPackageName} Documentation`,
     out: path.resolve(docsWorkspaceDirectory, "site-docs", "developer", "api"),
-    prettierConfigFile: path.resolve(repositoryRoot, ".prettierrc"),
+    prettierConfigFile: path.resolve(repositoryRoot, "prettier.config.ts"),
 };
 
 export default config;

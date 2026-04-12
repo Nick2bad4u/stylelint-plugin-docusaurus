@@ -2,11 +2,11 @@
  * @packageDocumentation
  * Type declaration entrypoint for the published `plugin.mjs` default export.
  */
-import type { ESLint } from "eslint";
+import type { Plugin } from "stylelint";
 
 /**
- * Default eslint-plugin-typefest plugin export shape.
+ * Default stylelint-plugin-docusaurus plugin pack export shape.
  */
-declare const plugin: ESLint.Plugin;
+declare const plugin: readonly Plugin[];
 
 export default plugin;
