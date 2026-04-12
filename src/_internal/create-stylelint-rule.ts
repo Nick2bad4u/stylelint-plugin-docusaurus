@@ -6,6 +6,7 @@ import type { Except } from "type-fest";
 
 import stylelint, {
     type Rule,
+    type RuleBase,
     type RuleMessages,
     type RuleMeta,
 } from "stylelint";
@@ -20,7 +21,7 @@ export type CreateStylelintRuleOptions<
     messages: M;
     meta?: Readonly<Except<RuleMeta, "url"> & { url?: string }>;
     primaryOptionArray?: boolean;
-    rule: Rule<P, S, M>;
+    rule: RuleBase<P, S>;
     ruleName: string;
 }>;
 
@@ -34,6 +35,16 @@ export type StylelintPluginRule<
     messages: M;
     meta: RuleMeta;
     rule: Rule<P, S, M>;
+    ruleName: string;
+}> &
+    ReturnType<typeof stylelint.createPlugin>;
+
+/** Nongeneric public rule contract used for heterogeneous runtime registries. */
+export type StylelintPluginRuleContract = Readonly<{
+    docs: StylelintRuleDocs;
+    messages: RuleMessages;
+    meta: RuleMeta;
+    rule: Rule;
     ruleName: string;
 }> &
     ReturnType<typeof stylelint.createPlugin>;
@@ -61,23 +72,24 @@ export const createStylelintRule = <
         ...options.meta,
         url: options.meta?.url ?? docs.url,
     };
+    const typedRule = rule as Rule<P, S, M>;
 
-    rule.ruleName = ruleName;
-    rule.messages = messages;
-    rule.meta = meta;
+    typedRule.ruleName = ruleName;
+    typedRule.messages = messages;
+    typedRule.meta = meta;
 
     if (options.primaryOptionArray === true) {
-        rule.primaryOptionArray = true;
+        typedRule.primaryOptionArray = true;
     }
 
-    const plugin = stylelint.createPlugin(ruleName, rule);
+    const plugin = stylelint.createPlugin(ruleName, typedRule);
 
     return {
         ...plugin,
         docs,
         messages,
         meta,
-        rule,
+        rule: typedRule,
         ruleName,
     };
 };

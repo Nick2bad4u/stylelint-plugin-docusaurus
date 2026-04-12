@@ -5,9 +5,17 @@ description: Current status of the public rule catalog for stylelint-plugin-docu
 
 # Current Status
 
-The public `docusaurus/*` rule catalog is currently empty.
+The public `docusaurus/*` rule catalog is no longer empty.
 
-## Why there are no rules yet
+## What has shipped so far
+
+The first public rules are now in place:
+
+- `docusaurus/no-invalid-theme-custom-property-scope`
+- `docusaurus/require-ifm-color-primary-scale`
+- `docusaurus/prefer-data-theme-color-mode`
+
+## Why the catalog still starts small
 
 This repository is being turned into the **Stylelint** counterpart of the maintainer's ESLint plugin template.
 

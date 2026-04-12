@@ -67,13 +67,15 @@ This package intentionally exports two configs from the start:
 | `configs.recommended` | Default low-noise config for broadly applicable Docusaurus rules. |
 | `configs.all`         | Exhaustive stable config for every public `docusaurus/*` rule.    |
 
-At the moment, both configs are equivalent because the public rule catalog is still intentionally empty.
+`configs.recommended` currently enables the two lower-noise baseline rules, while `configs.all` includes those rules plus the stricter primary-color-scale rule.
 
 ## Rules
 
-The public `docusaurus/*` rule catalog is currently empty on purpose.
-
-This repository already ships the runtime, tests, docs, and build scaffolding required for future Docusaurus-specific Stylelint rules.
+| Rule                                                                                                                                                   | Fix | Configs          | Description                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | ---------------- | -------------------------------------------------------------------------------------------- |
+| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) |  —  | recommended, all | Disallow declaring Docusaurus theme custom properties outside global theme scopes.           |
+| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                     |  🔧 | recommended, all | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes.           |
+| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale)               |  —  | all              | Require the full recommended Infima primary color scale when overriding --ifm-color-primary. |
 
 ## Documentation
 

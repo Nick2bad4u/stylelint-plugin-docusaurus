@@ -64,6 +64,38 @@ const sidebars = {
             },
             type: "category",
         },
+        {
+            className: "sb-cat-rules",
+            collapsed: false,
+            customProps: {
+                badge: "rules",
+            },
+            items: [
+                {
+                    id: "no-invalid-theme-custom-property-scope",
+                    label: "R001 no-invalid-theme-custom-property-scope",
+                    type: "doc",
+                },
+                {
+                    id: "require-ifm-color-primary-scale",
+                    label: "R002 require-ifm-color-primary-scale",
+                    type: "doc",
+                },
+                {
+                    id: "prefer-data-theme-color-mode",
+                    label: "R003 prefer-data-theme-color-mode",
+                    type: "doc",
+                },
+            ],
+            label: "Rules",
+            link: {
+                description:
+                    "Reference documentation for the first Docusaurus-specific Stylelint rules in this template.",
+                title: "Rules",
+                type: "generated-index",
+            },
+            type: "category",
+        },
     ],
 } satisfies SidebarsConfig;
 

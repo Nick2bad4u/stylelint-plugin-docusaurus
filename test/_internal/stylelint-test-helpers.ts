@@ -10,12 +10,15 @@ export type LintWithConfigOptions = Readonly<{
     code: string;
     codeFilename?: string;
     config?: ConfigLike;
+    fix?: boolean;
 }>;
 
 /** First result entry returned from `stylelint.lint(...)`. */
 export type StylelintLintResult = Awaited<
     ReturnType<typeof stylelint.lint>
 >["results"][number];
+/** Full stylelint.lint result used by fixer/assertion-heavy tests. */
+export type StylelintRunResult = Awaited<ReturnType<typeof stylelint.lint>>;
 /** Config-like input accepted by the local Stylelint test helper. */
 type ConfigLike = Omit<Config, "plugins"> & {
     plugins?: ConfigPluginEntry | readonly ConfigPluginEntry[];
@@ -42,6 +45,7 @@ export async function lintWithConfig({
     code,
     codeFilename = DEFAULT_CODE_FILENAME,
     config,
+    fix = false,
 }: LintWithConfigOptions): Promise<StylelintLintResult> {
     const mergedConfig: Config = {
         ...config,
@@ -55,6 +59,7 @@ export async function lintWithConfig({
         code,
         codeFilename,
         config: mergedConfig,
+        fix,
     });
     const [firstResult] = lintResult.results;
 
@@ -65,6 +70,31 @@ export async function lintWithConfig({
     }
 
     return firstResult;
+}
+
+/**
+ * Run Stylelint against an in-memory snippet and return the full lint result.
+ */
+export async function runStylelintWithConfig({
+    code,
+    codeFilename = DEFAULT_CODE_FILENAME,
+    config,
+    fix = false,
+}: LintWithConfigOptions): Promise<StylelintRunResult> {
+    const mergedConfig: Config = {
+        ...config,
+        plugins: [...plugins, ...normalizePlugins(config?.plugins)],
+        rules: {
+            ...config?.rules,
+        },
+    };
+
+    return stylelint.lint({
+        code,
+        codeFilename,
+        config: mergedConfig,
+        fix,
+    });
 }
 
 /** Normalize config plugin entries to an array form. */

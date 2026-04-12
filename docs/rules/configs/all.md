@@ -17,7 +17,8 @@ export default configs.all;
 
 ## Current behavior
 
-Because the public rule catalog is currently empty, `all` is presently equivalent to `recommended`.
+This config enables every current public rule, including the stricter
+`docusaurus/require-ifm-color-primary-scale` rule.
 
 ## Intended future role
 
@@ -25,4 +26,8 @@ As the plugin grows, `all` should remain the exhaustive opt-in surface for teams
 
 ## Rules in this config
 
-The public rule catalog is currently empty, so this config only registers the package surface for now.
+| Rule                                                                                                                                                   | Fix | Description                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | -------------------------------------------------------------------------------------------- |
+| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) |  —  | Disallow declaring Docusaurus theme custom properties outside global theme scopes.           |
+| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                     |  🔧 | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes.           |
+| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale)               |  —  | Require the full recommended Infima primary color scale when overriding --ifm-color-primary. |

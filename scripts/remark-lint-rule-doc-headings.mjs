@@ -56,8 +56,8 @@ const canonicalHeadingDefinitions = [
         requiredByDefault: false,
     },
     {
-        heading: "ESLint flat config example",
-        key: "eslintFlatConfigExample",
+        heading: "Stylelint config example",
+        key: "stylelintConfigExample",
         requiredByDefault: false,
     },
     {
@@ -124,7 +124,7 @@ const defaultHelperDocPathPattern =
 const defaultRuleCatalogIdLinePattern = /^> \*\*Rule catalog ID:\*\* R\d{3}$/u;
 const defaultPackageDocumentationLabelPattern =
     /^[^\r\n]+ package documentation:$/mu;
-const eslintPluginPackagePrefix = "eslint-plugin-";
+const supportedPluginPackagePrefixes = ["eslint-plugin-", "stylelint-plugin-"];
 
 const packageMetadataCache = new Map();
 
@@ -203,8 +203,12 @@ const isPackageName = (packageName) => typeof packageName === "string";
 const getRuleNamespaceAliasesFromPackageName = (packageName) => {
     const aliases = new Set();
 
-    if (packageName.startsWith(eslintPluginPackagePrefix)) {
-        const pluginName = packageName.slice(eslintPluginPackagePrefix.length);
+    for (const packagePrefix of supportedPluginPackagePrefixes) {
+        if (!packageName.startsWith(packagePrefix)) {
+            continue;
+        }
+
+        const pluginName = packageName.slice(packagePrefix.length);
 
         if (pluginName !== "") {
             aliases.add(pluginName);
@@ -226,13 +230,15 @@ const getRuleNamespaceAliasesFromPackageName = (packageName) => {
     const packageScope = packageName.slice(0, packageSeparatorIndex);
     const scopedPackageName = packageName.slice(packageSeparatorIndex + 1);
 
-    if (!scopedPackageName.startsWith(eslintPluginPackagePrefix)) {
+    const matchingScopedPrefix = supportedPluginPackagePrefixes.find((prefix) =>
+        scopedPackageName.startsWith(prefix)
+    );
+
+    if (matchingScopedPrefix === undefined) {
         return [...aliases];
     }
 
-    const pluginName = scopedPackageName.slice(
-        eslintPluginPackagePrefix.length
-    );
+    const pluginName = scopedPackageName.slice(matchingScopedPrefix.length);
 
     if (pluginName !== "") {
         aliases.add(pluginName);

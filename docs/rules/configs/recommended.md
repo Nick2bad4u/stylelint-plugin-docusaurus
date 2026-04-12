@@ -19,7 +19,10 @@ export default configs.recommended;
 
 This config registers the local plugin pack and enables the rules marked as recommended.
 
-At the moment the public rule catalog is still empty, so the config currently behaves as a lightweight package-registration scaffold.
+This config currently enables the two lower-noise baseline rules:
+
+- `docusaurus/no-invalid-theme-custom-property-scope`
+- `docusaurus/prefer-data-theme-color-mode`
 
 ## Intended future role
 
@@ -27,4 +30,7 @@ As Docusaurus-specific rules are added, `recommended` should stay focused on low
 
 ## Rules in this config
 
-The public rule catalog is currently empty, so this config only registers the package surface for now.
+| Rule                                                                                                                                                   | Fix | Description                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | ---------------------------------------------------------------------------------- |
+| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) |  —  | Disallow declaring Docusaurus theme custom properties outside global theme scopes. |
+| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                     |  🔧 | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes. |

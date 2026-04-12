@@ -19,13 +19,15 @@ The repository is intentionally being converted from a mature ESLint-plugin temp
 
 ## Current rule status
 
-The public rule catalog is currently empty on purpose.
+The public rule catalog now includes the first three Docusaurus-specific rules:
 
-That is not an omission or a placeholder trick. The goal is to ship a clean, coherent Stylelint template rather than invent speculative rules copied from the previous ESLint template.
+- `no-invalid-theme-custom-property-scope`
+- `require-ifm-color-primary-scale`
+- `prefer-data-theme-color-mode`
 
 ## What comes next
 
-Future public rules are expected to focus on Docusaurus-specific authoring concerns such as:
+Future public rules are expected to continue focusing on Docusaurus-specific authoring concerns such as:
 
 - safe use of Infima and Docusaurus custom properties
 - color-mode-aware selectors and theme boundaries

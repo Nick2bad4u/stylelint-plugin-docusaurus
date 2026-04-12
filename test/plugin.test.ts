@@ -37,6 +37,21 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(Object.keys(configs)).toStrictEqual(["all", "recommended"]);
     });
 
+    it("exposes the first public rule ids in stable order", () => {
+        expect.hasAssertions();
+
+        expect(ruleNames).toStrictEqual([
+            "no-invalid-theme-custom-property-scope",
+            "prefer-data-theme-color-mode",
+            "require-ifm-color-primary-scale",
+        ]);
+        expect(ruleIds).toStrictEqual([
+            "docusaurus/no-invalid-theme-custom-property-scope",
+            "docusaurus/prefer-data-theme-color-mode",
+            "docusaurus/require-ifm-color-primary-scale",
+        ]);
+    });
+
     it("lets the recommended config lint baseline CSS without parse errors", async () => {
         expect.hasAssertions();
 
@@ -62,7 +77,14 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
 
         expect(configs.recommended.plugins).toStrictEqual([...plugins]);
         expect(configs.all.plugins).toStrictEqual([...plugins]);
-        expect(configs.recommended.rules).toStrictEqual({});
-        expect(configs.all.rules).toStrictEqual({});
+        expect(configs.recommended.rules).toStrictEqual({
+            "docusaurus/no-invalid-theme-custom-property-scope": true,
+            "docusaurus/prefer-data-theme-color-mode": true,
+        });
+        expect(configs.all.rules).toStrictEqual({
+            "docusaurus/no-invalid-theme-custom-property-scope": true,
+            "docusaurus/prefer-data-theme-color-mode": true,
+            "docusaurus/require-ifm-color-primary-scale": true,
+        });
     });
 });
