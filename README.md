@@ -22,7 +22,7 @@ npm install --save-dev stylelint stylelint-plugin-docusaurus
 
 ### Compatibility
 
-- **Supported Stylelint versions:** `17.x`
+- **Supported Stylelint versions:** `16.x` and `17.x`
 - **Config system:** ESM config files such as `stylelint.config.mjs`
 - **Node.js runtime:** `>=22.0.0`
 

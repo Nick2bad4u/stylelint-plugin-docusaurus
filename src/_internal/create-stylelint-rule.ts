@@ -7,6 +7,7 @@ import stylelint, {
     type RuleMessages,
     type RuleMeta,
 } from "stylelint";
+import type { Except } from "type-fest";
 
 /** Input contract for the shared Stylelint rule creator. */
 export type CreateStylelintRuleOptions<
@@ -16,7 +17,7 @@ export type CreateStylelintRuleOptions<
 > = Readonly<{
     docs: StylelintRuleDocs;
     messages: M;
-    meta?: Readonly<Omit<RuleMeta, "url"> & { url?: string }>;
+    meta?: Readonly<Except<RuleMeta, "url"> & { url?: string }>;
     primaryOptionArray?: boolean;
     rule: Rule<P, S, M>;
     ruleName: string;

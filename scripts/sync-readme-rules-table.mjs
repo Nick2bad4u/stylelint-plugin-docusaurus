@@ -6,6 +6,7 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import * as builtPluginModule from "../dist/plugin.js";
 
 /**
@@ -105,6 +106,12 @@ export const generateReadmeRulesSectionFromRules = (rules) => {
     ].join("\n");
 };
 
+/**
+ * Synchronize or validate the README rules section against the built plugin's
+ * canonical rule metadata.
+ *
+ * @returns {Promise<void>}
+ */
 async function main() {
     const shouldWrite = process.argv.includes("--write");
     const readmeMarkdown = await readFile(readmePath, "utf8");
@@ -137,4 +144,9 @@ async function main() {
     await writeFile(readmePath, nextReadme, "utf8");
 }
 
-void main();
+if (
+    process.argv[1] &&
+    import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+    await main();
+}

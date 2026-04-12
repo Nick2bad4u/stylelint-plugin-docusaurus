@@ -39,7 +39,7 @@ If no concrete rules are provided, prefer a clean minimal plugin scaffold over s
 
 1. **Re-identify the repository** for the new package name, namespace, docs site, metadata, URLs, README, and Docusaurus branding.
 2. **Remove unrelated template rule content** surgically. Preserve shared infrastructure, but do not leave unrelated copied rules or docs in place.
-3. **Adapt the runtime to Stylelint**, not ESLint. Use Stylelint plugin packs, PostCSS traversal, and shareable Stylelint configs.
+3. **Adapt the runtime to Stylelint.** Use Stylelint plugin packs, PostCSS traversal, and shareable Stylelint configs.
 4. **Implement only requested rules.** If none are requested, keep the runtime/docs/tests intentionally minimal.
 5. **Keep rule metadata and docs authored statically.** Do not inject real docs content at runtime.
 6. **Keep package validation, docs generation, and sync workflows coherent.** Update them when package exports or public docs surfaces change.

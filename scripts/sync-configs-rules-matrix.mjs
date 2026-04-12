@@ -1,11 +1,14 @@
 /**
  * @packageDocumentation
- * Synchronize or validate config docs from canonical Stylelint config metadata.
+ * Synchronize or validate Stylelint config documentation tables from canonical
+ * built-plugin metadata.
  */
 // @ts-check
 
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+
 import * as builtPluginModule from "../dist/plugin.js";
 
 /** @typedef {"all" | "recommended"} ConfigName */
@@ -22,9 +25,10 @@ import * as builtPluginModule from "../dist/plugin.js";
 
 /**
  * @typedef {Readonly<
- *     Record<ConfigName, { rules?: Readonly<Record<string, boolean>> }>
+ *     Record<ConfigName, { rules?: Readonly<Record<string, unknown>> }>
  * >} ConfigMap
  */
+/** @typedef {Readonly<{ legacyAlias?: boolean }>} RunCliOptions */
 
 const builtRules = /** @type {RulesMap} */ (builtPluginModule.rules ?? {});
 const builtConfigs = /** @type {ConfigMap} */ (builtPluginModule.configs ?? {});
@@ -41,6 +45,8 @@ const detectLineEnding = (markdown) =>
 /**
  * @param {string} markdown
  * @param {"\n" | "\r\n"} lineEnding
+ *
+ * @returns {string}
  */
 const normalizeMarkdownLineEndings = (markdown, lineEnding) =>
     markdown.replace(/\r?\n/gv, lineEnding);
@@ -141,6 +147,8 @@ const generateRulesSection = (configName) => {
 /**
  * @param {string} markdown
  * @param {string} sectionText
+ *
+ * @returns {string}
  */
 const replaceSection = (markdown, sectionText) => {
     const { endOffset, startOffset } = getSectionBounds(markdown);
@@ -154,33 +162,17 @@ const replaceSection = (markdown, sectionText) => {
     );
 };
 
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
-/**/
-
 /**
+ * Synchronize or validate the config rule-table sections in
+ * `docs/rules/configs/*.md`.
  *
- */
-
-/**
+ * @param {Readonly<{ writeChanges: boolean }>} input
  *
+ * @returns {Promise<Readonly<{ changed: boolean }>>}
  */
-async function main() {
-    const shouldWrite = process.argv.includes("--write");
+const syncConfigDocs = async ({ writeChanges }) => {
+    /** @type {boolean} */
+    let changed = false;
 
     /** @type {readonly ConfigName[]} */
     const configNames = ["recommended", "all"];
@@ -203,14 +195,52 @@ async function main() {
             continue;
         }
 
-        if (!shouldWrite) {
-            throw new Error(
-                `Config docs are out of sync for '${configName}'. Run: npm run sync:configs-rules-matrix -- --write`
-            );
-        }
+        changed = true;
 
-        await writeFile(configDocPath, nextMarkdown, "utf8");
+        if (writeChanges) {
+            await writeFile(configDocPath, nextMarkdown, "utf8");
+        }
     }
+
+    return { changed };
+};
+
+/**
+ * CLI entrypoint for the config-rule-matrix synchronization script.
+ *
+ * @param {RunCliOptions} [options]
+ *
+ * @returns {Promise<void>}
+ */
+export async function runCli(options = {}) {
+    const writeChanges = process.argv.includes("--write");
+    const result = await syncConfigDocs({ writeChanges });
+
+    if (!result.changed) {
+        console.log("Config documentation tables are already synchronized.");
+        return;
+    }
+
+    if (writeChanges) {
+        const sourceLabel =
+            options.legacyAlias === true
+                ? "legacy preset alias"
+                : "plugin metadata";
+        console.log(
+            `Config documentation tables synchronized from ${sourceLabel}.`
+        );
+        return;
+    }
+
+    console.error(
+        "Config documentation tables are out of sync. Run: node scripts/sync-configs-rules-matrix.mjs --write"
+    );
+    process.exitCode = 1;
 }
 
-void main();
+if (
+    process.argv[1] &&
+    import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+    await runCli();
+}

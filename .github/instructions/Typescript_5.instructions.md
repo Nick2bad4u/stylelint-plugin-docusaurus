@@ -126,6 +126,7 @@ applyTo: "**/*.ts, **/*.tsx"
 ### Optional Utility Library Guidelines
 
 - If the repository already includes a utility-type library, keep imports **narrow and explicit**.
+- Using a utility-type library such as `type-fest` for the repository's own implementation code is fine when it genuinely improves clarity.
 - Use utility-library helpers only when they clearly improve readability over built-in utility types.
 - Common legitimate uses include:
   - JSON-safe types for serializable payloads

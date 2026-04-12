@@ -48,6 +48,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             `,
             config: {
                 ...configs.recommended,
+                // eslint-disable-next-line @typescript-eslint/no-misused-spread -- This is a plugin array copy, not text decomposition.
                 plugins: [...configs.recommended.plugins],
             },
         });

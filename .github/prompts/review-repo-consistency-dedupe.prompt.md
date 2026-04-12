@@ -6,7 +6,7 @@ argument-hint: Provide any subsystems, rule families, files, or patterns to prio
 
 # Task: Looping Repository Consistency, Dedupe, and Pattern Audit
 
-Audit this eslint-plugin repository for consistency drift, duplicate logic, naming mismatches, and repeated patterns that should be centralized.
+Audit this stylelint-plugin repository for consistency drift, duplicate logic, naming mismatches, and repeated patterns that should be centralized.
 
 Use any user-provided focus areas first; otherwise inspect the full repo.
 

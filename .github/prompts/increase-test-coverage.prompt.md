@@ -6,7 +6,7 @@ argument-hint: Provide any files, rule families, or areas to prioritize for cove
 
 # Task: Looping Test Coverage Maximization and Bug Fixing
 
-Audit this eslint-plugin repository to maximize test coverage, aiming for 100% where practical. Use any user-provided focus areas first; otherwise, inspect the full repo.
+Audit this stylelint-plugin repository to maximize test coverage, aiming for 100% where practical. Use any user-provided focus areas first; otherwise, inspect the full repo.
 
 ## Operating loop
 
