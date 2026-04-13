@@ -9,17 +9,21 @@ The public `docusaurus/*` rule catalog is no longer empty.
 
 ## What has shipped so far
 
-The public catalog now includes **21** rules instead of the initial starter set.
+The public catalog now includes **26** rules instead of the initial starter set.
 
 Newer additions now cover:
 
 - CSS Modules global-selector boundaries
+- CSS Modules local-anchor requirements for explicit global theme overrides
 - content-wrapper scoping for broad element overrides
 - explicit root `data-theme` selector correctness
+- prefers-color-scheme guidance for Docusaurus theme tokens and global theme surfaces
+- curated token-over-structure guidance for common DocSearch surfaces
+- explicit root-scope requirements for DocSearch token declarations
 - responsive navbar/sidebar breakpoint alignment
 - paired color-mode requirements for Infima primary scales and DocSearch tokens
 - curated token-over-structure guidance for common Infima surfaces
-- reserved cascade-layer names and `revert-layer` isolation safety
+- reserved cascade-layer names, `revert-layer` isolation safety, and broad `all` reset safety
 
 ## Why the catalog is still curated
 

@@ -15,22 +15,43 @@ import { ruleHasScopeAnchorInAncestors } from "../_internal/selector-scope-analy
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
-const ruleName = createRuleName("no-revert-layer-outside-isolation-subtrees");
+const broadAllResetKeywords = [
+    "initial",
+    "revert",
+    "unset",
+] as const;
+
+const ruleName = createRuleName(
+    "no-broad-all-resets-outside-isolation-subtrees"
+);
 const messages: {
-    rejectedSelector: (selector: string) => string;
+    rejectedSelector: (keyword: string, selector: string) => string;
 } = ruleMessages(ruleName, {
-    rejectedSelector: (selector: string): string =>
-        `Use revert-layer only inside an explicit local isolation subtree. Selector "${selector}" is too broad because it is not anchored by a component wrapper, local id, or dedicated data attribute.`,
+    rejectedSelector: (keyword: string, selector: string): string =>
+        `Use all: ${keyword} only inside an explicit local isolation subtree. Selector "${selector}" is too broad because it is not anchored by a component wrapper, local id, or dedicated data attribute.`,
 });
 
 const docs = {
     description:
-        "Disallow revert-layer usage outside explicitly isolated local subtrees.",
+        "Disallow broad all: initial|revert|unset resets outside explicitly isolated local subtrees.",
     recommended: false,
-    url: createRuleDocsUrl("no-revert-layer-outside-isolation-subtrees"),
+    url: createRuleDocsUrl("no-broad-all-resets-outside-isolation-subtrees"),
 } as const;
 
-/** Rule implementation for revert-layer isolation hygiene. */
+/** Find the first broad all-reset keyword in one declaration value. */
+function findBroadAllResetKeyword(
+    declarationValue: string
+): (typeof broadAllResetKeywords)[number] | undefined {
+    for (const keyword of broadAllResetKeywords) {
+        if (cssValueHasStandaloneIdentifier(declarationValue, keyword)) {
+            return keyword;
+        }
+    }
+
+    return undefined;
+}
+
+/** Rule implementation for broad all-reset isolation hygiene. */
 const ruleFunction: RuleBase<boolean, undefined> =
     (primary) => (root, result) => {
         const isValid = validateOptions(result, ruleName, {
@@ -42,13 +63,12 @@ const ruleFunction: RuleBase<boolean, undefined> =
             return;
         }
 
-        root.walkDecls((declaration) => {
-            if (
-                !cssValueHasStandaloneIdentifier(
-                    declaration.value,
-                    "revert-layer"
-                )
-            ) {
+        root.walkDecls("all", (declaration) => {
+            const broadResetKeyword = findBroadAllResetKeyword(
+                declaration.value
+            );
+
+            if (!isDefined(broadResetKeyword)) {
                 return;
             }
 
@@ -70,16 +90,19 @@ const ruleFunction: RuleBase<boolean, undefined> =
             }
 
             report({
-                message: messages.rejectedSelector(invalidSelector),
+                message: messages.rejectedSelector(
+                    broadResetKeyword,
+                    invalidSelector
+                ),
                 node: declaration,
                 result,
                 ruleName,
-                word: "revert-layer",
+                word: broadResetKeyword,
             });
         });
     };
 
-/** Public rule definition for revert-layer isolation hygiene. */
+/** Public rule definition for broad all-reset isolation hygiene. */
 const rule: StylelintPluginRule<boolean, undefined, typeof messages> =
     createStylelintRule<boolean, undefined, typeof messages>({
         docs,

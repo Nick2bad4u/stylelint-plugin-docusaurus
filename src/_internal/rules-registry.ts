@@ -4,27 +4,32 @@
  */
 import type { StylelintPluginRuleContract } from "./create-stylelint-rule.js";
 
+import * as noBroadAllResetsOutsideIsolationSubtreesModule from "../rules/no-broad-all-resets-outside-isolation-subtrees.js";
 import * as noDirectThemeTokenConsumptionInCssModulesModule from "../rules/no-direct-theme-token-consumption-in-css-modules.js";
 import * as noDocusaurusLayerNameCollisionsModule from "../rules/no-docusaurus-layer-name-collisions.js";
 import * as noInvalidThemeCustomPropertyScopeModule from "../rules/no-invalid-theme-custom-property-scope.js";
-import * as noNavbarBreakpointDesyncModule from "../rules/no-navbar-breakpoint-desync.js";
 import * as noMobileNavbarBackdropFilterModule from "../rules/no-mobile-navbar-backdrop-filter.js";
 import * as noMobileNavbarStackingContextTrapsModule from "../rules/no-mobile-navbar-stacking-context-traps.js";
+import * as noNavbarBreakpointDesyncModule from "../rules/no-navbar-breakpoint-desync.js";
 import * as noRevertLayerOutsideIsolationSubtreesModule from "../rules/no-revert-layer-outside-isolation-subtrees.js";
 import * as noSubtreeDataThemeSelectorsModule from "../rules/no-subtree-data-theme-selectors.js";
 import * as noUnanchoredInfimaSubcomponentSelectorsModule from "../rules/no-unanchored-infima-subcomponent-selectors.js";
-import * as noUnscopedContentElementOverridesModule from "../rules/no-unscoped-content-element-overrides.js";
 import * as noUnsafeThemeInternalSelectorsModule from "../rules/no-unsafe-theme-internal-selectors.js";
+import * as noUnscopedContentElementOverridesModule from "../rules/no-unscoped-content-element-overrides.js";
 import * as noUnstableDocusaurusGeneratedClassSelectorsModule from "../rules/no-unstable-docusaurus-generated-class-selectors.js";
 import * as noUnwrappedGlobalThemeSelectorsInCssModulesModule from "../rules/no-unwrapped-global-theme-selectors-in-css-modules.js";
 import * as preferDataThemeColorModeModule from "../rules/prefer-data-theme-color-mode.js";
 import * as preferDataThemeDocsearchOverridesModule from "../rules/prefer-data-theme-docsearch-overrides.js";
+import * as preferDataThemeOverPrefersColorSchemeModule from "../rules/prefer-data-theme-over-prefers-color-scheme.js";
+import * as preferDocsearchThemeTokensOverStructuralOverridesModule from "../rules/prefer-docsearch-theme-tokens-over-structural-overrides.js";
 import * as preferInfimaThemeTokensOverStructuralOverridesModule from "../rules/prefer-infima-theme-tokens-over-structural-overrides.js";
 import * as preferStableDocusaurusThemeClassNamesModule from "../rules/prefer-stable-docusaurus-theme-class-names.js";
 import * as requireDocsearchColorModePairsModule from "../rules/require-docsearch-color-mode-pairs.js";
-import * as requireIfmColorPrimaryScaleModule from "../rules/require-ifm-color-primary-scale.js";
-import * as requireIfmColorPrimaryScalePerColorModeModule from "../rules/require-ifm-color-primary-scale-per-color-mode.js";
+import * as requireDocsearchRootScopeForDocsearchTokenOverridesModule from "../rules/require-docsearch-root-scope-for-docsearch-token-overrides.js";
 import * as requireHtmlPrefixForDocusaurusDataAttributeSelectorsModule from "../rules/require-html-prefix-for-docusaurus-data-attribute-selectors.js";
+import * as requireIfmColorPrimaryScalePerColorModeModule from "../rules/require-ifm-color-primary-scale-per-color-mode.js";
+import * as requireIfmColorPrimaryScaleModule from "../rules/require-ifm-color-primary-scale.js";
+import * as requireLocalAnchorForGlobalThemeOverridesInCssModulesModule from "../rules/require-local-anchor-for-global-theme-overrides-in-css-modules.js";
 
 /**
  * Public rule registry keyed by unqualified rule name. The scaffold
@@ -33,6 +38,8 @@ import * as requireHtmlPrefixForDocusaurusDataAttributeSelectorsModule from "../
 export const docusaurusRules: Readonly<
     Record<string, StylelintPluginRuleContract>
 > = {
+    "no-broad-all-resets-outside-isolation-subtrees":
+        noBroadAllResetsOutsideIsolationSubtreesModule.default,
     "no-direct-theme-token-consumption-in-css-modules":
         noDirectThemeTokenConsumptionInCssModulesModule.default,
     "no-docusaurus-layer-name-collisions":
@@ -61,18 +68,26 @@ export const docusaurusRules: Readonly<
     "prefer-data-theme-color-mode": preferDataThemeColorModeModule.default,
     "prefer-data-theme-docsearch-overrides":
         preferDataThemeDocsearchOverridesModule.default,
+    "prefer-data-theme-over-prefers-color-scheme":
+        preferDataThemeOverPrefersColorSchemeModule.default,
+    "prefer-docsearch-theme-tokens-over-structural-overrides":
+        preferDocsearchThemeTokensOverStructuralOverridesModule.default,
     "prefer-infima-theme-tokens-over-structural-overrides":
         preferInfimaThemeTokensOverStructuralOverridesModule.default,
     "prefer-stable-docusaurus-theme-class-names":
         preferStableDocusaurusThemeClassNamesModule.default,
     "require-docsearch-color-mode-pairs":
         requireDocsearchColorModePairsModule.default,
+    "require-docsearch-root-scope-for-docsearch-token-overrides":
+        requireDocsearchRootScopeForDocsearchTokenOverridesModule.default,
     "require-html-prefix-for-docusaurus-data-attribute-selectors":
         requireHtmlPrefixForDocusaurusDataAttributeSelectorsModule.default,
     "require-ifm-color-primary-scale":
         requireIfmColorPrimaryScaleModule.default,
     "require-ifm-color-primary-scale-per-color-mode":
         requireIfmColorPrimaryScalePerColorModeModule.default,
+    "require-local-anchor-for-global-theme-overrides-in-css-modules":
+        requireLocalAnchorForGlobalThemeOverridesInCssModulesModule.default,
 };
 
 /** Public rule registry type. */

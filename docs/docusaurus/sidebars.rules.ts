@@ -176,6 +176,31 @@ const sidebars: SidebarsConfig = {
                     label: "R021 no-direct-theme-token-consumption-in-css-modules",
                     type: "doc",
                 },
+                {
+                    id: "prefer-data-theme-over-prefers-color-scheme",
+                    label: "R022 prefer-data-theme-over-prefers-color-scheme",
+                    type: "doc",
+                },
+                {
+                    id: "require-local-anchor-for-global-theme-overrides-in-css-modules",
+                    label: "R023 require-local-anchor-for-global-theme-overrides-in-css-modules",
+                    type: "doc",
+                },
+                {
+                    id: "prefer-docsearch-theme-tokens-over-structural-overrides",
+                    label: "R024 prefer-docsearch-theme-tokens-over-structural-overrides",
+                    type: "doc",
+                },
+                {
+                    id: "no-broad-all-resets-outside-isolation-subtrees",
+                    label: "R025 no-broad-all-resets-outside-isolation-subtrees",
+                    type: "doc",
+                },
+                {
+                    id: "require-docsearch-root-scope-for-docsearch-token-overrides",
+                    label: "R026 require-docsearch-root-scope-for-docsearch-token-overrides",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {
@@ -187,6 +212,6 @@ const sidebars: SidebarsConfig = {
             type: "category",
         },
     ],
-};
+} satisfies SidebarsConfig;
 
 export default sidebars;
