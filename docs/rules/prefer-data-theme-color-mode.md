@@ -23,15 +23,15 @@ Using the attribute selector keeps styles aligned with the current platform cont
 
 ```css
 .theme-dark .navbar {
-  color: white;
+ color: white;
 }
 ```
 
 ## ✅ Correct
 
 ```css
-[data-theme='dark'] .navbar {
-  color: white;
+[data-theme="dark"] .navbar {
+ color: white;
 }
 ```
 
@@ -46,8 +46,8 @@ Using the attribute selector keeps styles aligned with the current platform cont
 ### ✅ Correct — light mode selector
 
 ```css
-[data-theme='light'] .footer {
-  color: black;
+[data-theme="light"] .footer {
+ color: black;
 }
 ```
 
@@ -57,11 +57,11 @@ Using the attribute selector keeps styles aligned with the current platform cont
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.recommended,
-  rules: {
-    ...configs.recommended.rules,
-    "docusaurus/prefer-data-theme-color-mode": true,
-  },
+ ...configs.recommended,
+ rules: {
+  ...configs.recommended.rules,
+  "docusaurus/prefer-data-theme-color-mode": true,
+ },
 };
 ```
 

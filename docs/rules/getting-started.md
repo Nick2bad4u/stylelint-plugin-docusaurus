@@ -29,10 +29,10 @@ If you prefer to compose the config yourself, register the plugin pack explicitl
 import docusaurusPlugin from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: [...docusaurusPlugin],
-  rules: {
-    // Future docusaurus/* rules go here.
-  },
+ plugins: [...docusaurusPlugin],
+ rules: {
+  // Future docusaurus/* rules go here.
+ },
 };
 ```
 

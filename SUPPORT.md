@@ -6,7 +6,7 @@ Thanks for using `stylelint-plugin-docusaurus`.
 
 1. Check project docs first:
    - [README.md](./README.md)
-   - [docs/](./docs/)
+   - [docs/rules/overview.md](./docs/rules/overview.md)
 2. Search existing issues:
    - <https://github.com/Nick2bad4u/stylelint-plugin-docusaurus/issues>
 3. Open a new issue if needed:

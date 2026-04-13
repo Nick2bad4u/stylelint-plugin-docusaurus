@@ -1,5 +1,4 @@
 ---
-id: developer/index
 title: Developer Docs
 description: Maintainer and contributor documentation for the stylelint-plugin-docusaurus template.
 ---

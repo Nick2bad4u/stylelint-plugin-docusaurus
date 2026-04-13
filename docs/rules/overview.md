@@ -5,9 +5,9 @@ description: Overview of stylelint-plugin-docusaurus and its current package sur
 
 # stylelint-plugin-docusaurus
 
-`stylelint-plugin-docusaurus` is a Stylelint plugin scaffold focused on Docusaurus styling conventions, theme-token hygiene, and future Docusaurus-specific CSS rules.
+`stylelint-plugin-docusaurus` is a Stylelint plugin focused on Docusaurus styling conventions, theme-token hygiene, selector stability, CSS Modules boundaries, color-mode correctness, and mobile navbar safety.
 
-The repository is intentionally being converted from a mature ESLint-plugin template into a Stylelint-first template. That means the infrastructure is already high quality, but the public Stylelint rule catalog is intentionally minimal while the new rule families are designed.
+The repository was intentionally converted from a mature ESLint-plugin template into a Stylelint-first package. The infrastructure was already strong; the public rule catalog has now grown into a broader Docusaurus-specific surface.
 
 ## What the package currently exports
 
@@ -19,24 +19,25 @@ The repository is intentionally being converted from a mature ESLint-plugin temp
 
 ## Current rule status
 
-The public rule catalog now includes the first eight Docusaurus-specific rules:
+The public rule catalog now includes **21** Docusaurus-specific rules.
 
-- `no-invalid-theme-custom-property-scope`
-- `no-mobile-navbar-backdrop-filter`
-- `no-mobile-navbar-stacking-context-traps`
-- `no-unstable-docusaurus-generated-class-selectors`
-- `require-ifm-color-primary-scale`
-- `prefer-data-theme-color-mode`
-- `prefer-data-theme-docsearch-overrides`
-- `prefer-stable-docusaurus-theme-class-names`
+The current families cover:
+
+- theme-token scope and Infima primary-scale guardrails
+- color-mode selector and DocSearch color-mode correctness
+- stable theme class usage and unsafe internal selector detection
+- CSS Modules boundaries for global theme selectors and token consumption
+- mobile navbar/sidebar safety and breakpoint alignment
+- cascade-layer and `revert-layer` safety
+- HTML data-attribute and content-wrapper selector hygiene
 
 ## What comes next
 
-Future public rules are expected to continue focusing on Docusaurus-specific authoring concerns such as:
+Future public rules can continue extending Docusaurus-specific authoring concerns such as:
 
-- safe use of Infima and Docusaurus custom properties
-- color-mode-aware selectors and theme boundaries
-- component-scoped token aliasing
-- stylesheet patterns that interact cleanly with swizzled components and generated theme CSS
+- stricter curated stable-class mappings
+- broader theme-surface token guidance
+- additional swizzle-safe customization contracts
+- more Docusaurus v4 cascade-layer guardrails
 
-Until those rules are added, the package surface stays intentionally small and accurate.
+The package surface is still intentionally curated: the goal is Docusaurus-specific signal, not a duplicate of generic CSS linting plugins.

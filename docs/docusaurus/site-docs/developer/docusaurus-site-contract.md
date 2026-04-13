@@ -1,5 +1,4 @@
 ---
-id: developer/docusaurus-site-contract
 title: Docs Site Contract
 description: Source-of-truth rules for maintaining the Docusaurus documentation app in this repository.
 ---

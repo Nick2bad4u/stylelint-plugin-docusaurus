@@ -5,6 +5,7 @@ import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
 
 import GitHubStats from "../components/GitHubStats";
+import { docsCatalogStats } from "../data/docsCatalog";
 import styles from "./index.module.css";
 
 type HeroBadge = {
@@ -49,13 +50,13 @@ const heroBadges = [
 const heroStats = [
     {
         description:
-            "The plugin now ships focused guardrails for theme scopes, color mode, stable theme class usage, unstable generated selectors, DocSearch overrides, navbar mobile behavior, stacking-context safety, and Infima color scales.",
-        headline: "\uf0ca 8 Public Rules",
+            "The plugin now ships focused guardrails for theme scopes, CSS Modules boundaries, selector stability, color mode, DocSearch pairing, navbar/mobile behavior, cascade-layer safety, and Infima token usage.",
+        headline: `\uf0ca ${String(docsCatalogStats.publicRuleCount)} Public Rule${docsCatalogStats.publicRuleCount === 1 ? "" : "s"}`,
     },
     {
         description:
             "Start with a conservative default or opt into the full stable catalog later.",
-        headline: "\ue690 2 Shareable Configs",
+        headline: `\ue690 ${String(docsCatalogStats.shareableConfigCount)} Shareable Config${docsCatalogStats.shareableConfigCount === 1 ? "" : "s"}`,
     },
     {
         description:

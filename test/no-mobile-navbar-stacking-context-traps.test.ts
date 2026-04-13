@@ -119,6 +119,51 @@ describe("docusaurus/no-mobile-navbar-stacking-context-traps", () => {
         expect(result.warnings[0]?.text).toContain("will-change");
     });
 
+    it("does not report descendant selectors that style children inside the navbar rather than the navbar element itself", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                .navbar .heroBanner {
+                    transform: translateZ(0);
+                }
+            `,
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(0);
+    });
+
+    it("still reports selectors wrapped in :is(...) when they target the navbar element itself", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                :is(.navbar, .theme-layout-navbar) {
+                    transform: translateZ(0);
+                }
+            `,
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(1);
+        expect(result.warnings[0]?.text).toContain(
+            ":is(.navbar, .theme-layout-navbar)"
+        );
+    });
+
     it("allows risky properties when they are explicitly desktop-only", async () => {
         expect.hasAssertions();
 
@@ -141,5 +186,55 @@ describe("docusaurus/no-mobile-navbar-stacking-context-traps", () => {
 
         expect(result.parseErrors).toHaveLength(0);
         expect(result.warnings).toHaveLength(0);
+    });
+
+    it("allows range-context desktop guards such as width greater than 996px", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                @media (996px < width) {
+                    .theme-layout-navbar {
+                        transform: translateZ(0);
+                        contain: content;
+                    }
+                }
+            `,
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(0);
+    });
+
+    it("still reports risky navbar properties when a negated desktop guard applies on mobile", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                @media not all and (min-width: 997px) {
+                    .navbar {
+                        transform: translateZ(0);
+                    }
+                }
+            `,
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(1);
+        expect(result.warnings[0]?.text).toContain(
+            "containing block or stacking-context trap"
+        );
     });
 });

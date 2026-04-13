@@ -1,21 +1,15 @@
-export interface PresetsRuleModule {
-    readonly meta?:
-        | {
-              readonly docs?:
-                  | {
-                        readonly typefestConfigs?:
-                            | readonly string[]
-                            | string
-                            | undefined;
-                        readonly url?: string | undefined;
-                    }
-                  | undefined;
-              readonly fixable?: string | undefined;
-              readonly hasSuggestions?: boolean | undefined;
-          }
-        | undefined;
-}
+export {
+    generateRulesSectionFromConfig,
+    getConfigDocPath,
+    isDirectExecution,
+    loadBuiltPluginMetadata,
+    normalizeConfigNames,
+    parseCliArgs,
+    resolveConfigDocTargets,
+    syncConfigDocs,
+} from "./sync-configs-rules-matrix.mjs";
 
-export function generatePresetsRulesMatrixSectionFromRules(
-    rules: Readonly<Record<string, PresetsRuleModule>>
-): string;
+export function runCli(input?: {
+    readonly runConfigMatrixCli?: typeof import("./sync-configs-rules-matrix.mjs").runCli;
+    readonly warn?: typeof console.warn;
+}): Promise<void>;

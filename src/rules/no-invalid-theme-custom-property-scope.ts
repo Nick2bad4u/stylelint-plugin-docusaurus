@@ -6,9 +6,15 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import {
     getContainingRule,
+    isDocsearchThemeCustomPropertyName,
     isAllowedThemeScopeRule,
     isDocusaurusThemeCustomPropertyName,
 } from "../_internal/docusaurus-theme-scope.js";
+import {
+    getSelectors,
+    parseSelectorList,
+    selectorTrailingCompoundHasClass,
+} from "../_internal/selector-parser-utils.js";
 import {
     createRuleDocsUrl,
     createRuleName,
@@ -26,10 +32,40 @@ const messages: {
 
 const docs = {
     description:
-        "Disallow declaring Docusaurus theme custom properties outside global theme scopes.",
+        "Disallow declaring Docusaurus theme custom properties outside global theme scopes, except for DocSearch variables scoped to the DocSearch UI.",
     recommended: true,
     url: createRuleDocsUrl("no-invalid-theme-custom-property-scope"),
 } as const;
+
+/** Boundary-aware fallback for exact `.DocSearch` root class detection. */
+const docSearchRootClassPattern =
+    /(^|[^A-Za-z0-9_-])\.DocSearch(?![A-Za-z0-9_-])/u;
+
+/**
+ * Check whether every selector in a rule scopes DocSearch variables to the
+ * DocSearch UI surface.
+ */
+function isAllowedDocSearchScopeRule(
+    ruleNode: Readonly<import("postcss").Rule>
+): boolean {
+    const parsedSelectorList = parseSelectorList(ruleNode.selector);
+
+    if (isDefined(parsedSelectorList)) {
+        const selectors = getSelectors(parsedSelectorList);
+
+        return (
+            selectors.length > 0 &&
+            selectors.every((selector) =>
+                selectorTrailingCompoundHasClass(
+                    selector,
+                    (className) => className === "DocSearch"
+                )
+            )
+        );
+    }
+
+    return docSearchRootClassPattern.test(ruleNode.selector);
+}
 
 /**
  * Rule implementation for validating global scope placement of Docusaurus theme
@@ -55,6 +91,15 @@ const ruleFunction: RuleBase<boolean, undefined> =
 
             if (!isDefined(containingRule)) {
                 return;
+            }
+
+            if (isDocsearchThemeCustomPropertyName(declaration.prop)) {
+                if (
+                    isAllowedThemeScopeRule(containingRule) ||
+                    isAllowedDocSearchScopeRule(containingRule)
+                ) {
+                    return;
+                }
             }
 
             if (isAllowedThemeScopeRule(containingRule)) {

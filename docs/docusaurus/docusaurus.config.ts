@@ -595,24 +595,8 @@ const config = {
                             to: "/docs/developer",
                         },
                         {
-                            label: "• API Reference",
-                            to: "/docs/developer/api",
-                        },
-                        {
-                            label: "• ADRs",
-                            to: "/docs/developer/adr",
-                        },
-                        {
-                            label: "• Types",
-                            to: "/docs/category/types",
-                        },
-                        {
-                            label: "• Charts",
-                            to: "/docs/developer/charts",
-                        },
-                        {
-                            label: "• Internals",
-                            to: "/docs/category/runtime",
+                            label: "• Docs Site Contract",
+                            to: "/docs/developer/docusaurus-site-contract",
                         },
                     ],
                 },
@@ -625,10 +609,6 @@ const config = {
                         {
                             label: "• Latest Posts",
                             to: "/blog",
-                        },
-                        {
-                            label: "• All Posts",
-                            to: "/blog/archive",
                         },
                     ],
                 },
@@ -675,7 +655,7 @@ const config = {
             {
                 blogDir: "blog",
                 blogRouteBasePath: "blog",
-                docsDir: "docs",
+                docsDir: "site-docs",
                 docsRouteBasePath: "docs",
                 explicitSearchResultPath: false,
                 forceIgnoreNoIndex: true,

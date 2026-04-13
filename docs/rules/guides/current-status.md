@@ -9,18 +9,19 @@ The public `docusaurus/*` rule catalog is no longer empty.
 
 ## What has shipped so far
 
-The first public rules are now in place:
+The public catalog now includes **21** rules instead of the initial starter set.
 
-- `docusaurus/no-invalid-theme-custom-property-scope`
-- `docusaurus/no-mobile-navbar-backdrop-filter`
-- `docusaurus/no-mobile-navbar-stacking-context-traps`
-- `docusaurus/no-unstable-docusaurus-generated-class-selectors`
-- `docusaurus/require-ifm-color-primary-scale`
-- `docusaurus/prefer-data-theme-color-mode`
-- `docusaurus/prefer-data-theme-docsearch-overrides`
-- `docusaurus/prefer-stable-docusaurus-theme-class-names`
+Newer additions now cover:
 
-## Why the catalog still starts small
+- CSS Modules global-selector boundaries
+- content-wrapper scoping for broad element overrides
+- explicit root `data-theme` selector correctness
+- responsive navbar/sidebar breakpoint alignment
+- paired color-mode requirements for Infima primary scales and DocSearch tokens
+- curated token-over-structure guidance for common Infima surfaces
+- reserved cascade-layer names and `revert-layer` isolation safety
+
+## Why the catalog is still curated
 
 This repository is being turned into the **Stylelint** counterpart of the maintainer's ESLint plugin template.
 
@@ -28,13 +29,13 @@ The previous repository content contained a large amount of utility-library-spec
 
 ## What is already ready
 
-Even with a still-small public rule catalog, the repository already includes the important long-term pieces:
+With the expanded public rule catalog, the repository now includes the important long-term pieces:
 
 - typed Stylelint plugin runtime scaffolding
 - package exports and CJS/ESM build output
 - Vitest-based Stylelint integration-test helpers
 - Docusaurus docs-site scaffolding
-- README/config sync infrastructure ready to be adapted to real rule metadata
+- README/config sync infrastructure driven by real rule metadata
 
 ## What a future rule must include
 
@@ -46,4 +47,4 @@ Every future public rule should ship with:
 4. Vitest coverage using real `stylelint.lint(...)` execution
 5. registration in the plugin runtime and shareable configs
 
-The template is ready for those additions; the content is intentionally waiting for real Docusaurus-specific rule design.
+The package is now in active rule-authoring mode rather than template-only mode, but the same implementation bar still applies to each future addition.

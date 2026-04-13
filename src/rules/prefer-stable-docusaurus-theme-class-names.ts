@@ -4,7 +4,11 @@ import { isDefined } from "ts-extras";
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
-import { normalizeSelectorList } from "../_internal/docusaurus-theme-scope.js";
+import {
+    findClassAttributeFragmentMatch,
+    getSelectors,
+    parseSelectorList,
+} from "../_internal/selector-parser-utils.js";
 import {
     createRuleDocsUrl,
     createRuleName,
@@ -45,21 +49,6 @@ const stableThemeClassMappings = new Map<string, string>([
 ]);
 
 /**
- * Create the exact attribute-selector fallbacks that this rule replaces with a
- * stable Docusaurus theme class.
- */
-function createAttributeSelectorCandidates(
-    unstableSelectorFragment: string
-): readonly string[] {
-    return [
-        `[class*='${unstableSelectorFragment}']`,
-        `[class*="${unstableSelectorFragment}"]`,
-        `[class^='${unstableSelectorFragment}']`,
-        `[class^="${unstableSelectorFragment}"]`,
-    ];
-}
-
-/**
  * Find the first attribute selector that should be replaced by a stable
  * Docusaurus theme class.
  */
@@ -69,24 +58,35 @@ function findStableThemeClassOpportunity(selectorList: string):
           stableThemeClassName: string;
       }>
     | undefined {
-    for (const selector of normalizeSelectorList(selectorList)) {
-        for (const [
-            unstableSelectorFragment,
-            stableThemeClassName,
-        ] of stableThemeClassMappings) {
-            for (const attributeSelector of createAttributeSelectorCandidates(
-                unstableSelectorFragment
-            )) {
-                if (!selector.includes(attributeSelector)) {
-                    continue;
-                }
+    const parsedSelectorList = parseSelectorList(selectorList);
 
-                return {
-                    attributeSelector,
-                    stableThemeClassName,
-                };
-            }
+    if (!isDefined(parsedSelectorList)) {
+        return undefined;
+    }
+
+    for (const selector of getSelectors(parsedSelectorList)) {
+        const attributeMatch = findClassAttributeFragmentMatch(
+            selector,
+            stableThemeClassMappings.keys(),
+            { includeGlobal: true }
+        );
+
+        if (!isDefined(attributeMatch)) {
+            continue;
         }
+
+        const stableThemeClassName = stableThemeClassMappings.get(
+            attributeMatch.fragment
+        );
+
+        if (!isDefined(stableThemeClassName)) {
+            continue;
+        }
+
+        return {
+            attributeSelector: attributeMatch.attributeSelector,
+            stableThemeClassName,
+        };
     }
 
     return undefined;

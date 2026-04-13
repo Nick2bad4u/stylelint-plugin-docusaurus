@@ -26,8 +26,8 @@ The safest default is to keep navbar blur off the mobile navbar entirely and onl
 
 ```css
 .navbar {
-  backdrop-filter: blur(16px);
-  background: rgb(20 20 20 / 70%);
+ backdrop-filter: blur(16px);
+ background: rgb(20 20 20 / 70%);
 }
 ```
 
@@ -35,11 +35,11 @@ The safest default is to keep navbar blur off the mobile navbar entirely and onl
 
 ```css
 @media (min-width: 997px) {
-  .navbar {
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    background: rgb(20 20 20 / 70%);
-  }
+ .navbar {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  background: rgb(20 20 20 / 70%);
+ }
 }
 ```
 
@@ -55,7 +55,7 @@ The safest default is to keep navbar blur off the mobile navbar entirely and onl
 
 ```css
 .heroBanner {
-  backdrop-filter: blur(12px);
+ backdrop-filter: blur(12px);
 }
 ```
 
@@ -63,7 +63,7 @@ The safest default is to keep navbar blur off the mobile navbar entirely and onl
 
 ```css
 .navbar-sidebar--show {
-  backdrop-filter: none;
+ backdrop-filter: none;
 }
 ```
 
@@ -73,11 +73,11 @@ The safest default is to keep navbar blur off the mobile navbar entirely and onl
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.recommended,
-  rules: {
-    ...configs.recommended.rules,
-    "docusaurus/no-mobile-navbar-backdrop-filter": true,
-  },
+ ...configs.recommended,
+ rules: {
+  ...configs.recommended.rules,
+  "docusaurus/no-mobile-navbar-backdrop-filter": true,
+ },
 };
 ```
 

@@ -32,15 +32,15 @@ When there is no stable theme class name available, Docusaurus recommends using 
 
 ```css
 .codeBlockContainer_RIuc {
-  border-radius: 8px;
+ border-radius: 8px;
 }
 ```
 
 ## ✅ Correct
 
 ```css
-[class*='codeBlockContainer'] {
-  border-radius: 8px;
+[class*="codeBlockContainer"] {
+ border-radius: 8px;
 }
 ```
 
@@ -56,7 +56,7 @@ When there is no stable theme class name available, Docusaurus recommends using 
 
 ```css
 .theme-doc-markdown {
-  max-width: 72ch;
+ max-width: 72ch;
 }
 ```
 
@@ -64,7 +64,7 @@ When there is no stable theme class name available, Docusaurus recommends using 
 
 ```css
 .navbar__brand {
-  gap: 0.5rem;
+ gap: 0.5rem;
 }
 ```
 
@@ -74,11 +74,11 @@ When there is no stable theme class name available, Docusaurus recommends using 
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.all,
-  rules: {
-    ...configs.all.rules,
-    "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
-  },
+ ...configs.all,
+ rules: {
+  ...configs.all.rules,
+  "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
+ },
 };
 ```
 

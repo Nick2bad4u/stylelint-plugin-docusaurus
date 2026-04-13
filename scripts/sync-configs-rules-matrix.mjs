@@ -6,12 +6,10 @@
 // @ts-check
 
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-import * as builtPluginModule from "../dist/plugin.js";
-
-/** @typedef {"all" | "recommended"} ConfigName */
+import { escapeMarkdownTableCell } from "./_internal/escape-markdown-table-cell.mjs";
 
 /**
  * @typedef {Readonly<{
@@ -25,17 +23,125 @@ import * as builtPluginModule from "../dist/plugin.js";
 
 /**
  * @typedef {Readonly<
- *     Record<ConfigName, { rules?: Readonly<Record<string, unknown>> }>
+ *     Record<string, { rules?: Readonly<Record<string, unknown>> }>
  * >} ConfigMap
  */
+/**
+ * @typedef {Readonly<{
+ *     configNames?: unknown;
+ *     configs?: ConfigMap;
+ *     rules?: RulesMap;
+ * }>} BuiltPluginModule
+ */
+/**
+ * @typedef {Readonly<{
+ *     configNames: readonly string[];
+ *     configs: ConfigMap;
+ *     rules: RulesMap;
+ * }>} ConfigMatrixMetadata
+ */
 /** @typedef {Readonly<{ legacyAlias?: boolean }>} RunCliOptions */
+/** @typedef {Readonly<{ configDocPath: string; configName: string }>} ConfigDocTarget */
 
-const builtRules = /** @type {RulesMap} */ (builtPluginModule.rules ?? {});
-const builtConfigs = /** @type {ConfigMap} */ (builtPluginModule.configs ?? {});
+const scriptsDirectoryPath = dirname(fileURLToPath(import.meta.url));
+const repositoryRootPath = resolve(scriptsDirectoryPath, "..");
+const builtPluginModulePath = resolve(repositoryRootPath, "dist", "plugin.js");
+
+/**
+ * @param {unknown} configNamesValue
+ * @param {ConfigMap} configs
+ *
+ * @returns {readonly string[]}
+ */
+export function normalizeConfigNames(configNamesValue, configs) {
+    if (Array.isArray(configNamesValue)) {
+        const explicitConfigNames = configNamesValue.filter(
+            /** @returns {candidate is string} */
+            (candidate) => typeof candidate === "string" && candidate !== ""
+        );
+
+        if (explicitConfigNames.length > 0) {
+            return [...new Set(explicitConfigNames)];
+        }
+    }
+
+    return Object.keys(configs).toSorted((left, right) =>
+        left.localeCompare(right)
+    );
+}
 const sectionHeading = "## Rules in this config";
-const configDocPathByName = {
-    all: resolve(process.cwd(), "docs/rules/configs/all.md"),
-    recommended: resolve(process.cwd(), "docs/rules/configs/recommended.md"),
+
+/**
+ * @param {Readonly<{
+ *     argvEntry?: string | undefined;
+ *     currentImportUrl: string;
+ * }>} input
+ *
+ * @returns {boolean}
+ */
+export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
+    typeof argvEntry === "string" &&
+    pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+
+/**
+ * @param {readonly string[]} cliArgs
+ *
+ * @returns {{ writeChanges: boolean }}
+ */
+export const parseCliArgs = (cliArgs) => {
+    /** @type {boolean} */
+    let writeChanges = false;
+
+    for (const cliArg of cliArgs) {
+        if (cliArg === "--write") {
+            writeChanges = true;
+            continue;
+        }
+
+        throw new TypeError(`Unknown argument: ${cliArg}`);
+    }
+
+    return { writeChanges };
+};
+
+/**
+ * @param {Readonly<{
+ *     builtPluginPath?: string;
+ *     importModule?: (modulePath: string) => Promise<BuiltPluginModule>;
+ * }>} [input]
+ *
+ * @returns {Promise<ConfigMatrixMetadata>}
+ */
+export const loadBuiltPluginMetadata = async ({
+    builtPluginPath = builtPluginModulePath,
+    importModule = async (modulePath) =>
+        /** @type {Promise<BuiltPluginModule>} */ (
+            import(pathToFileURL(modulePath).href)
+        ),
+} = {}) => {
+    try {
+        const builtPluginModule = await importModule(builtPluginPath);
+        const configs = /** @type {ConfigMap} */ (
+            builtPluginModule.configs ?? {}
+        );
+
+        return {
+            configNames: normalizeConfigNames(
+                builtPluginModule.configNames,
+                configs
+            ),
+            configs,
+            rules: /** @type {RulesMap} */ (builtPluginModule.rules ?? {}),
+        };
+    } catch (error) {
+        throw new Error(
+            [
+                `Failed to load built plugin metadata from ${builtPluginPath}.`,
+                "Run: npm run build",
+            ].join(" "),
+            { cause: error }
+        );
+    }
 };
 
 /** @param {string} markdown */
@@ -82,38 +188,100 @@ const getRuleFixIndicator = (ruleModule) =>
     ruleModule.meta?.fixable === true ? "🔧" : "—";
 
 /**
- * @param {string} ruleId
- *
- * @returns {null | readonly [string, RuleModule]}
- */
-const getRuleEntryFromId = (ruleId) => {
-    const shortRuleName = ruleId.split("/").at(-1);
-
-    if (!shortRuleName) {
-        return null;
-    }
-
-    const ruleModule = builtRules[shortRuleName];
-
-    if (ruleModule === undefined) {
-        return null;
-    }
-
-    return [shortRuleName, ruleModule];
-};
-
-/**
- * @param {ConfigName} configName
+ * @param {string} configName
+ * @param {string} [repositoryRoot]
  *
  * @returns {string}
  */
-const generateRulesSection = (configName) => {
+export const getConfigDocPath = (
+    configName,
+    repositoryRoot = repositoryRootPath
+) => resolve(repositoryRoot, "docs/rules/configs", `${configName}.md`);
+
+/**
+ * @param {Readonly<{
+ *     configNames: readonly string[];
+ *     hasDocFile?: (path: string) => Promise<boolean>;
+ *     repositoryRoot?: string;
+ * }>} input
+ *
+ * @returns {Promise<readonly ConfigDocTarget[]>}
+ */
+export const resolveConfigDocTargets = async ({
+    configNames,
+    hasDocFile = async (path) => {
+        try {
+            await readFile(path, "utf8");
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    repositoryRoot = repositoryRootPath,
+}) => {
+    /** @type {ConfigDocTarget[]} */
+    const targets = [];
+
+    for (const configName of configNames) {
+        const configDocPath = getConfigDocPath(configName, repositoryRoot);
+
+        if (!(await hasDocFile(configDocPath))) {
+            throw new Error(
+                `Missing config documentation file for exported config '${configName}': ${configDocPath}`
+            );
+        }
+
+        targets.push({
+            configDocPath,
+            configName,
+        });
+    }
+
+    return targets;
+};
+
+/**
+ * @param {Readonly<{
+ *     configName: string;
+ *     configs: ConfigMap;
+ *     rules: RulesMap;
+ * }>} input
+ *
+ * @returns {string}
+ */
+export const generateRulesSectionFromConfig = ({
+    configName,
+    configs,
+    rules,
+}) => {
+    if (!(configName in configs)) {
+        throw new Error(
+            `Exported config '${configName}' is missing from the built plugin config map.`
+        );
+    }
+
     const configuredRuleIds = Object.keys(
-        builtConfigs[configName]?.rules ?? {}
+        configs[configName]?.rules ?? {}
     ).toSorted((left, right) => left.localeCompare(right));
-    const ruleEntries = configuredRuleIds
-        .map(getRuleEntryFromId)
-        .filter((entry) => entry !== null);
+
+    /** @type {(readonly [string, RuleModule])[]} */
+    const ruleEntries = [];
+
+    for (const ruleId of configuredRuleIds) {
+        const shortRuleName = ruleId.split("/").at(-1);
+
+        if (!shortRuleName) {
+            continue;
+        }
+
+        const ruleModule = rules[shortRuleName];
+
+        if (ruleModule === undefined) {
+            continue;
+        }
+
+        ruleEntries.push([shortRuleName, ruleModule]);
+    }
 
     if (ruleEntries.length === 0) {
         return [
@@ -138,7 +306,7 @@ const generateRulesSection = (configName) => {
                 );
             }
 
-            return `| [\`${ruleName}\`](${docs.url}) | ${getRuleFixIndicator(ruleModule)} | ${docs.description} |`;
+            return `| [\`${ruleName}\`](${docs.url}) | ${getRuleFixIndicator(ruleModule)} | ${escapeMarkdownTableCell(docs.description)} |`;
         }),
         "",
     ].join("\n");
@@ -166,27 +334,71 @@ const replaceSection = (markdown, sectionText) => {
  * Synchronize or validate the config rule-table sections in
  * `docs/rules/configs/*.md`.
  *
- * @param {Readonly<{ writeChanges: boolean }>} input
+ * @param {Readonly<{
+ *     hasDocFile?: ((path: string) => Promise<boolean>) | undefined;
+ *     loadPluginMetadata?: (() => Promise<ConfigMatrixMetadata>) | undefined;
+ *     metadata?: ConfigMatrixMetadata | undefined;
+ *     readFileFn?:
+ *         | ((filePath: string, encoding: "utf8") => Promise<string>)
+ *         | undefined;
+ *     repositoryRootPath?: string | undefined;
+ *     writeChanges: boolean;
+ *     writeFileFn?:
+ *         | ((
+ *               filePath: string,
+ *               contents: string,
+ *               encoding: "utf8"
+ *           ) => Promise<void>)
+ *         | undefined;
+ * }>} input
  *
- * @returns {Promise<Readonly<{ changed: boolean }>>}
+ * @returns {Promise<
+ *     Readonly<{ changed: boolean; updatedFilePaths: readonly string[] }>
+ * >}
  */
-const syncConfigDocs = async ({ writeChanges }) => {
+export const syncConfigDocs = async ({
+    hasDocFile,
+    loadPluginMetadata = async () => loadBuiltPluginMetadata(),
+    metadata,
+    readFileFn = readFile,
+    repositoryRootPath: targetRepositoryRootPath = repositoryRootPath,
+    writeChanges,
+    writeFileFn = writeFile,
+}) => {
     /** @type {boolean} */
     let changed = false;
+    /** @type {string[]} */
+    const updatedFilePaths = [];
 
-    /** @type {readonly ConfigName[]} */
-    const configNames = ["recommended", "all"];
+    const activeMetadata = metadata ?? (await loadPluginMetadata());
+    /** @type {Parameters<typeof resolveConfigDocTargets>[0]} */
+    const resolveTargetsInput =
+        hasDocFile === undefined
+            ? {
+                  configNames: activeMetadata.configNames,
+                  repositoryRoot: targetRepositoryRootPath,
+              }
+            : {
+                  configNames: activeMetadata.configNames,
+                  hasDocFile,
+                  repositoryRoot: targetRepositoryRootPath,
+              };
 
-    for (const configName of configNames) {
-        const configDocPath = configDocPathByName[configName];
-        const markdown = await readFile(configDocPath, "utf8");
+    const configTargets = await resolveConfigDocTargets(resolveTargetsInput);
+
+    for (const { configDocPath, configName } of configTargets) {
+        const markdown = await readFileFn(configDocPath, "utf8");
         const lineEnding = detectLineEnding(markdown);
         const normalizedMarkdown = normalizeMarkdownLineEndings(
             markdown,
             lineEnding
         );
         const nextSection = normalizeMarkdownLineEndings(
-            generateRulesSection(configName),
+            generateRulesSectionFromConfig({
+                configName,
+                configs: activeMetadata.configs,
+                rules: activeMetadata.rules,
+            }),
             lineEnding
         );
         const nextMarkdown = replaceSection(normalizedMarkdown, nextSection);
@@ -197,50 +409,72 @@ const syncConfigDocs = async ({ writeChanges }) => {
 
         changed = true;
 
-        if (writeChanges) {
-            await writeFile(configDocPath, nextMarkdown, "utf8");
+        if (!writeChanges) {
+            throw new Error(
+                "Config documentation tables are out of sync. Run: node scripts/sync-configs-rules-matrix.mjs --write"
+            );
         }
+
+        await writeFileFn(configDocPath, nextMarkdown, "utf8");
+        updatedFilePaths.push(configDocPath);
     }
 
-    return { changed };
+    return {
+        changed,
+        updatedFilePaths,
+    };
 };
 
 /**
  * CLI entrypoint for the config-rule-matrix synchronization script.
  *
- * @param {RunCliOptions} [options]
+ * @param {Readonly<{
+ *     cliArgs?: readonly string[] | undefined;
+ *     legacyAlias?: boolean | undefined;
+ *     loadPluginMetadata?: (() => Promise<ConfigMatrixMetadata>) | undefined;
+ *     repositoryRootPath?: string | undefined;
+ * }>} [options]
  *
  * @returns {Promise<void>}
  */
-export async function runCli(options = {}) {
-    const writeChanges = process.argv.includes("--write");
-    const result = await syncConfigDocs({ writeChanges });
+export async function runCli({
+    cliArgs = process.argv.slice(2),
+    legacyAlias = false,
+    loadPluginMetadata,
+    repositoryRootPath: cliRepositoryRootPath = repositoryRootPath,
+} = {}) {
+    const { writeChanges } = parseCliArgs(cliArgs);
+    const result = await syncConfigDocs({
+        loadPluginMetadata,
+        repositoryRootPath: cliRepositoryRootPath,
+        writeChanges,
+    });
 
     if (!result.changed) {
         console.log("Config documentation tables are already synchronized.");
         return;
     }
 
-    if (writeChanges) {
-        const sourceLabel =
-            options.legacyAlias === true
-                ? "legacy preset alias"
-                : "plugin metadata";
-        console.log(
-            `Config documentation tables synchronized from ${sourceLabel}.`
-        );
-        return;
-    }
-
-    console.error(
-        "Config documentation tables are out of sync. Run: node scripts/sync-configs-rules-matrix.mjs --write"
+    const sourceLabel =
+        legacyAlias === true ? "legacy preset alias" : "plugin metadata";
+    console.log(
+        `Config documentation tables synchronized from ${sourceLabel}.`
     );
-    process.exitCode = 1;
 }
 
 if (
-    process.argv[1] &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
+    isDirectExecution({
+        argvEntry: process.argv[1],
+        currentImportUrl: import.meta.url,
+    })
 ) {
-    await runCli();
+    try {
+        await runCli();
+    } catch (error) {
+        console.error(
+            "Failed to synchronize config documentation tables:",
+            error
+        );
+        process.exitCode = 1;
+    }
 }

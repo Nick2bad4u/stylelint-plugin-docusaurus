@@ -7,7 +7,7 @@
  * - Concurrency limit for file checks
  * - Summary metrics and timing
  * - Deduplicated issues
- * - --max-path-display and --concurrency CLI flags
+ * - --max-path-display/--max-path and --concurrency CLI flags
  */
 
 import { readdir, readFile, stat } from "node:fs/promises";
@@ -15,35 +15,85 @@ import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 
+import { stripMarkdownCode } from "./_internal/strip-markdown-code.mjs";
+
 const argv = process.argv.slice(2);
 const isVerbose = argv.includes("--verbose") || argv.includes("-v");
 const failFast = argv.includes("--fail-fast") || argv.includes("-f");
 
 /**
- * @param {string} argumentPrefix
+ * Parse a positive integer CLI flag in either `--flag=value` or `--flag value`
+ * form.
+ *
+ * @param {readonly string[]} cliArgs
+ * @param {string} argumentName
  * @param {number} fallbackValue
+ * @param {readonly string[]} [aliases]
  *
  * @returns {number}
  */
-const parsePositiveIntegerFlag = (argumentPrefix, fallbackValue) => {
-    const argument = argv.find((candidate) =>
-        candidate.startsWith(argumentPrefix)
-    );
+export const parsePositiveIntegerFlag = (
+    cliArgs,
+    argumentName,
+    fallbackValue,
+    aliases = []
+) => {
+    const supportedNames = [argumentName, ...aliases];
 
-    if (argument === undefined) {
-        return fallbackValue;
+    for (let index = 0; index < cliArgs.length; index += 1) {
+        const argument = cliArgs[index];
+
+        if (typeof argument !== "string") {
+            continue;
+        }
+
+        const inlineName = supportedNames.find((candidateName) =>
+            argument.startsWith(`${candidateName}=`)
+        );
+
+        let rawValue;
+
+        if (inlineName !== undefined) {
+            rawValue = argument.slice(inlineName.length + 1).trim();
+        } else if (supportedNames.includes(argument)) {
+            rawValue = cliArgs[index + 1]?.trim() ?? "";
+        } else {
+            continue;
+        }
+
+        if (!/^\d+$/u.test(rawValue)) {
+            throw new TypeError(
+                `Invalid value for ${argumentName}: ${rawValue || "(empty)"}`
+            );
+        }
+
+        const parsedValue = Number.parseInt(rawValue, 10);
+
+        if (parsedValue < 1) {
+            throw new RangeError(
+                `${argumentName} must be a positive integer: ${rawValue}`
+            );
+        }
+
+        return parsedValue;
     }
 
-    const numericPortion = argument.slice(argumentPrefix.length);
-    const parsedValue = Number.parseInt(numericPortion, 10);
+    if (!Number.isInteger(fallbackValue) || fallbackValue < 1) {
+        throw new RangeError(
+            `Fallback value for ${argumentName} must be a positive integer: ${String(fallbackValue)}`
+        );
+    }
 
-    return Number.isNaN(parsedValue) || parsedValue < 1
-        ? fallbackValue
-        : parsedValue;
+    return fallbackValue;
 };
 
-const maxPathDisplay = parsePositiveIntegerFlag("--max-path=", 50);
-const CONCURRENCY = parsePositiveIntegerFlag("--concurrency=", 50);
+const maxPathDisplay = parsePositiveIntegerFlag(
+    argv,
+    "--max-path-display",
+    50,
+    ["--max-path"]
+);
+const CONCURRENCY = parsePositiveIntegerFlag(argv, "--concurrency", 50);
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectoryPath = dirname(currentFilePath);
@@ -67,9 +117,12 @@ const IGNORED_DIRECTORIES = new Set([
     ".stryker-tmp",
 ]);
 
-// Capture Markdown links like [text](url) and images ![alt](url)
-// NOTE: for more accuracy use a Markdown parser (remark) instead of regex.
+// Capture Markdown links like [text](url) and images ![alt](url).
+// NOTE: this intentionally stays lightweight for MDX-heavy docs, so the
+// surrounding helpers strip code spans/blocks and normalize destinations.
 const LINK_PATTERN = /!?\[[^\]]*]\(([^)]+)\)/g;
+const HTML_ANCHOR_HREF_PATTERN =
+    /<a\b[^>]*\bhref\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/giu;
 
 const EXTERNAL_PROTOCOLS = [
     "http:",
@@ -162,11 +215,89 @@ function isAnchor(link) {
     return link.startsWith("#");
 }
 
+export { stripMarkdownCode };
+
+/**
+ * Extract markdown links and images from prose content after stripping code.
+ *
+ * @param {string} content
+ *
+ * @returns {readonly RegExpMatchArray[]}
+ */
+export function extractMarkdownLinkMatches(content) {
+    return Array.from(stripMarkdownCode(content).matchAll(LINK_PATTERN));
+}
+
+/**
+ * Extract raw HTML anchor destinations from prose content after stripping code.
+ *
+ * @param {string} content
+ *
+ * @returns {readonly string[]}
+ */
+export function extractHtmlAnchorLinks(content) {
+    return Array.from(
+        stripMarkdownCode(content).matchAll(HTML_ANCHOR_HREF_PATTERN),
+        (match) => match[1] ?? match[2] ?? match[3] ?? ""
+    ).filter((link) => link.length > 0);
+}
+
+/**
+ * Remove optional markdown inline-link titles from a captured destination.
+ *
+ * @param {string} rawLink
+ *
+ * @returns {string}
+ */
+export function stripOptionalMarkdownLinkTitle(rawLink) {
+    const trimmedLink = rawLink.trim();
+
+    if (trimmedLink.startsWith("<")) {
+        const closingAngleBracketOffset = trimmedLink.indexOf(">", 1);
+
+        if (closingAngleBracketOffset !== -1) {
+            return trimmedLink.slice(1, closingAngleBracketOffset).trim();
+        }
+    }
+
+    let parenthesisDepth = 0;
+    let isEscaped = false;
+
+    for (const [characterOffset, character] of [...trimmedLink].entries()) {
+        if (isEscaped) {
+            isEscaped = false;
+            continue;
+        }
+
+        if (character === "\\") {
+            isEscaped = true;
+            continue;
+        }
+
+        if (character === "(") {
+            parenthesisDepth += 1;
+            continue;
+        }
+
+        if (character === ")" && parenthesisDepth > 0) {
+            parenthesisDepth -= 1;
+            continue;
+        }
+
+        if (/\s/u.test(character) && parenthesisDepth === 0) {
+            return trimmedLink.slice(0, characterOffset).trim();
+        }
+    }
+
+    return trimmedLink;
+}
+
 /**
  * @param {string} rawLink
  */
-function normalizeLink(rawLink) {
-    const [pathPart] = rawLink.split("#");
+export function normalizeLink(rawLink) {
+    const linkWithoutTitle = stripOptionalMarkdownLinkTitle(rawLink);
+    const [pathPart] = linkWithoutTitle.split("#");
     if (!pathPart) return "";
     const [cleanPath] = pathPart.split("?");
     if (!cleanPath) return "";
@@ -174,27 +305,29 @@ function normalizeLink(rawLink) {
 }
 
 /**
- * Cache results of pathExists
+ * Cache results of file existence checks.
  */
-const pathExistsCache = new Map();
+const pathIsFileCache = new Map();
 
-const pathExists = async (
+const pathExistsAsFile = async (
     /** @type {import("node:fs").PathLike} */ pathToCheck
 ) => {
-    if (pathExistsCache.has(pathToCheck)) {
-        return pathExistsCache.get(pathToCheck);
+    if (pathIsFileCache.has(pathToCheck)) {
+        return pathIsFileCache.get(pathToCheck);
     }
     try {
-        await stat(pathToCheck);
-        pathExistsCache.set(pathToCheck, true);
-        return true;
+        const pathStats = await stat(pathToCheck);
+        const isFilePath = pathStats.isFile();
+
+        pathIsFileCache.set(pathToCheck, isFilePath);
+        return isFilePath;
     } catch {
-        pathExistsCache.set(pathToCheck, false);
+        pathIsFileCache.set(pathToCheck, false);
         return false;
     }
 };
 
-const getPathCandidates = (
+export const getPathCandidates = (
     /** @type {string} */ markdownPath,
     /** @type {string} */ normalizedLink
 ) => {
@@ -221,6 +354,29 @@ const getPathCandidates = (
 };
 
 /**
+ * Resolve the first filesystem-backed file candidate for a normalized link.
+ *
+ * @param {string} markdownPath
+ * @param {string} normalizedLink
+ *
+ * @returns {Promise<string | undefined>}
+ */
+export async function resolveExistingPathCandidate(
+    markdownPath,
+    normalizedLink
+) {
+    const pathCandidates = getPathCandidates(markdownPath, normalizedLink);
+
+    for (const candidatePath of pathCandidates) {
+        if (await pathExistsAsFile(candidatePath)) {
+            return candidatePath;
+        }
+    }
+
+    return undefined;
+}
+
+/**
  * Validate a single link and push to issues if broken. Returns true if broken
  * (so caller can optionally fail-fast).
  *
@@ -239,13 +395,22 @@ const getPathCandidates = (
  */
 async function validateLink(markdownPath, link, issues, issueSet, metrics) {
     metrics.totalLinksChecked++;
-    const normalized = normalizeLink(link);
-    if (normalized.length === 0) {
+    const trimmedLink = link.trim();
+
+    if (trimmedLink.length === 0) {
         metrics.emptyLinks++;
         return false;
     }
-    if (isAnchor(normalized)) {
+
+    if (isAnchor(trimmedLink)) {
         metrics.anchorsIgnored++;
+        return false;
+    }
+
+    const normalized = normalizeLink(trimmedLink);
+
+    if (normalized.length === 0) {
+        metrics.emptyLinks++;
         return false;
     }
     if (isExternalLink(normalized)) {
@@ -258,13 +423,16 @@ async function validateLink(markdownPath, link, issues, issueSet, metrics) {
         return false;
     }
 
-    const pathCandidates = getPathCandidates(markdownPath, normalized);
+    const resolvedCandidatePath = await resolveExistingPathCandidate(
+        markdownPath,
+        normalized
+    );
 
-    for (const candidatePath of pathCandidates) {
-        if (await pathExists(candidatePath)) {
-            return false;
-        }
+    if (resolvedCandidatePath !== undefined) {
+        return false;
     }
+
+    const pathCandidates = getPathCandidates(markdownPath, normalized);
 
     const key = `${markdownPath}|${link}`;
     if (!issueSet.has(key)) {
@@ -306,9 +474,12 @@ async function checkFile(markdownPath, issues, issueSet, metrics) {
     }
 
     const content = await readFile(markdownPath, "utf8");
-    // Skip fenced code blocks
-    const contentWithoutCodeBlocks = content.replaceAll(/```[\s\S]*?```/g, "");
-    const matches = Array.from(contentWithoutCodeBlocks.matchAll(LINK_PATTERN));
+    const strippedContent = stripMarkdownCode(content);
+    const matches = Array.from(strippedContent.matchAll(LINK_PATTERN));
+    const htmlAnchorLinks = Array.from(
+        strippedContent.matchAll(HTML_ANCHOR_HREF_PATTERN),
+        (match) => match[1] ?? match[2] ?? match[3] ?? ""
+    ).filter((link) => link.length > 0);
 
     if (matches.length === 0) {
         metrics.filesWithNoLinks++;
@@ -334,6 +505,20 @@ async function checkFile(markdownPath, issues, issueSet, metrics) {
             if (broken && failFast) {
                 throw new Error("Fail-fast triggered due to broken link");
             }
+        }
+    }
+
+    for (const link of htmlAnchorLinks) {
+        const broken = await validateLink(
+            markdownPath,
+            link,
+            issues,
+            issueSet,
+            metrics
+        );
+
+        if (broken && failFast) {
+            throw new Error("Fail-fast triggered due to broken link");
         }
     }
 }
@@ -479,12 +664,19 @@ async function main() {
     console.log(pc.gray(`Elapsed: ${(elapsedMs / 1000).toFixed(2)}s`));
 }
 
-try {
-    await main();
-} catch (error) {
-    console.error(
-        pc.red("Documentation link check failed due to an unexpected error.")
-    );
-    console.error(error);
-    process.exit(1);
+if (
+    process.argv[1] !== undefined &&
+    resolve(process.argv[1]) === currentFilePath
+) {
+    try {
+        await main();
+    } catch (error) {
+        console.error(
+            pc.red(
+                "Documentation link check failed due to an unexpected error."
+            )
+        );
+        console.error(error);
+        process.exit(1);
+    }
 }

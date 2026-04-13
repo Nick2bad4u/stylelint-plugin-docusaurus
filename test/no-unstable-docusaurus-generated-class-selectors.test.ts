@@ -48,6 +48,28 @@ describe("docusaurus/no-unstable-docusaurus-generated-class-selectors", () => {
         expect(result.warnings).toHaveLength(0);
     });
 
+    it("does not confuse quoted attribute values that merely mention a generated class name", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                [data-target='.codeBlockContainer_RIuc'] {
+                    border-radius: 8px;
+                }
+            `,
+            codeFilename: "src/css/custom.css",
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(0);
+    });
+
     it("reports exact generated Docusaurus class selectors in global CSS", async () => {
         expect.hasAssertions();
 
@@ -96,6 +118,29 @@ describe("docusaurus/no-unstable-docusaurus-generated-class-selectors", () => {
         expect(result.warnings).toHaveLength(1);
     });
 
+    it("reports generated class selectors nested inside pseudo-function selectors", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                :is(.codeBlockContainer_RIuc, .theme-doc-markdown) {
+                    border-radius: 8px;
+                }
+            `,
+            codeFilename: "src/css/custom.css",
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(1);
+        expect(result.warnings[0]?.text).toContain(".codeBlockContainer_RIuc");
+    });
+
     it("ignores CSS module source files", async () => {
         expect.hasAssertions();
 
@@ -106,6 +151,28 @@ describe("docusaurus/no-unstable-docusaurus-generated-class-selectors", () => {
                 }
             `,
             codeFilename: "src/theme/CodeBlock/styles.module.css",
+            config: {
+                plugins: [],
+                rules: {
+                    "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
+                },
+            },
+        });
+
+        expect(result.parseErrors).toHaveLength(0);
+        expect(result.warnings).toHaveLength(0);
+    });
+
+    it("ignores Less CSS module source files", async () => {
+        expect.hasAssertions();
+
+        const result = await lintWithConfig({
+            code: `
+                .codeBlockContainer_RIuc {
+                    border-radius: 8px;
+                }
+            `,
+            codeFilename: "src/theme/CodeBlock/styles.module.less",
             config: {
                 plugins: [],
                 rules: {

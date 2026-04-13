@@ -1,12 +1,15 @@
-import type { Root } from "postcss";
-
 import stylelint, { type RuleBase } from "stylelint";
 import { isDefined } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
-import { normalizeSelectorList } from "../_internal/docusaurus-theme-scope.js";
+import {
+    getClassNamesOutsideGlobal,
+    getSelectors,
+    parseSelectorList,
+} from "../_internal/selector-parser-utils.js";
+import { isCssModuleRoot } from "../_internal/source-file-context.js";
 import {
     createRuleDocsUrl,
     createRuleName,
@@ -40,58 +43,6 @@ const docs = {
 } as const;
 
 /**
- * Extract class tokens from one selector string.
- */
-function extractSelectorNames(selector: string): readonly string[] {
-    const selectorNames = new Set<string>();
-    let index = 0;
-
-    while (index < selector.length) {
-        const currentCharacter = selector[index];
-
-        if (currentCharacter !== ".") {
-            index += 1;
-            continue;
-        }
-
-        const firstTokenCharacter = selector[index + 1];
-
-        if (
-            !isDefined(firstTokenCharacter) ||
-            !isCssIdentifierStart(firstTokenCharacter)
-        ) {
-            index += 1;
-            continue;
-        }
-
-        let cursor = index + 1;
-        let tokenText = "";
-
-        while (cursor < selector.length) {
-            const tokenCharacter = selector[cursor];
-
-            if (
-                !isDefined(tokenCharacter) ||
-                !isCssIdentifierContinuation(tokenCharacter)
-            ) {
-                break;
-            }
-
-            tokenText += tokenCharacter;
-            cursor += 1;
-        }
-
-        if (tokenText.length > 0) {
-            selectorNames.add(tokenText);
-        }
-
-        index = cursor;
-    }
-
-    return [...selectorNames];
-}
-
-/**
  * Find the first unstable generated class selector in one selector list.
  */
 function findUnstableGeneratedClassSelector(selectorList: string):
@@ -100,8 +51,16 @@ function findUnstableGeneratedClassSelector(selectorList: string):
           suggestedAttributeSelector: string;
       }>
     | undefined {
-    for (const selector of normalizeSelectorList(selectorList)) {
-        for (const generatedSelectorName of extractSelectorNames(selector)) {
+    const parsedSelectorList = parseSelectorList(selectorList);
+
+    if (!isDefined(parsedSelectorList)) {
+        return undefined;
+    }
+
+    for (const selector of getSelectors(parsedSelectorList)) {
+        for (const generatedSelectorName of getClassNamesOutsideGlobal(
+            selector
+        )) {
             const suggestedAttributeSelector =
                 getGeneratedClassSelectorSuggestion(generatedSelectorName);
 
@@ -154,43 +113,6 @@ function getGeneratedClassSelectorSuggestion(
 }
 
 /**
- * Check whether a character is an ASCII digit.
- */
-function isAsciiDigit(character: string): boolean {
-    return character >= "0" && character <= "9";
-}
-
-/**
- * Check whether a character is an ASCII letter.
- */
-function isAsciiLetter(character: string): boolean {
-    const codePoint = character.codePointAt(0);
-
-    if (!isDefined(codePoint)) {
-        return false;
-    }
-
-    return (
-        (codePoint >= 65 && codePoint <= 90) ||
-        (codePoint >= 97 && codePoint <= 122)
-    );
-}
-
-/**
- * Check whether a character can continue a CSS class token.
- */
-function isCssIdentifierContinuation(character: string): boolean {
-    return isCssIdentifierStart(character) || isAsciiDigit(character);
-}
-
-/**
- * Check whether a character can start a CSS class token.
- */
-function isCssIdentifierStart(character: string): boolean {
-    return character === "-" || character === "_" || isAsciiLetter(character);
-}
-
-/**
  * Check whether a suffix looks like a generated CSS-module hash fragment.
  */
 function isGeneratedHashSuffix(suffix: string): boolean {
@@ -201,7 +123,7 @@ function isGeneratedHashSuffix(suffix: string): boolean {
     let containsUppercaseLetterOrDigit = false;
 
     for (const character of suffix) {
-        if (!isCssIdentifierContinuation(character)) {
+        if (!/^[A-Za-z0-9_-]$/u.test(character)) {
             return false;
         }
 
@@ -214,26 +136,6 @@ function isGeneratedHashSuffix(suffix: string): boolean {
     }
 
     return containsUppercaseLetterOrDigit;
-}
-
-/**
- * Check whether the current stylesheet is a CSS module source file.
- */
-function isModuleStylesheet(root: Readonly<Root>): boolean {
-    const filePath = root.source?.input.file;
-
-    if (!isDefined(filePath)) {
-        return false;
-    }
-
-    const normalizedPath = filePath.toLowerCase();
-
-    return (
-        normalizedPath.endsWith(".module.css") ||
-        normalizedPath.endsWith(".module.scss") ||
-        normalizedPath.endsWith(".module.sass") ||
-        normalizedPath.endsWith(".module.less")
-    );
 }
 
 /* eslint-enable @typescript-eslint/no-use-before-define -- Helper block ends here. */
@@ -253,7 +155,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
             return;
         }
 
-        if (isModuleStylesheet(root)) {
+        if (isCssModuleRoot(root)) {
             return;
         }
 

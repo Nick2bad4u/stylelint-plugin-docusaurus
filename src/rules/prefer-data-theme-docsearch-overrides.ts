@@ -4,7 +4,12 @@ import { isDefined } from "ts-extras";
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
-import { normalizeSelectorList } from "../_internal/docusaurus-theme-scope.js";
+import {
+    getSelectors,
+    parseSelectorList,
+    selectorHasAttributeInPositiveScope,
+    selectorHasClassInPositiveScope,
+} from "../_internal/selector-parser-utils.js";
 import {
     createRuleDocsUrl,
     createRuleName,
@@ -27,6 +32,11 @@ const docs = {
     url: createRuleDocsUrl("prefer-data-theme-docsearch-overrides"),
 } as const;
 
+/** Check whether one class token belongs to a DocSearch UI surface. */
+function isDocSearchSurfaceClassName(className: string): boolean {
+    return className === "DocSearch" || className.startsWith("DocSearch-");
+}
+
 /**
  * Find the first selector that uses `.navbar--dark` as a DocSearch color-mode
  * proxy without any explicit site `data-theme` scope.
@@ -34,20 +44,42 @@ const docs = {
 function findInvalidDocSearchOverrideSelector(
     selectorList: string
 ): string | undefined {
-    for (const selector of normalizeSelectorList(selectorList)) {
-        if (!selector.includes(".navbar--dark")) {
+    const parsedSelectorList = parseSelectorList(selectorList);
+
+    if (!isDefined(parsedSelectorList)) {
+        return undefined;
+    }
+
+    for (const selector of getSelectors(parsedSelectorList)) {
+        if (
+            !selectorHasClassInPositiveScope(
+                selector,
+                (className) => className === "navbar--dark"
+            )
+        ) {
             continue;
         }
 
-        if (!selector.includes(".DocSearch")) {
+        if (
+            !selectorHasClassInPositiveScope(
+                selector,
+                isDocSearchSurfaceClassName
+            )
+        ) {
             continue;
         }
 
-        if (selector.includes("[data-theme")) {
+        if (
+            selectorHasAttributeInPositiveScope(
+                selector,
+                (attributeNode) =>
+                    attributeNode.attribute.toLowerCase() === "data-theme"
+            )
+        ) {
             continue;
         }
 
-        return selector;
+        return selector.toString();
     }
 
     return undefined;

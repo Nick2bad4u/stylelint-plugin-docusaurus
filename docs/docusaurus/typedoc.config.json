@@ -107,6 +107,5 @@
     "sort": [
         "source-order"
     ],
-    "themeColor": "#2E2A33",
     "tsconfig": "../../tsconfig.build.json"
 }

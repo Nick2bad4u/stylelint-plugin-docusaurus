@@ -1,7 +1,7 @@
 import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
 /** Rule and config docs sidebar for the Stylelint plugin docs section. */
-const sidebars = {
+const sidebars: SidebarsConfig = {
     rules: [
         {
             className: "sb-doc-overview",
@@ -111,17 +111,82 @@ const sidebars = {
                     label: "R008 no-mobile-navbar-stacking-context-traps",
                     type: "doc",
                 },
+                {
+                    id: "no-unwrapped-global-theme-selectors-in-css-modules",
+                    label: "R009 no-unwrapped-global-theme-selectors-in-css-modules",
+                    type: "doc",
+                },
+                {
+                    id: "no-unscoped-content-element-overrides",
+                    label: "R010 no-unscoped-content-element-overrides",
+                    type: "doc",
+                },
+                {
+                    id: "no-unanchored-infima-subcomponent-selectors",
+                    label: "R011 no-unanchored-infima-subcomponent-selectors",
+                    type: "doc",
+                },
+                {
+                    id: "no-subtree-data-theme-selectors",
+                    label: "R012 no-subtree-data-theme-selectors",
+                    type: "doc",
+                },
+                {
+                    id: "no-navbar-breakpoint-desync",
+                    label: "R013 no-navbar-breakpoint-desync",
+                    type: "doc",
+                },
+                {
+                    id: "require-ifm-color-primary-scale-per-color-mode",
+                    label: "R014 require-ifm-color-primary-scale-per-color-mode",
+                    type: "doc",
+                },
+                {
+                    id: "require-docsearch-color-mode-pairs",
+                    label: "R015 require-docsearch-color-mode-pairs",
+                    type: "doc",
+                },
+                {
+                    id: "prefer-infima-theme-tokens-over-structural-overrides",
+                    label: "R016 prefer-infima-theme-tokens-over-structural-overrides",
+                    type: "doc",
+                },
+                {
+                    id: "no-unsafe-theme-internal-selectors",
+                    label: "R017 no-unsafe-theme-internal-selectors",
+                    type: "doc",
+                },
+                {
+                    id: "require-html-prefix-for-docusaurus-data-attribute-selectors",
+                    label: "R018 require-html-prefix-for-docusaurus-data-attribute-selectors",
+                    type: "doc",
+                },
+                {
+                    id: "no-docusaurus-layer-name-collisions",
+                    label: "R019 no-docusaurus-layer-name-collisions",
+                    type: "doc",
+                },
+                {
+                    id: "no-revert-layer-outside-isolation-subtrees",
+                    label: "R020 no-revert-layer-outside-isolation-subtrees",
+                    type: "doc",
+                },
+                {
+                    id: "no-direct-theme-token-consumption-in-css-modules",
+                    label: "R021 no-direct-theme-token-consumption-in-css-modules",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {
                 description:
-                    "Reference documentation for the first Docusaurus-specific Stylelint rules in this template.",
+                    "Reference documentation for the public Docusaurus-specific Stylelint rule catalog in this package.",
                 title: "Rules",
                 type: "generated-index",
             },
             type: "category",
         },
     ],
-} satisfies SidebarsConfig;
+};
 
 export default sidebars;

@@ -28,17 +28,17 @@ Using `.navbar--dark` for DocSearch dark-mode overrides can make the search UI d
 
 ```css
 .navbar--dark .DocSearch-Button {
-  color: white;
-  background: rgb(20 20 20 / 80%);
+ color: white;
+ background: rgb(20 20 20 / 80%);
 }
 ```
 
 ## ✅ Correct
 
 ```css
-[data-theme='dark'] .DocSearch-Button {
-  color: white;
-  background: rgb(20 20 20 / 80%);
+[data-theme="dark"] .DocSearch-Button {
+ color: white;
+ background: rgb(20 20 20 / 80%);
 }
 ```
 
@@ -53,8 +53,8 @@ Using `.navbar--dark` for DocSearch dark-mode overrides can make the search UI d
 ### ✅ Correct — explicit light-mode scope
 
 ```css
-[data-theme='light'] .DocSearch-Button {
-  color: var(--ifm-color-emphasis-700);
+[data-theme="light"] .DocSearch-Button {
+ color: var(--ifm-color-emphasis-700);
 }
 ```
 
@@ -62,7 +62,7 @@ Using `.navbar--dark` for DocSearch dark-mode overrides can make the search UI d
 
 ```css
 .navbar--dark .searchLabel {
-  color: white;
+ color: white;
 }
 ```
 
@@ -72,11 +72,11 @@ Using `.navbar--dark` for DocSearch dark-mode overrides can make the search UI d
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.all,
-  rules: {
-    ...configs.all.rules,
-    "docusaurus/prefer-data-theme-docsearch-overrides": true,
-  },
+ ...configs.all,
+ rules: {
+  ...configs.all.rules,
+  "docusaurus/prefer-data-theme-docsearch-overrides": true,
+ },
 };
 ```
 

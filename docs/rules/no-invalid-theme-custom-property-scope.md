@@ -8,6 +8,8 @@ This rule targets declarations of Docusaurus-wide theme variables such as `--ifm
 
 It is focused on **where** those variables are declared, not where they are read with `var(...)`.
 
+For `--docsearch-*` variables, the rule allows both global theme scopes and explicit `.DocSearch` UI scopes because Docusaurus documents DocSearch theming through the DocSearch component surface.
+
 ## What this rule reports
 
 This rule reports Docusaurus theme custom property declarations when they appear inside component or page selectors instead of a global theme scope such as `:root` or `[data-theme='dark']`.
@@ -22,7 +24,7 @@ Declaring them inside component selectors makes theme behavior harder to reason 
 
 ```css
 .heroBanner {
-  --ifm-color-primary: #4e89e8;
+ --ifm-color-primary: #4e89e8;
 }
 ```
 
@@ -30,11 +32,11 @@ Declaring them inside component selectors makes theme behavior harder to reason 
 
 ```css
 :root {
-  --ifm-color-primary: #4e89e8;
+ --ifm-color-primary: #4e89e8;
 }
 
-[data-theme='dark'] {
-  --ifm-color-primary: #8ab4f8;
+[data-theme="dark"] {
+ --ifm-color-primary: #8ab4f8;
 }
 ```
 
@@ -50,7 +52,15 @@ Declaring them inside component selectors makes theme behavior harder to reason 
 
 ```css
 .heroBanner {
-  color: var(--ifm-color-primary);
+ color: var(--ifm-color-primary);
+}
+```
+
+### ✅ Correct — scope DocSearch variables to the DocSearch UI
+
+```css
+[data-theme="dark"] .DocSearch {
+ --docsearch-primary-color: #8ab4f8;
 }
 ```
 
@@ -60,11 +70,11 @@ Declaring them inside component selectors makes theme behavior harder to reason 
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.recommended,
-  rules: {
-    ...configs.recommended.rules,
-    "docusaurus/no-invalid-theme-custom-property-scope": true,
-  },
+ ...configs.recommended,
+ rules: {
+  ...configs.recommended.rules,
+  "docusaurus/no-invalid-theme-custom-property-scope": true,
+ },
 };
 ```
 

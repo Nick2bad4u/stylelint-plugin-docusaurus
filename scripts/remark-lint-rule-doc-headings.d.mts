@@ -12,7 +12,7 @@ export type RuleDocPrimaryHeadingKey =
     | "deprecated"
     | "behaviorAndMigrationNotes"
     | "additionalExamples"
-    | "eslintFlatConfigExample"
+    | "stylelintConfigExample"
     | "whenNotToUseIt"
     | "packageDocumentation"
     | "furtherReading"

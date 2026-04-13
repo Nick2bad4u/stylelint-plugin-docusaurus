@@ -53,7 +53,7 @@ function getPreferredSelector(
  * selectors.
  */
 const ruleFunction: RuleBase<boolean, undefined> =
-    (primary, _secondaryOptions, context) => (root, result) => {
+    (primary) => (root, result) => {
         const isValid = validateOptions(result, ruleName, {
             actual: primary,
             possible: [true],
@@ -73,20 +73,18 @@ const ruleFunction: RuleBase<boolean, undefined> =
             }
 
             const preferredSelector = getPreferredSelector(legacySelector);
+            const nextSelector = normalizeLegacyThemeColorModeSelectors(
+                ruleNode.selector
+            );
 
-            if (context.fix === true) {
-                const nextSelector = normalizeLegacyThemeColorModeSelectors(
-                    ruleNode.selector
-                );
-
-                if (nextSelector !== ruleNode.selector) {
-                    ruleNode.selector = nextSelector;
-                }
-
+            if (nextSelector === ruleNode.selector) {
                 return;
             }
 
             report({
+                fix: () => {
+                    ruleNode.selector = nextSelector;
+                },
                 message: messages.rejectedLegacySelector(
                     legacySelector,
                     preferredSelector

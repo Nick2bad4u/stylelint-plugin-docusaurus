@@ -28,6 +28,12 @@ export function deriveSiteConfiguration(
 
 export function decodeXmlEntities(value: string): string;
 
+export function parsePositiveInteger(
+    rawValue: string | undefined,
+    defaultValue: number,
+    label: string
+): number;
+
 export function parseSitemapUrls(sitemapXml: string): readonly string[];
 
 export function chunkValues<T>(

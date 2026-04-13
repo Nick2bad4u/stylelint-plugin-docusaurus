@@ -30,7 +30,7 @@ Those mobile overlay elements rely on fixed-position behavior. If custom CSS put
 
 ```css
 .navbar {
-  transform: translateZ(0);
+ transform: translateZ(0);
 }
 ```
 
@@ -38,9 +38,9 @@ Those mobile overlay elements rely on fixed-position behavior. If custom CSS put
 
 ```css
 @media (min-width: 997px) {
-  .navbar {
-    transform: translateZ(0);
-  }
+ .navbar {
+  transform: translateZ(0);
+ }
 }
 ```
 
@@ -56,7 +56,7 @@ Those mobile overlay elements rely on fixed-position behavior. If custom CSS put
 
 ```css
 .navbar--fixed-top {
-  contain: content;
+ contain: content;
 }
 ```
 
@@ -64,8 +64,8 @@ Those mobile overlay elements rely on fixed-position behavior. If custom CSS put
 
 ```css
 .navbar {
-  transform: none;
-  will-change: opacity;
+ transform: none;
+ will-change: opacity;
 }
 ```
 
@@ -75,11 +75,11 @@ Those mobile overlay elements rely on fixed-position behavior. If custom CSS put
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.all,
-  rules: {
-    ...configs.all.rules,
-    "docusaurus/no-mobile-navbar-stacking-context-traps": true,
-  },
+ ...configs.all,
+ rules: {
+  ...configs.all.rules,
+  "docusaurus/no-mobile-navbar-stacking-context-traps": true,
+ },
 };
 ```
 

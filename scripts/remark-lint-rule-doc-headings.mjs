@@ -6,6 +6,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+import { stripMarkdownCode } from "./_internal/strip-markdown-code.mjs";
+
 /** @typedef {import("mdast").Heading} Heading */
 /** @typedef {import("mdast").Root} Root */
 /** @typedef {import("unist").Node} Node */
@@ -274,6 +276,17 @@ const getExpectedH1Titles = (fileRuleId, ruleNamespaceAliases) => {
  * @returns {string}
  */
 const normalizePath = (path) => path.replaceAll("\\", "/");
+
+/**
+ * @param {RegExp} pattern
+ * @param {string} value
+ *
+ * @returns {boolean}
+ */
+const testPattern = (pattern, value) => {
+    pattern.lastIndex = 0;
+    return pattern.test(value);
+};
 
 /**
  * @param {unknown} value
@@ -708,7 +721,11 @@ export default function remarkLintRuleDocHeadings(options = {}) {
                 nextH2Heading
             );
 
-            if (!/\[[^\]]+\]\([^\)]+\)/u.test(deprecatedSectionContent)) {
+            if (
+                !/\[[^\]]+\]\([^\)]+\)/u.test(
+                    stripMarkdownCode(deprecatedSectionContent)
+                )
+            ) {
                 file.message(
                     "`## Deprecated` should include a link to the recommended replacement rule or package.",
                     deprecatedSectionHeading,
@@ -751,8 +768,9 @@ export default function remarkLintRuleDocHeadings(options = {}) {
                 );
 
                 if (
-                    !packageDocumentationLabelPattern.test(
-                        packageDocumentationContent
+                    !testPattern(
+                        packageDocumentationLabelPattern,
+                        stripMarkdownCode(packageDocumentationContent)
                     )
                 ) {
                     file.message(
@@ -765,11 +783,11 @@ export default function remarkLintRuleDocHeadings(options = {}) {
         }
 
         if (requireRuleCatalogId) {
-            const markdownContent = String(file);
+            const markdownContent = stripMarkdownCode(String(file));
             const ruleCatalogIdLines = markdownContent
                 .split(/\r?\n/u)
                 .map((line) => line.trimEnd())
-                .filter((line) => ruleCatalogIdLinePattern.test(line));
+                .filter((line) => testPattern(ruleCatalogIdLinePattern, line));
 
             if (ruleCatalogIdLines.length === 0) {
                 file.message(

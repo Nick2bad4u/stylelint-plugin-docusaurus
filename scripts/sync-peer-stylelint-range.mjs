@@ -8,46 +8,52 @@
 // @ts-check
 
 import { readFile, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const packageJsonPath = fileURLToPath(
     new URL("../package.json", import.meta.url)
 );
-const minimumSupportedStylelintRange = "^16.0.0";
+export const minimumSupportedStylelintRange = "^16.0.0";
+
+/**
+ * Determine whether the current module is being executed directly.
+ *
+ * @param {object} [input] - Direct-execution detection input.
+ * @param {string | undefined} [input.argvEntry=process.argv[1]] - Entry path.
+ *   Default is `process.argv[1]`
+ * @param {string} [input.currentImportUrl=import.meta.url] - Current module
+ *   URL. Default is `import.meta.url`
+ *
+ * @returns {boolean} Whether this module is the CLI entrypoint.
+ */
+export function isDirectExecution({
+    argvEntry = process.argv[1],
+    currentImportUrl = import.meta.url,
+} = {}) {
+    if (typeof argvEntry !== "string" || argvEntry.length === 0) {
+        return false;
+    }
+
+    return pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+}
 
 /**
  * @returns {Promise<Record<string, unknown>>}
  */
-const readPackageJson = async () => {
+export const readPackageJson = async (filePath = packageJsonPath) => {
     try {
-        const packageJsonContent = await readFile(packageJsonPath, "utf8");
+        const packageJsonContent = await readFile(filePath, "utf8");
         return /** @type {Record<string, unknown>} */ (
             JSON.parse(packageJsonContent)
         );
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         throw new TypeError(
-            `Failed to read package.json at ${packageJsonPath}: ${message}`,
+            `Failed to read package.json at ${filePath}: ${message}`,
             { cause: error }
         );
     }
-};
-
-/**
- * @param {unknown} existingPeerRange
- *
- * @returns {string}
- */
-const resolvePeerFloorRange = (existingPeerRange) => {
-    if (typeof existingPeerRange !== "string") {
-        return minimumSupportedStylelintRange;
-    }
-
-    const [floorCandidate] = existingPeerRange
-        .split("||")
-        .map((part) => part.trim());
-
-    return floorCandidate || minimumSupportedStylelintRange;
 };
 
 /**
@@ -55,15 +61,83 @@ const resolvePeerFloorRange = (existingPeerRange) => {
  *
  * @returns {value is Record<string, unknown>}
  */
-const isRecord = (value) => typeof value === "object" && value !== null;
+export const isRecord = (value) => typeof value === "object" && value !== null;
+
+/**
+ * Normalize a Stylelint range string.
+ *
+ * @param {unknown} range
+ *
+ * @returns {string}
+ */
+export const normalizeStylelintRange = (range) => {
+    if (typeof range !== "string" || range.trim().length === 0) {
+        throw new TypeError(
+            "Expected a non-empty Stylelint version range string."
+        );
+    }
+
+    return range.trim();
+};
+
+/**
+ * Split a Stylelint semver range into normalized `||` clauses.
+ *
+ * @param {string} range
+ *
+ * @returns {readonly string[]}
+ */
+const getStylelintRangeClauses = (range) =>
+    normalizeStylelintRange(range)
+        .split("||")
+        .map((clause) => clause.trim())
+        .filter((clause) => clause.length > 0);
+
+/**
+ * Build the next `peerDependencies.stylelint` range.
+ *
+ * The template's minimum supported Stylelint range is always the floor source
+ * of truth. Existing peer ranges must not be allowed to drop or replace it.
+ *
+ * @param {object} input
+ * @param {unknown} input.devDependencyStylelintRange
+ * @param {string} [input.minimumRange=minimumSupportedStylelintRange] Default
+ *   is `minimumSupportedStylelintRange`
+ *
+ * @returns {string}
+ */
+export const createPeerStylelintRange = ({
+    devDependencyStylelintRange,
+    minimumRange = minimumSupportedStylelintRange,
+}) => {
+    const normalizedMinimumRange = normalizeStylelintRange(minimumRange);
+    const normalizedDevDependencyRange = normalizeStylelintRange(
+        devDependencyStylelintRange
+    );
+
+    return [
+        ...new Set([
+            normalizedMinimumRange,
+            ...getStylelintRangeClauses(normalizedDevDependencyRange),
+        ]),
+    ].join(" || ");
+};
 
 /**
  * Synchronize `peerDependencies.stylelint` to the current supported range.
  *
- * @returns {Promise<void>}
+ * @param {object} [input]
+ * @param {string} [input.filePath=packageJsonPath] Default is `packageJsonPath`
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ *   Default is `console`
+ *
+ * @returns {Promise<"updated" | "unchanged">}
  */
-const main = async () => {
-    const packageJson = await readPackageJson();
+export const synchronizePeerStylelintRange = async ({
+    filePath = packageJsonPath,
+    logger = console,
+} = {}) => {
+    const packageJson = await readPackageJson(filePath);
     const devDependencies = packageJson["devDependencies"];
     const peerDependencies = packageJson["peerDependencies"];
 
@@ -73,44 +147,65 @@ const main = async () => {
         );
     }
 
-    const devDependencyStylelintRange = devDependencies["stylelint"];
-
-    if (
-        typeof devDependencyStylelintRange !== "string" ||
-        devDependencyStylelintRange.trim().length === 0
-    ) {
-        throw new TypeError(
-            "Expected devDependencies.stylelint to be a non-empty string range"
-        );
-    }
-
-    const peerFloorRange = resolvePeerFloorRange(peerDependencies["stylelint"]);
-    const nextPeerSegments = [
-        ...new Set([peerFloorRange, devDependencyStylelintRange]),
-    ];
-    const nextPeerStylelintRange = nextPeerSegments.join(" || ");
+    const nextPeerStylelintRange = createPeerStylelintRange({
+        devDependencyStylelintRange: devDependencies["stylelint"],
+    });
 
     if (peerDependencies["stylelint"] === nextPeerStylelintRange) {
-        console.log(
+        logger.log(
             `peerDependencies.stylelint already aligned: ${nextPeerStylelintRange}`
         );
-        return;
+        return "unchanged";
     }
 
     peerDependencies["stylelint"] = nextPeerStylelintRange;
     await writeFile(
-        packageJsonPath,
+        filePath,
         `${JSON.stringify(packageJson, null, 4)}\n`,
         "utf8"
     );
-    console.log(
+    logger.log(
         `Updated peerDependencies.stylelint to: ${nextPeerStylelintRange}`
     );
+    return "updated";
 };
 
-try {
-    await main();
-} catch (error) {
-    console.error("Failed to synchronize peerDependencies.stylelint:", error);
-    process.exitCode = 1;
+/**
+ * CLI entrypoint.
+ *
+ * @param {object} [input]
+ * @param {string} [input.filePath=packageJsonPath] Default is `packageJsonPath`
+ * @param {{
+ *     error: (...args: readonly unknown[]) => void;
+ *     log: (...args: readonly unknown[]) => void;
+ * }} [input.logger=console]
+ *   Default is `console`
+ *
+ * @returns {Promise<number>}
+ */
+export const runCli = async ({
+    filePath = packageJsonPath,
+    logger = console,
+} = {}) => {
+    try {
+        await synchronizePeerStylelintRange({
+            filePath,
+            logger,
+        });
+        return 0;
+    } catch (error) {
+        logger.error(
+            "Failed to synchronize peerDependencies.stylelint:",
+            error
+        );
+        return 1;
+    }
+};
+
+if (isDirectExecution()) {
+    const exitCode = await runCli({ filePath: packageJsonPath });
+
+    if (exitCode !== 0) {
+        process.exitCode = exitCode;
+    }
 }

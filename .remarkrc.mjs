@@ -212,7 +212,7 @@ const ruleDocHeadingDefaults = {
         deprecated: true,
         behaviorAndMigrationNotes: true,
         additionalExamples: true,
-        eslintFlatConfigExample: true,
+        stylelintConfigExample: true,
         whenNotToUseIt: true,
         packageDocumentation: true,
         furtherReading: true,

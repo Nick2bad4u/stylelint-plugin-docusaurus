@@ -5,7 +5,7 @@ description: Shareable Stylelint configs exported by stylelint-plugin-docusaurus
 
 # Configs
 
-`stylelint-plugin-docusaurus` currently exports two shareable configs:
+`stylelint-plugin-docusaurus` currently exports these shareable configs:
 
 - `recommended`
 - `all`
@@ -16,4 +16,4 @@ The template keeps both config entrypoints from day one so new rules can be cate
 
 The configs are no longer equivalent.
 
-`recommended` stays focused on broadly applicable, low-noise Docusaurus guardrails, while `all` additionally enables stricter or more specialized opt-in rules such as `docusaurus/require-ifm-color-primary-scale`, `docusaurus/prefer-data-theme-docsearch-overrides`, `docusaurus/no-mobile-navbar-stacking-context-traps`, `docusaurus/no-unstable-docusaurus-generated-class-selectors`, and `docusaurus/prefer-stable-docusaurus-theme-class-names`.
+`recommended` stays focused on broadly applicable, low-noise Docusaurus guardrails, while `all` additionally enables stricter or more specialized opt-in rules such as `docusaurus/no-unscoped-content-element-overrides`, `docusaurus/no-unanchored-infima-subcomponent-selectors`, `docusaurus/no-navbar-breakpoint-desync`, `docusaurus/require-docsearch-color-mode-pairs`, `docusaurus/prefer-infima-theme-tokens-over-structural-overrides`, and the cascade-layer safety rules.

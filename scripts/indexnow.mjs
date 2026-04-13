@@ -1,5 +1,5 @@
 import * as fs from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import * as path from "node:path";
 import { execFile as executeFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -387,12 +387,18 @@ const createRejectedPayloadError = ({
  *
  * @returns {number}
  */
-const parsePositiveInteger = (rawValue, defaultValue, label) => {
+export const parsePositiveInteger = (rawValue, defaultValue, label) => {
     if (rawValue === undefined || rawValue.trim().length === 0) {
         return defaultValue;
     }
 
-    const numericValue = Number.parseInt(rawValue, 10);
+    const normalizedValue = rawValue.trim();
+
+    if (!/^\d+$/u.test(normalizedValue)) {
+        throw new Error(`${label} must be a positive integer.`);
+    }
+
+    const numericValue = Number.parseInt(normalizedValue, 10);
 
     if (!Number.isSafeInteger(numericValue) || numericValue <= 0) {
         throw new Error(`${label} must be a positive integer.`);
@@ -734,7 +740,17 @@ const normalizeDocusaurusSourcePathForSiteDirectory = (
     ];
 
     for (const candidatePath of candidatePaths) {
-        if (!existsSync(candidatePath)) {
+        const candidatePathRelativeToSiteDirectory = path.relative(
+            resolvedSiteDirectoryPath,
+            candidatePath
+        );
+
+        if (
+            candidatePathRelativeToSiteDirectory.startsWith("..") ||
+            path.isAbsolute(candidatePathRelativeToSiteDirectory) ||
+            !existsSync(candidatePath) ||
+            !statSync(candidatePath).isFile()
+        ) {
             continue;
         }
 
@@ -867,22 +883,18 @@ export const resolveChangedUrlsFromManifest = ({
     manifestEntries,
     siteUrl,
 }) => {
-    const manifestBySourcePath = new Map(
-        manifestEntries.map((entry) => [entry.sourcePath, entry.permalink])
-    );
     /** @type {string[]} */
     const urls = [];
     const seenUrls = new Set();
+    const changedPathSet = new Set(changedPaths);
 
-    for (const changedPath of changedPaths) {
-        const permalink = manifestBySourcePath.get(changedPath);
-
-        if (permalink === undefined) {
+    for (const manifestEntry of manifestEntries) {
+        if (!changedPathSet.has(manifestEntry.sourcePath)) {
             continue;
         }
 
         const absoluteUrl = new URL(
-            permalink,
+            manifestEntry.permalink,
             normalizeSiteUrl(siteUrl)
         ).toString();
 

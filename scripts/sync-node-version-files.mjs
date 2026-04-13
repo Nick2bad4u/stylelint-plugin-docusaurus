@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Synchronize repository Node version files.
  *
@@ -13,9 +11,12 @@
  * - `.node-version`
  * - `.nvmrc`
  */
+// @ts-check
 
 import { readFile, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import process from "node:process";
+import { resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const packageJsonPath = fileURLToPath(
     new URL("../package.json", import.meta.url)
@@ -26,20 +27,24 @@ const nodeVersionFilePath = fileURLToPath(
 const nvmrcFilePath = fileURLToPath(new URL("../.nvmrc", import.meta.url));
 
 /**
+ * @typedef {"updated" | "validated" | "validated-current"} NodeVersionSyncResult
+ */
+
+/**
  * Normalize a Node.js version string to exact `x.y.z` form.
  *
  * @param {unknown} version
  *
  * @returns {string}
  */
-const normalizeNodeVersion = (version) => {
+export const normalizeNodeVersion = (version) => {
     if (typeof version !== "string") {
         throw new TypeError("Expected a string Node.js version.");
     }
 
     const trimmedVersion = version.trim().replace(/^v/iu, "");
 
-    if (!/^\d+\.\d+\.\d+$/v.test(trimmedVersion)) {
+    if (!/^\d+\.\d+\.\d+$/u.test(trimmedVersion)) {
         throw new TypeError(
             `Expected an exact Node.js version in x.y.z form, received: ${version}`
         );
@@ -55,7 +60,29 @@ const normalizeNodeVersion = (version) => {
  *
  * @returns {value is Record<string, unknown>}
  */
-const isRecord = (value) => typeof value === "object" && value !== null;
+export const isRecord = (value) => typeof value === "object" && value !== null;
+
+/**
+ * Determine whether the current module is being executed directly.
+ *
+ * @param {object} [input]
+ * @param {string | undefined} [input.argvEntry=process.argv[1]] Default is
+ *   `process.argv[1]`
+ * @param {string} [input.currentImportUrl=import.meta.url] Default is
+ *   `import.meta.url`
+ *
+ * @returns {boolean}
+ */
+export function isDirectExecution({
+    argvEntry = process.argv[1],
+    currentImportUrl = import.meta.url,
+} = {}) {
+    if (typeof argvEntry !== "string" || argvEntry.length === 0) {
+        return false;
+    }
+
+    return pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+}
 
 /**
  * Parse command-line arguments.
@@ -74,7 +101,7 @@ const isRecord = (value) => typeof value === "object" && value !== null;
  *     explicitVersion: string | null;
  * }}
  */
-const parseArguments = (argumentList) => {
+export const parseArguments = (argumentList) => {
     /** @type {boolean} */
     let checkOnly = false;
     /** @type {boolean} */
@@ -139,33 +166,67 @@ const parseArguments = (argumentList) => {
 /**
  * Read and parse package.json.
  *
+ * @param {string} [filePath=packageJsonPath] Default is `packageJsonPath`
+ *
  * @returns {Promise<Record<string, unknown>>}
  */
-const readPackageJson = async () => {
-    const packageJsonContent = await readFile(packageJsonPath, "utf8");
+export const readPackageJson = async (filePath = packageJsonPath) => {
+    try {
+        const packageJsonContent = await readFile(filePath, "utf8");
+        const parsedPackageJson = JSON.parse(packageJsonContent);
 
-    return /** @type {Record<string, unknown>} */ (
-        JSON.parse(packageJsonContent)
-    );
+        if (!isRecord(parsedPackageJson)) {
+            throw new TypeError(
+                "Expected package.json to contain a JSON object."
+            );
+        }
+
+        return parsedPackageJson;
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new TypeError(
+            `Failed to read package.json at ${filePath}: ${message}`,
+            {
+                cause: error,
+            }
+        );
+    }
 };
 
 /**
- * Extract the minimum supported Node.js version when `engines.node` uses the
- * repository's current `>=x.y.z` form.
+ * Extract the minimum supported Node.js version when `engines.node` uses a
+ * leading `>=` comparator, optionally followed by upper-bound comparators.
  *
  * @param {unknown} enginesValue
  *
  * @returns {string | null}
  */
-const resolveMinimumEngineVersion = (enginesValue) => {
+export const resolveMinimumEngineVersion = (enginesValue) => {
     if (!isRecord(enginesValue) || typeof enginesValue["node"] !== "string") {
         return null;
     }
 
     const nodeEngineRange = enginesValue["node"].trim();
-    const match = /^>=\s*(\d+\.\d+\.\d+)$/v.exec(nodeEngineRange);
+    if (nodeEngineRange.includes("||")) {
+        return null;
+    }
 
-    return match?.[1] ?? null;
+    const match = /^>=\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\s+.*)?$/u.exec(
+        nodeEngineRange
+    );
+
+    if (match === null) {
+        return null;
+    }
+
+    const [
+        ,
+        majorVersion,
+        minorVersion = "0",
+        patchVersion = "0",
+    ] = match;
+
+    return `${majorVersion}.${minorVersion}.${patchVersion}`;
 };
 
 /**
@@ -176,7 +237,7 @@ const resolveMinimumEngineVersion = (enginesValue) => {
  *
  * @returns {number}
  */
-const compareExactVersions = (leftVersion, rightVersion) => {
+export const compareExactVersions = (leftVersion, rightVersion) => {
     const leftSegments = leftVersion.split(".").map(Number);
     const rightSegments = rightVersion.split(".").map(Number);
 
@@ -205,7 +266,7 @@ const compareExactVersions = (leftVersion, rightVersion) => {
  *
  * @returns {void}
  */
-const assertPreferredVersionSupported = (
+export const assertPreferredVersionSupported = (
     preferredVersion,
     minimumEngineVersion
 ) => {
@@ -231,7 +292,7 @@ const assertPreferredVersionSupported = (
  *
  * @returns {Promise<string | null>}
  */
-const readOptionalVersionFile = async (filePath) => {
+export const readOptionalVersionFile = async (filePath) => {
     try {
         return await readFile(filePath, "utf8");
     } catch (error) {
@@ -250,30 +311,57 @@ const readOptionalVersionFile = async (filePath) => {
 /**
  * Write the managed version files.
  *
- * @param {string} preferredVersion
+ * @param {object} input
+ * @param {string} input.preferredVersion
+ * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ *   `nodeVersionFilePath`
+ * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ *   `nvmrcFilePath`
  *
- * @returns {Promise<void>}
+ * @returns {Promise<string>}
  */
-const writeVersionFiles = async (preferredVersion) => {
-    const fileContent = `${preferredVersion}\n`;
+export const writeVersionFiles = async ({
+    preferredVersion,
+    nodeVersionFilePath: targetNodeVersionFilePath = nodeVersionFilePath,
+    nvmrcFilePath: targetNvmrcFilePath = nvmrcFilePath,
+}) => {
+    const normalizedPreferredVersion = normalizeNodeVersion(preferredVersion);
+    const fileContent = `${normalizedPreferredVersion}\n`;
 
     await Promise.all([
-        writeFile(nodeVersionFilePath, fileContent, "utf8"),
-        writeFile(nvmrcFilePath, fileContent, "utf8"),
+        writeFile(targetNodeVersionFilePath, fileContent, "utf8"),
+        writeFile(targetNvmrcFilePath, fileContent, "utf8"),
     ]);
+
+    return normalizedPreferredVersion;
 };
 
 /**
  * Validate the managed version files.
  *
- * @param {{ expectedVersion: string | null }} options
+ * @param {object} input
+ * @param {string | null} input.expectedVersion
+ * @param {string | null} [input.minimumEngineVersion=null] Default is `null`
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ *   Default is `console`
+ * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ *   `nodeVersionFilePath`
+ * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ *   `nvmrcFilePath`
  *
- * @returns {Promise<void>}
+ * @returns {Promise<string>}
  */
-const validateVersionFiles = async ({ expectedVersion }) => {
-    const nodeVersionFileContent =
-        await readOptionalVersionFile(nodeVersionFilePath);
-    const nvmrcFileContent = await readOptionalVersionFile(nvmrcFilePath);
+export const validateVersionFiles = async ({
+    expectedVersion,
+    minimumEngineVersion = null,
+    logger = console,
+    nodeVersionFilePath: targetNodeVersionFilePath = nodeVersionFilePath,
+    nvmrcFilePath: targetNvmrcFilePath = nvmrcFilePath,
+}) => {
+    const nodeVersionFileContent = await readOptionalVersionFile(
+        targetNodeVersionFilePath
+    );
+    const nvmrcFileContent = await readOptionalVersionFile(targetNvmrcFilePath);
 
     if (nodeVersionFileContent === null || nvmrcFileContent === null) {
         throw new TypeError(
@@ -309,41 +397,140 @@ const validateVersionFiles = async ({ expectedVersion }) => {
         );
     }
 
-    console.log(
+    assertPreferredVersionSupported(
+        normalizedNodeVersionFile,
+        minimumEngineVersion
+    );
+
+    logger.log(
         `Node version files are synchronized: ${normalizedNodeVersionFile}`
     );
+
+    return normalizedNodeVersionFile;
 };
 
-const main = async () => {
-    const { checkCurrent, checkOnly, explicitVersion } = parseArguments(
-        process.argv.slice(2)
-    );
-    const packageJson = await readPackageJson();
+/**
+ * Synchronize or validate the repository's Node version files.
+ *
+ * @param {object} [input]
+ * @param {readonly string[]} [input.argumentList=process.argv.slice(2)]
+ *   Default is `process.argv.slice(2)`
+ * @param {string} [input.currentRuntimeVersion=process.versions.node] Default
+ *   is `process.versions.node`
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ *   Default is `console`
+ * @param {string} [input.packageJsonPath=packageJsonPath] Default is
+ *   `packageJsonPath`
+ * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ *   `nodeVersionFilePath`
+ * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ *   `nvmrcFilePath`
+ *
+ * @returns {Promise<NodeVersionSyncResult>}
+ */
+export const synchronizeNodeVersionFiles = async ({
+    argumentList = process.argv.slice(2),
+    currentRuntimeVersion = process.versions.node,
+    logger = console,
+    packageJsonPath: targetPackageJsonPath = packageJsonPath,
+    nodeVersionFilePath: targetNodeVersionFilePath = nodeVersionFilePath,
+    nvmrcFilePath: targetNvmrcFilePath = nvmrcFilePath,
+} = {}) => {
+    const { checkCurrent, checkOnly, explicitVersion } =
+        parseArguments(argumentList);
+    const packageJson = await readPackageJson(targetPackageJsonPath);
     const minimumEngineVersion = resolveMinimumEngineVersion(
         packageJson["engines"]
     );
     const preferredVersion =
-        explicitVersion ?? normalizeNodeVersion(process.versions.node);
+        explicitVersion ?? normalizeNodeVersion(currentRuntimeVersion);
 
     assertPreferredVersionSupported(preferredVersion, minimumEngineVersion);
 
     if (checkOnly) {
-        await validateVersionFiles({ expectedVersion: null });
-        return;
+        await validateVersionFiles({
+            expectedVersion: null,
+            logger,
+            minimumEngineVersion,
+            nodeVersionFilePath: targetNodeVersionFilePath,
+            nvmrcFilePath: targetNvmrcFilePath,
+        });
+        return "validated";
     }
 
     if (checkCurrent) {
-        await validateVersionFiles({ expectedVersion: preferredVersion });
-        return;
+        await validateVersionFiles({
+            expectedVersion: preferredVersion,
+            logger,
+            minimumEngineVersion,
+            nodeVersionFilePath: targetNodeVersionFilePath,
+            nvmrcFilePath: targetNvmrcFilePath,
+        });
+        return "validated-current";
     }
 
-    await writeVersionFiles(preferredVersion);
-    console.log(`Synchronized .node-version and .nvmrc to ${preferredVersion}`);
+    const synchronizedVersion = await writeVersionFiles({
+        preferredVersion,
+        nodeVersionFilePath: targetNodeVersionFilePath,
+        nvmrcFilePath: targetNvmrcFilePath,
+    });
+
+    logger.log(
+        `Synchronized .node-version and .nvmrc to ${synchronizedVersion}`
+    );
+    return "updated";
 };
 
-try {
-    await main();
-} catch (error) {
-    console.error("Failed to synchronize Node version files:", error);
-    process.exitCode = 1;
+/**
+ * CLI entrypoint.
+ *
+ * @param {object} [input]
+ * @param {readonly string[]} [input.argumentList=process.argv.slice(2)]
+ *   Default is `process.argv.slice(2)`
+ * @param {string} [input.currentRuntimeVersion=process.versions.node] Default
+ *   is `process.versions.node`
+ * @param {{
+ *     error: (...args: readonly unknown[]) => void;
+ *     log: (...args: readonly unknown[]) => void;
+ * }} [input.logger=console]
+ *   Default is `console`
+ * @param {string} [input.packageJsonPath=packageJsonPath] Default is
+ *   `packageJsonPath`
+ * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ *   `nodeVersionFilePath`
+ * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ *   `nvmrcFilePath`
+ *
+ * @returns {Promise<number>}
+ */
+export const runCli = async ({
+    argumentList = process.argv.slice(2),
+    currentRuntimeVersion = process.versions.node,
+    logger = console,
+    packageJsonPath: targetPackageJsonPath = packageJsonPath,
+    nodeVersionFilePath: targetNodeVersionFilePath = nodeVersionFilePath,
+    nvmrcFilePath: targetNvmrcFilePath = nvmrcFilePath,
+} = {}) => {
+    try {
+        await synchronizeNodeVersionFiles({
+            argumentList,
+            currentRuntimeVersion,
+            logger,
+            packageJsonPath: targetPackageJsonPath,
+            nodeVersionFilePath: targetNodeVersionFilePath,
+            nvmrcFilePath: targetNvmrcFilePath,
+        });
+        return 0;
+    } catch (error) {
+        logger.error("Failed to synchronize Node version files:", error);
+        return 1;
+    }
+};
+
+if (isDirectExecution()) {
+    const exitCode = await runCli();
+
+    if (exitCode !== 0) {
+        process.exitCode = exitCode;
+    }
 }

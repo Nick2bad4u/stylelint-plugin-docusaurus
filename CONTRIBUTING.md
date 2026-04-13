@@ -56,7 +56,7 @@ Use these commands locally before submitting a pull request:
 - `npm test`
 - `npm run lint:all:fix:quiet`
 - `npm run sync:readme-rules-table:write`
-- `npm run sync:configs-rules-matrix -- --write`
+- `npm run sync:configs-rules-matrix:write`
 
 ## Documentation and sync workflow
 

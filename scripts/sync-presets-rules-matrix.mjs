@@ -7,25 +7,62 @@
  */
 // @ts-check
 
-import { pathToFileURL } from "node:url";
+import {
+    generateRulesSectionFromConfig,
+    getConfigDocPath,
+    isDirectExecution,
+    loadBuiltPluginMetadata,
+    normalizeConfigNames,
+    parseCliArgs,
+    resolveConfigDocTargets,
+    runCli as runConfigMatrixCli,
+    syncConfigDocs,
+} from "./sync-configs-rules-matrix.mjs";
 
-import { runCli as runConfigMatrixCli } from "./sync-configs-rules-matrix.mjs";
+export {
+    generateRulesSectionFromConfig,
+    getConfigDocPath,
+    isDirectExecution,
+    loadBuiltPluginMetadata,
+    normalizeConfigNames,
+    parseCliArgs,
+    resolveConfigDocTargets,
+    syncConfigDocs,
+};
 
 /**
  * CLI entrypoint for the legacy preset-matrix alias.
  *
+ * @param {Readonly<{
+ *     runConfigMatrixCli?: typeof import("./sync-configs-rules-matrix.mjs").runCli;
+ *     warn?: typeof console.warn;
+ * }>} [input]
+ *
  * @returns {Promise<void>}
  */
-async function main() {
-    console.warn(
+export async function runCli({
+    runConfigMatrixCli: configMatrixCli = runConfigMatrixCli,
+    warn = console.warn,
+} = {}) {
+    warn(
         "sync-presets-rules-matrix.mjs is deprecated in this Stylelint template. Use sync-configs-rules-matrix.mjs instead."
     );
-    await runConfigMatrixCli({ legacyAlias: true });
+    await configMatrixCli({ legacyAlias: true });
 }
 
 if (
-    process.argv[1] &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
+    isDirectExecution({
+        argvEntry: process.argv[1],
+        currentImportUrl: import.meta.url,
+    })
 ) {
-    await main();
+    try {
+        await runCli();
+    } catch (error) {
+        console.error(
+            "Failed to synchronize config documentation tables via legacy preset alias:",
+            error
+        );
+        process.exitCode = 1;
+    }
 }

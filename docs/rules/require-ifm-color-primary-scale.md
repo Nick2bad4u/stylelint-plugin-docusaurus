@@ -28,8 +28,8 @@ Defining only part of that family can lead to inconsistent button, link, hover, 
 
 ```css
 :root {
-  --ifm-color-primary: #4e89e8;
-  --ifm-color-primary-dark: #3576d4;
+ --ifm-color-primary: #4e89e8;
+ --ifm-color-primary-dark: #3576d4;
 }
 ```
 
@@ -37,13 +37,13 @@ Defining only part of that family can lead to inconsistent button, link, hover, 
 
 ```css
 :root {
-  --ifm-color-primary: #4e89e8;
-  --ifm-color-primary-dark: #3576d4;
-  --ifm-color-primary-darker: #2c68be;
-  --ifm-color-primary-darkest: #234f92;
-  --ifm-color-primary-light: #6d9ef0;
-  --ifm-color-primary-lighter: #89b1f4;
-  --ifm-color-primary-lightest: #b8d0fa;
+ --ifm-color-primary: #4e89e8;
+ --ifm-color-primary-dark: #3576d4;
+ --ifm-color-primary-darker: #2c68be;
+ --ifm-color-primary-darkest: #234f92;
+ --ifm-color-primary-light: #6d9ef0;
+ --ifm-color-primary-lighter: #89b1f4;
+ --ifm-color-primary-lightest: #b8d0fa;
 }
 ```
 
@@ -58,14 +58,14 @@ Defining only part of that family can lead to inconsistent button, link, hover, 
 ### ✅ Correct — dark mode scale override
 
 ```css
-[data-theme='dark'] {
-  --ifm-color-primary: #8ab4f8;
-  --ifm-color-primary-dark: #74a5f6;
-  --ifm-color-primary-darker: #6299f4;
-  --ifm-color-primary-darkest: #3d7ee9;
-  --ifm-color-primary-light: #a0c3fa;
-  --ifm-color-primary-lighter: #b5d1fb;
-  --ifm-color-primary-lightest: #d7e6fd;
+[data-theme="dark"] {
+ --ifm-color-primary: #8ab4f8;
+ --ifm-color-primary-dark: #74a5f6;
+ --ifm-color-primary-darker: #6299f4;
+ --ifm-color-primary-darkest: #3d7ee9;
+ --ifm-color-primary-light: #a0c3fa;
+ --ifm-color-primary-lighter: #b5d1fb;
+ --ifm-color-primary-lightest: #d7e6fd;
 }
 ```
 
@@ -75,11 +75,11 @@ Defining only part of that family can lead to inconsistent button, link, hover, 
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.all,
-  rules: {
-    ...configs.all.rules,
-    "docusaurus/require-ifm-color-primary-scale": true,
-  },
+ ...configs.all,
+ rules: {
+  ...configs.all.rules,
+  "docusaurus/require-ifm-color-primary-scale": true,
+ },
 };
 ```
 

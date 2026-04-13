@@ -26,8 +26,8 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 ## ❌ Incorrect
 
 ```css
-[class*='codeBlockContainer'] {
-  border-radius: 8px;
+[class*="codeBlockContainer"] {
+ border-radius: 8px;
 }
 ```
 
@@ -35,7 +35,7 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 
 ```css
 .theme-code-block {
-  border-radius: 8px;
+ border-radius: 8px;
 }
 ```
 
@@ -51,7 +51,7 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 
 ```css
 .theme-announcement-bar {
-  padding-block: 1rem;
+ padding-block: 1rem;
 }
 ```
 
@@ -59,15 +59,15 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 
 ```css
 .theme-doc-toc-mobile {
-  margin-top: 1rem;
+ margin-top: 1rem;
 }
 ```
 
 ### ✅ Allowed — no known stable equivalent in the rule map yet
 
 ```css
-[class*='announcementBarContent'] {
-  max-width: 60rem;
+[class*="announcementBarContent"] {
+ max-width: 60rem;
 }
 ```
 
@@ -77,11 +77,11 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 import { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.all,
-  rules: {
-    ...configs.all.rules,
-    "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
-  },
+ ...configs.all,
+ rules: {
+  ...configs.all.rules,
+  "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
+ },
 };
 ```
 

@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const require = createRequire(import.meta.url);
 const typedocPackageJsonPath = require.resolve("typedoc/package.json");
@@ -14,18 +14,48 @@ const typedocCliPath = resolve(
 const windowsSystemRoot =
     process.env["SystemRoot"] ?? process.env["WINDIR"] ?? "C:\\Windows";
 const substExecutablePath = resolve(windowsSystemRoot, "System32", "subst.exe");
+const temporaryDriveLetters = [
+    "Z",
+    "Y",
+    "X",
+    "W",
+    "V",
+    "U",
+    "T",
+    "S",
+    "R",
+];
 
 /**
- * Parse a `--config FILE` (or `--options FILE`) argument from CLI args.
+ * Parse a `--config FILE`, `--config=FILE`, `--options FILE`, or
+ * `--options=FILE` argument from CLI args.
  *
  * @param {readonly string[]} cliArgs - Raw process arguments after the script
  *   path.
  *
  * @returns {string} TypeDoc options file name to pass to `typedoc --options`.
  */
-function getConfigFileName(cliArgs) {
+export function getConfigFileName(cliArgs) {
     for (let index = 0; index < cliArgs.length; index += 1) {
         const argument = cliArgs[index];
+
+        if (typeof argument !== "string") {
+            continue;
+        }
+
+        if (
+            argument.startsWith("--config=") ||
+            argument.startsWith("--options=")
+        ) {
+            const inlineValue = argument.slice(argument.indexOf("=") + 1);
+
+            if (inlineValue.length === 0) {
+                throw new Error(`Missing value for CLI argument: ${argument}`);
+            }
+
+            return inlineValue;
+        }
+
         if (argument !== "--config" && argument !== "--options") {
             continue;
         }
@@ -36,7 +66,12 @@ function getConfigFileName(cliArgs) {
         }
 
         const nextValue = cliArgs[nextIndex];
-        if (typeof nextValue !== "string" || nextValue.length === 0) {
+
+        if (
+            typeof nextValue !== "string" ||
+            nextValue.length === 0 ||
+            nextValue.startsWith("--")
+        ) {
             throw new Error(`Missing value for CLI argument: ${argument}`);
         }
 
@@ -120,6 +155,15 @@ function normalizeWindowsPath(filePath) {
 }
 
 /**
+ * Return the reserved drive roots the wrapper may temporarily create.
+ *
+ * @returns {readonly string[]}
+ */
+export function getTemporaryDriveRoots() {
+    return temporaryDriveLetters.map((letter) => `${letter}:`);
+}
+
+/**
  * List active `subst` mappings.
  *
  * @returns {ReadonlyArray<{ driveRoot: string; targetPath: string }>} Active
@@ -177,6 +221,32 @@ function getSubstMappings() {
 }
 
 /**
+ * Select only temporary-drive mappings that point at the repository root.
+ *
+ * @param {string} repositoryRoot
+ * @param {ReadonlyArray<{ driveRoot: string; targetPath: string }>} [mappings]
+ * @param {readonly string[]} [temporaryDriveRoots]
+ *
+ * @returns {ReadonlyArray<{ driveRoot: string; targetPath: string }>}
+ */
+export function selectRepositoryTemporarySubstMappings(
+    repositoryRoot,
+    mappings = getSubstMappings(),
+    temporaryDriveRoots = getTemporaryDriveRoots()
+) {
+    const normalizedRepositoryRoot = normalizeWindowsPath(repositoryRoot);
+    const temporaryDriveRootSet = new Set(
+        temporaryDriveRoots.map((driveRoot) => driveRoot.toUpperCase())
+    );
+
+    return mappings.filter(
+        ({ driveRoot, targetPath }) =>
+            temporaryDriveRootSet.has(driveRoot.toUpperCase()) &&
+            normalizeWindowsPath(targetPath) === normalizedRepositoryRoot
+    );
+}
+
+/**
  * Remove a `subst` mapping if it exists.
  *
  * @param {string} driveRoot - Drive root such as `X:`.
@@ -202,13 +272,9 @@ function removeSubstDrive(driveRoot) {
  * @param {string} repositoryRoot - Absolute repository root directory.
  */
 function removeStaleRepositorySubstMappings(repositoryRoot) {
-    const normalizedRepositoryRoot = normalizeWindowsPath(repositoryRoot);
-
-    for (const { driveRoot, targetPath } of getSubstMappings()) {
-        if (normalizeWindowsPath(targetPath) !== normalizedRepositoryRoot) {
-            continue;
-        }
-
+    for (const { driveRoot } of selectRepositoryTemporarySubstMappings(
+        repositoryRoot
+    )) {
         removeSubstDrive(driveRoot);
     }
 }
@@ -279,19 +345,7 @@ function registerTemporaryDriveCleanup(driveRoot) {
  * @returns {string} Drive letter (without colon).
  */
 function getTemporaryDriveLetter() {
-    const candidateLetters = [
-        "Z",
-        "Y",
-        "X",
-        "W",
-        "V",
-        "U",
-        "T",
-        "S",
-        "R",
-    ];
-
-    for (const letter of candidateLetters) {
+    for (const letter of temporaryDriveLetters) {
         if (!existsSync(`${letter}:\\`)) {
             return letter;
         }
@@ -338,17 +392,77 @@ function runViaTemporaryDrive(
     }
 }
 
-const scriptDirectory = dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = resolve(scriptDirectory, "..");
-const docsWorkspaceDirectory = resolve(repositoryRoot, "docs", "docusaurus");
-const docsWorkspaceRelativePath = relative(
-    repositoryRoot,
-    docsWorkspaceDirectory
-);
-const configFile = getConfigFileName(process.argv.slice(2));
+/**
+ * @typedef {Readonly<{
+ *     configFile: string;
+ *     docsWorkspaceDirectory: string;
+ *     docsWorkspaceRelativePath: string;
+ *     repositoryRoot: string;
+ *     useTemporaryDrive: boolean;
+ * }>} TypedocExecutionPlan
+ */
 
-if (process.platform === "win32" && /[()]/u.test(repositoryRoot)) {
-    runViaTemporaryDrive(repositoryRoot, docsWorkspaceRelativePath, configFile);
-} else {
-    runTypedoc(docsWorkspaceDirectory, configFile);
+/**
+ * Compute the execution plan for the TypeDoc wrapper without performing any
+ * side effects.
+ *
+ * @param {Readonly<{
+ *     cliArgs?: readonly string[];
+ *     docsWorkspaceDirectory?: string;
+ *     platform?: NodeJS.Platform;
+ *     repositoryRoot?: string;
+ * }>} [input]
+ *
+ * @returns {TypedocExecutionPlan}
+ */
+export function createTypedocExecutionPlan({
+    cliArgs = process.argv.slice(2),
+    platform = process.platform,
+    repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), ".."),
+    docsWorkspaceDirectory = resolve(repositoryRoot, "docs", "docusaurus"),
+} = {}) {
+    return {
+        configFile: getConfigFileName(cliArgs),
+        docsWorkspaceDirectory,
+        docsWorkspaceRelativePath: relative(
+            repositoryRoot,
+            docsWorkspaceDirectory
+        ),
+        repositoryRoot,
+        useTemporaryDrive: platform === "win32" && /[()]/u.test(repositoryRoot),
+    };
+}
+
+/**
+ * CLI entrypoint for the TypeDoc wrapper.
+ *
+ * @param {Readonly<{
+ *     cliArgs?: readonly string[];
+ *     docsWorkspaceDirectory?: string;
+ *     platform?: NodeJS.Platform;
+ *     repositoryRoot?: string;
+ * }>} [input]
+ *
+ * @returns {void}
+ */
+export function runCli(input = {}) {
+    const executionPlan = createTypedocExecutionPlan(input);
+
+    if (executionPlan.useTemporaryDrive) {
+        runViaTemporaryDrive(
+            executionPlan.repositoryRoot,
+            executionPlan.docsWorkspaceRelativePath,
+            executionPlan.configFile
+        );
+        return;
+    }
+
+    runTypedoc(executionPlan.docsWorkspaceDirectory, executionPlan.configFile);
+}
+
+if (
+    process.argv[1] !== undefined &&
+    import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+    runCli();
 }
