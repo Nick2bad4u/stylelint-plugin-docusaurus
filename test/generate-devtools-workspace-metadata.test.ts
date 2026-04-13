@@ -1,5 +1,5 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -47,9 +47,11 @@ describe("generate-devtools-workspace-metadata helpers", () => {
 
         mkdirSync("temp", { recursive: true });
 
-        const tempRoot = mkdtempSync(resolve("temp", "devtools-metadata-"));
-        const packageJsonPath = resolve(tempRoot, "package.json");
-        const metadataOutputPath = resolve(
+        const tempRoot = mkdtempSync(
+            path.resolve("temp", "devtools-metadata-")
+        );
+        const packageJsonPath = path.resolve(tempRoot, "package.json");
+        const metadataOutputPath = path.resolve(
             tempRoot,
             "docs",
             "docusaurus",
@@ -64,7 +66,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
             packageJsonPath,
             '{"name":"fixture-devtools-workspace"}\n'
         );
-        mkdirSync(dirname(metadataOutputPath), { recursive: true });
+        mkdirSync(path.dirname(metadataOutputPath), { recursive: true });
         writeFileSync(
             metadataOutputPath,
             '{"workspace":{"uuid":"broken-uuid"}}\n'
@@ -91,9 +93,11 @@ describe("generate-devtools-workspace-metadata helpers", () => {
 
         mkdirSync("temp", { recursive: true });
 
-        const tempRoot = mkdtempSync(resolve("temp", "devtools-metadata-"));
-        const packageJsonPath = resolve(tempRoot, "package.json");
-        const metadataOutputPath = resolve(
+        const tempRoot = mkdtempSync(
+            path.resolve("temp", "devtools-metadata-")
+        );
+        const packageJsonPath = path.resolve(tempRoot, "package.json");
+        const metadataOutputPath = path.resolve(
             tempRoot,
             "docs",
             "docusaurus",
@@ -108,7 +112,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
             packageJsonPath,
             '{"name":"fixture-devtools-workspace"}\n'
         );
-        mkdirSync(dirname(metadataOutputPath), { recursive: true });
+        mkdirSync(path.dirname(metadataOutputPath), { recursive: true });
         writeFileSync(
             metadataOutputPath,
             '{"workspace":{"uuid":"broken-uuid"}}\n'
@@ -148,7 +152,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
     it("exposes a direct-execution guard so imports do not trigger writes", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve(
+        const scriptPath = path.resolve(
             "scripts",
             "generate-devtools-workspace-metadata.mjs"
         );
@@ -163,7 +167,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve(
+                argvEntry: path.resolve(
                     "test",
                     "generate-devtools-workspace-metadata.test.ts"
                 ),

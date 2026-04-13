@@ -2,20 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import * as indexNowModule from "../scripts/indexnow.mjs";
 
-const {
-    collectRouteManifestEntriesFromData,
-    normalizeDocusaurusSourcePath,
-    resolveChangedUrlsFromManifest,
-} = indexNowModule;
-
 describe("indexNow route-manifest helpers", () => {
     it("rejects route sources that escape the configured Docusaurus site directory", () => {
         expect.hasAssertions();
 
-        const manifestEntries = collectRouteManifestEntriesFromData({
-            permalink: "/malicious/",
-            source: "@site/../../package.json",
-        });
+        const manifestEntries =
+            indexNowModule.collectRouteManifestEntriesFromData({
+                permalink: "/malicious/",
+                source: "@site/../../package.json",
+            });
 
         expect(manifestEntries).toStrictEqual([]);
     });
@@ -23,10 +18,11 @@ describe("indexNow route-manifest helpers", () => {
     it("rejects route sources that resolve to directories instead of files", () => {
         expect.hasAssertions();
 
-        const manifestEntries = collectRouteManifestEntriesFromData({
-            permalink: "/directory-source/",
-            source: "@site/src",
-        });
+        const manifestEntries =
+            indexNowModule.collectRouteManifestEntriesFromData({
+                permalink: "/directory-source/",
+                source: "@site/src",
+            });
 
         expect(manifestEntries).toStrictEqual([]);
     });
@@ -34,16 +30,18 @@ describe("indexNow route-manifest helpers", () => {
     it("keeps valid Docusaurus source files inside the site directory", () => {
         expect.hasAssertions();
 
-        expect(normalizeDocusaurusSourcePath("@site/src/pages/index.jsx")).toBe(
-            "docs/docusaurus/src/pages/index.tsx"
-        );
+        expect(
+            indexNowModule.normalizeDocusaurusSourcePath(
+                "@site/src/pages/index.jsx"
+            )
+        ).toBe("docs/docusaurus/src/pages/index.tsx");
     });
 
     it("resolves all manifest permalinks for a changed source file instead of collapsing to one route", () => {
         expect.hasAssertions();
 
         expect(
-            resolveChangedUrlsFromManifest({
+            indexNowModule.resolveChangedUrlsFromManifest({
                 changedPaths: ["docs/docusaurus/blog/example.md"],
                 manifestEntries: [
                     {
@@ -69,7 +67,7 @@ describe("indexNow route-manifest helpers", () => {
         expect.hasAssertions();
 
         expect(
-            resolveChangedUrlsFromManifest({
+            indexNowModule.resolveChangedUrlsFromManifest({
                 changedPaths: ["docs/rules/overview.md"],
                 manifestEntries: [
                     {
@@ -119,7 +117,7 @@ describe("indexNow route-manifest helpers", () => {
         ]) {
             expect(() =>
                 parsePositiveInteger?.(invalidValue, 25, "Batch size")
-            ).toThrowError("Batch size must be a positive integer.");
+            ).toThrow("Batch size must be a positive integer.");
         }
     });
 });

@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { arrayFind, isDefined  } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -66,7 +66,17 @@ function findUnscopedContentElementSelector(
             continue;
         }
 
-        const contentElementName = arrayFind(getTypeNamesOutsideGlobal(selector), (typeName) => isDocusaurusContentElementName(typeName));
+        let contentElementName: string | undefined = undefined;
+
+        for (const typeName of getTypeNamesOutsideGlobal(selector)) {
+            if (!isDocusaurusContentElementName(typeName)) {
+                continue;
+            }
+
+            contentElementName = typeName;
+
+            break;
+        }
 
         if (!isDefined(contentElementName)) {
             continue;

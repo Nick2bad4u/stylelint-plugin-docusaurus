@@ -22,10 +22,10 @@ const ruleName = createRuleName(
     "no-unwrapped-global-theme-selectors-in-css-modules"
 );
 const messages: {
-    rejectedSelector: (classSelector: string, selector: string) => string;
+    rejectedSelector: (themeClassSelector: string, selector: string) => string;
 } = ruleMessages(ruleName, {
-    rejectedSelector: (classSelector: string, selector: string): string =>
-        `Wrap global Docusaurus selector ${classSelector} in :global(...) inside CSS Modules. Selector "${selector}" currently relies on a runtime theme class that CSS Modules localize by default.`,
+    rejectedSelector: (themeClassSelector: string, selector: string): string =>
+        `Wrap global Docusaurus selector ${themeClassSelector} in :global(...) inside CSS Modules. Selector "${selector}" currently relies on a runtime theme class that CSS Modules localize by default.`,
 });
 
 const docs = {
@@ -40,8 +40,8 @@ const docs = {
 /** Find the first unwrapped global theme class used inside a CSS Module rule. */
 function findInvalidCssModuleSelector(selectorList: string):
     | Readonly<{
-          classSelector: string;
           selector: string;
+          themeClassSelector: string;
       }>
     | undefined {
     const parsedSelectorList = parseSelectorList(selectorList);
@@ -51,14 +51,14 @@ function findInvalidCssModuleSelector(selectorList: string):
     }
 
     for (const selector of getSelectors(parsedSelectorList)) {
-        for (const className of getClassNamesOutsideGlobal(selector)) {
-            if (!isLikelyDocusaurusGlobalThemeClassName(className)) {
+        for (const themeClassName of getClassNamesOutsideGlobal(selector)) {
+            if (!isLikelyDocusaurusGlobalThemeClassName(themeClassName)) {
                 continue;
             }
 
             return {
-                classSelector: `.${className}`,
                 selector: selector.toString(),
+                themeClassSelector: `.${themeClassName}`,
             };
         }
     }
@@ -89,13 +89,13 @@ const ruleFunction: RuleBase<boolean, undefined> =
 
             report({
                 message: messages.rejectedSelector(
-                    invalidSelector.classSelector,
+                    invalidSelector.themeClassSelector,
                     invalidSelector.selector
                 ),
                 node: ruleNode,
                 result,
                 ruleName,
-                word: invalidSelector.classSelector,
+                word: invalidSelector.themeClassSelector,
             });
         });
     };

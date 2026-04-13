@@ -51,7 +51,7 @@
 // eslint-disable-next-line import-x/no-named-as-default -- Rule wants packages not in dev, doesn't apply here
 import defineConfig from "stylelint-define-config";
 
-import localDocusaurusPlugin from "./plugin.mjs";
+import plugin from "./plugin.mjs";
 
 /**
  * Local dogfood rule set for validating the repository's own Docusaurus site
@@ -372,7 +372,7 @@ const config = defineConfig({
      */
     plugins: [
         // Local plugin dogfooding through the built public runtime.
-        ...localDocusaurusPlugin,
+        ...plugin,
 
         /**
          * Accessibility-focused linting rules for inclusive CSS.

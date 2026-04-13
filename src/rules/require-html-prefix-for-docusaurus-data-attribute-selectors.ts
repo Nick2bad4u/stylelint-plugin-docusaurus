@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { arrayFind, isDefined, isEmpty, setHas   } from "ts-extras";
+import { isDefined, isEmpty, setHas } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -80,8 +80,8 @@ function findMissingHtmlPrefixSelector(selectorList: string):
         }
 
         const hasGlobalDocusaurusTarget =
-            selectorHasClassOutsideGlobal(selector, (className) =>
-                isLikelyDocusaurusGlobalThemeClassName(className)
+            selectorHasClassOutsideGlobal(selector, (cssClassName) =>
+                isLikelyDocusaurusGlobalThemeClassName(cssClassName)
             ) ||
             getIdNamesOutsideGlobal(selector).some((idName) =>
                 setHas(rootOnlyIgnoredIdNames, idName)
@@ -91,7 +91,19 @@ function findMissingHtmlPrefixSelector(selectorList: string):
             continue;
         }
 
-        const bareAttributeMatch = arrayFind(relevantAttributeMatches, (attributeMatch) => attributeMatch.kind === "bare");
+        let bareAttributeMatch:
+            | (typeof relevantAttributeMatches)[number]
+            | undefined = undefined;
+
+        for (const attributeMatch of relevantAttributeMatches) {
+            if (attributeMatch.kind !== "bare") {
+                continue;
+            }
+
+            bareAttributeMatch = attributeMatch;
+
+            break;
+        }
 
         if (!isDefined(bareAttributeMatch)) {
             continue;

@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import * as path from "node:path";
+import { describe, expect, it } from "vitest";
 
 import {
     extractMarkdownLinkMatches,
@@ -11,19 +11,6 @@ import {
 } from "../scripts/check-doc-links.mjs";
 
 describe("check-doc-links script helpers", () => {
-    const temporaryDirectoryPaths: string[] = [];
-
-    afterEach(async () => {
-        await Promise.all(
-            temporaryDirectoryPaths.splice(0).map(async (temporaryDirectory) =>
-                rm(temporaryDirectory, {
-                    force: true,
-                    recursive: true,
-                })
-            )
-        );
-    });
-
     it("ignores markdown-looking links inside inline code spans and fenced code blocks", () => {
         expect.hasAssertions();
 
@@ -37,9 +24,9 @@ Use [SECURITY.md](./SECURITY.md).
 ~~~
         `);
 
-        expect(
-            linkMatches.map((match: RegExpMatchArray) => match[1])
-        ).toStrictEqual(["./SECURITY.md"]);
+        expect(linkMatches.map((match) => match[1])).toStrictEqual([
+            "./SECURITY.md",
+        ]);
     });
 
     it("ignores markdown-looking links inside indented fenced code blocks that use longer closing fences", () => {
@@ -53,19 +40,18 @@ Use [SECURITY.md](./SECURITY.md).
    \`\`\`\`
         `);
 
-        expect(
-            linkMatches.map((match: RegExpMatchArray) => match[1])
-        ).toStrictEqual(["./SECURITY.md"]);
+        expect(linkMatches.map((match) => match[1])).toStrictEqual([
+            "./SECURITY.md",
+        ]);
     });
 
     it("extracts raw HTML anchor destinations from prose while ignoring anchors inside fenced code", async () => {
         expect.hasAssertions();
 
-        const checkDocLinksModule = /** @type {{
-    extractHtmlAnchorLinks: (
-        content: string
-    ) => readonly string[];
-}} */ await import("../scripts/check-doc-links.mjs");
+        const checkDocLinksModule =
+            (await import("../scripts/check-doc-links.mjs")) as {
+                extractHtmlAnchorLinks: (content: string) => readonly string[];
+            };
 
         const htmlLinks = checkDocLinksModule.extractHtmlAnchorLinks(`
 Use <a href="./README.md">the README</a>.
@@ -163,32 +149,40 @@ Or <a href='./docs/rules/overview.md'>overview</a>.
         expect.hasAssertions();
 
         const temporaryDirectoryPath = await mkdtemp(
-            join(tmpdir(), "stylelint-plugin-docusaurus-check-doc-links-")
+            path.join(tmpdir(), "stylelint-plugin-docusaurus-check-doc-links-")
         );
 
-        temporaryDirectoryPaths.push(temporaryDirectoryPath);
+        try {
+            const markdownPath = path.join(temporaryDirectoryPath, "guide.md");
+            const linkedDirectoryPath = path.join(
+                temporaryDirectoryPath,
+                "plain-dir"
+            );
+            const indexedDirectoryPath = path.join(
+                temporaryDirectoryPath,
+                "indexed-dir"
+            );
 
-        const markdownPath = join(temporaryDirectoryPath, "guide.md");
-        const linkedDirectoryPath = join(temporaryDirectoryPath, "plain-dir");
-        const indexedDirectoryPath = join(
-            temporaryDirectoryPath,
-            "indexed-dir"
-        );
+            await writeFile(markdownPath, "# Guide\n", "utf8");
+            await mkdir(linkedDirectoryPath, { recursive: true });
+            await mkdir(indexedDirectoryPath, { recursive: true });
+            await writeFile(
+                path.join(indexedDirectoryPath, "index.md"),
+                "# Indexed\n",
+                "utf8"
+            );
 
-        await writeFile(markdownPath, "# Guide\n", "utf8");
-        await mkdir(linkedDirectoryPath, { recursive: true });
-        await mkdir(indexedDirectoryPath, { recursive: true });
-        await writeFile(
-            join(indexedDirectoryPath, "index.md"),
-            "# Indexed\n",
-            "utf8"
-        );
-
-        await expect(
-            resolveExistingPathCandidate(markdownPath, "./plain-dir")
-        ).resolves.toBeUndefined();
-        await expect(
-            resolveExistingPathCandidate(markdownPath, "./indexed-dir")
-        ).resolves.toBe(join(indexedDirectoryPath, "index.md"));
+            await expect(
+                resolveExistingPathCandidate(markdownPath, "./plain-dir")
+            ).resolves.toBeUndefined();
+            await expect(
+                resolveExistingPathCandidate(markdownPath, "./indexed-dir")
+            ).resolves.toBe(path.join(indexedDirectoryPath, "index.md"));
+        } finally {
+            await rm(temporaryDirectoryPath, {
+                force: true,
+                recursive: true,
+            });
+        }
     });
 });

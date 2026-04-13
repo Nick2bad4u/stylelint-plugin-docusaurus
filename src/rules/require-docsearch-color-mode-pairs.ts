@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined, safeCastTo  } from "ts-extras";
+import { isDefined, safeCastTo, setHas } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -62,13 +62,15 @@ function getDocSearchColorMode(selector: string): ColorMode | undefined {
     if (
         !selectorTrailingCompoundHasClass(
             parsedSelector,
-            (className) => className === "DocSearch"
+            (cssClassName) => cssClassName === "DocSearch"
         )
     ) {
         return undefined;
     }
 
-    return safeCastTo<ColorMode | undefined>(getLeadingDocusaurusColorMode(selector));
+    return safeCastTo<ColorMode | undefined>(
+        getLeadingDocusaurusColorMode(selector)
+    );
 }
 
 /** Rule implementation for paired light/dark DocSearch overrides. */
@@ -122,7 +124,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
         });
 
         if (modesWithDocSearchOverrides.size <= 1) {
-            const existingMode = modesWithDocSearchOverrides.has("dark")
+            const existingMode = setHas(modesWithDocSearchOverrides, "dark")
                 ? "dark"
                 : "light";
             const missingMode = existingMode === "dark" ? "light" : "dark";

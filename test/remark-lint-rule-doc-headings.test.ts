@@ -1,4 +1,5 @@
-import { resolve } from "node:path";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { remark } from "remark";
 import { VFile } from "vfile";
 import { describe, expect, it } from "vitest";
@@ -7,8 +8,13 @@ import type { RemarkLintRuleDocHeadingsOptions } from "../scripts/remark-lint-ru
 
 import remarkLintRuleDocHeadings from "../scripts/remark-lint-rule-doc-headings.mjs";
 
-const repositoryRoot = resolve(import.meta.dirname, "..");
-const sampleRuleDocPath = resolve(repositoryRoot, "docs/rules/sample-rule.md");
+const repositoryRoot = path.resolve(
+    fileURLToPath(new URL("..", import.meta.url))
+);
+const sampleRuleDocPath = path.resolve(
+    repositoryRoot,
+    "docs/rules/sample-rule.md"
+);
 
 interface RuleDocMarkdownOverrides {
     deprecatedSection?: string;

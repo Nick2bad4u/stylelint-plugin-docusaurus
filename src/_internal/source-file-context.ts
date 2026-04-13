@@ -11,7 +11,7 @@ export function getSourceFilePath(root: Readonly<Root>): string | undefined {
         return undefined;
     }
 
-    return normalizeSourceFilePath(filePath);
+    return filePath.replaceAll("\\", "/");
 }
 
 /** Check whether one source file path belongs to a CSS Modules stylesheet. */

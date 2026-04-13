@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { arrayFind, isDefined  } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -35,9 +35,16 @@ const docs = {
 function findReservedLayerName(
     layerNames: readonly string[]
 ): string | undefined {
-    return arrayFind(layerNames, (layerName) =>
+    for (const layerName of layerNames) {
+        if (
             layerName === reservedDocusaurusCascadeLayerPrefix ||
-            layerName.startsWith(`${reservedDocusaurusCascadeLayerPrefix}.`));
+            layerName.startsWith(`${reservedDocusaurusCascadeLayerPrefix}.`)
+        ) {
+            return layerName;
+        }
+    }
+
+    return undefined;
 }
 
 /** Rule implementation for reserved Docusaurus cascade-layer names. */

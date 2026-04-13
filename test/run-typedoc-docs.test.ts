@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -56,8 +56,7 @@ describe("run-typedoc-docs wrapper", () => {
             })
         ).toStrictEqual({
             configFile: "typedoc.local.config.mjs",
-            docsWorkspaceDirectory:
-                String.raw`C:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\stylelint-plugin-docusaurus\docs\docusaurus`,
+            docsWorkspaceDirectory: String.raw`C:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\stylelint-plugin-docusaurus\docs\docusaurus`,
             docsWorkspaceRelativePath: String.raw`docs\docusaurus`,
             repositoryRoot:
                 "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/stylelint-plugin-docusaurus",
@@ -109,7 +108,7 @@ describe("run-typedoc-docs wrapper", () => {
 
         const typedocConfig = JSON.parse(
             readFileSync(
-                resolve("docs", "docusaurus", "typedoc.config.json"),
+                path.resolve("docs", "docusaurus", "typedoc.config.json"),
                 "utf8"
             )
         ) as Record<string, unknown>;

@@ -1,5 +1,7 @@
+import type { AtRule } from "postcss";
+
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined, isInteger, setHas   } from "ts-extras";
+import { isDefined, isInteger, setHas } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -49,7 +51,7 @@ const navbarResponsiveSurfaceClassNames = new Set([
 
 /** Find the first non-default Docusaurus breakpoint in a media-query chain. */
 function findNonDefaultNavbarBreakpoint(
-    mediaQueries: readonly import("postcss").AtRule[]
+    mediaQueries: readonly Readonly<AtRule>[]
 ): undefined | WidthBreakpointConstraint {
     for (const mediaQuery of mediaQueries) {
         for (const constraint of extractWidthBreakpointConstraints(
@@ -78,8 +80,8 @@ function findResponsiveNavbarSelector(
 
     for (const selector of getSelectors(parsedSelectorList)) {
         if (
-            !selectorTrailingCompoundHasClass(selector, (className) =>
-                setHas(navbarResponsiveSurfaceClassNames, className)
+            !selectorTrailingCompoundHasClass(selector, (cssClassName) =>
+                setHas(navbarResponsiveSurfaceClassNames, cssClassName)
             )
         ) {
             continue;

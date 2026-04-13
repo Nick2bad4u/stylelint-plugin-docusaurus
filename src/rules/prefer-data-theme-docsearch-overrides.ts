@@ -49,7 +49,7 @@ function findInvalidDocSearchOverrideSelector(
         if (
             !selectorHasClassInPositiveScope(
                 selector,
-                (className) => className === "navbar--dark"
+                (cssClassName) => cssClassName === "navbar--dark"
             )
         ) {
             continue;
@@ -58,7 +58,9 @@ function findInvalidDocSearchOverrideSelector(
         if (
             !selectorHasClassInPositiveScope(
                 selector,
-                isDocSearchSurfaceClassName
+                (cssClassName) =>
+                    cssClassName === "DocSearch" ||
+                    cssClassName.startsWith("DocSearch-")
             )
         ) {
             continue;
@@ -79,12 +81,6 @@ function findInvalidDocSearchOverrideSelector(
 
     return undefined;
 }
-
-/** Check whether one class token belongs to a DocSearch UI surface. */
-function isDocSearchSurfaceClassName(className: string): boolean {
-    return className === "DocSearch" || className.startsWith("DocSearch-");
-}
-
 /**
  * Rule implementation for preferring site color-mode selectors when customizing
  * DocSearch UI styles.

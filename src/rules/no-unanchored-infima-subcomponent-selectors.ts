@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { arrayFind, isDefined  } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -27,10 +27,10 @@ const { report, ruleMessages, validateOptions } = stylelint.utils;
 
 const ruleName = createRuleName("no-unanchored-infima-subcomponent-selectors");
 const messages: {
-    rejectedSelector: (classSelector: string, selector: string) => string;
+    rejectedSelector: (infimaClassSelector: string, selector: string) => string;
 } = ruleMessages(ruleName, {
-    rejectedSelector: (classSelector: string, selector: string): string =>
-        `Anchor Infima selector ${classSelector} under a stable Docusaurus wrapper or component-local selector instead of using brittle selector "${selector}" by itself.`,
+    rejectedSelector: (infimaClassSelector: string, selector: string): string =>
+        `Anchor Infima selector ${infimaClassSelector} under a stable Docusaurus wrapper or component-local selector instead of using brittle selector "${selector}" by itself.`,
 });
 
 const docs = {
@@ -46,7 +46,7 @@ function findUnanchoredInfimaSelector(
     ancestorHasScopeAnchor: boolean
 ):
     | Readonly<{
-          classSelector: string;
+          infimaClassSelector: string;
           selector: string;
       }>
     | undefined {
@@ -57,7 +57,17 @@ function findUnanchoredInfimaSelector(
     }
 
     for (const selector of getSelectors(parsedSelectorList)) {
-        const targetedClassName = arrayFind(getClassNamesOutsideGlobal(selector), (className) => isTargetedInfimaSubcomponentClassName(className));
+        let targetedClassName: string | undefined = undefined;
+
+        for (const cssClassName of getClassNamesOutsideGlobal(selector)) {
+            if (!isTargetedInfimaSubcomponentClassName(cssClassName)) {
+                continue;
+            }
+
+            targetedClassName = cssClassName;
+
+            break;
+        }
 
         if (!isDefined(targetedClassName)) {
             continue;
@@ -73,7 +83,7 @@ function findUnanchoredInfimaSelector(
         }
 
         return {
-            classSelector: `.${targetedClassName}`,
+            infimaClassSelector: `.${targetedClassName}`,
             selector: selector.toString(),
         };
     }
@@ -108,13 +118,13 @@ const ruleFunction: RuleBase<boolean, undefined> =
 
             report({
                 message: messages.rejectedSelector(
-                    invalidSelector.classSelector,
+                    invalidSelector.infimaClassSelector,
                     invalidSelector.selector
                 ),
                 node: ruleNode,
                 result,
                 ruleName,
-                word: invalidSelector.classSelector,
+                word: invalidSelector.infimaClassSelector,
             });
         });
     };

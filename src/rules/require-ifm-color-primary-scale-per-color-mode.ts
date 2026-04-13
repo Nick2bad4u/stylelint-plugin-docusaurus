@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined, safeCastTo  } from "ts-extras";
+import { isDefined, safeCastTo, setHas } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -38,9 +38,11 @@ const docs = {
 
 /** Classify one theme-scope selector to its Docusaurus color mode. */
 function getThemeScopeColorMode(selector: string): ColorMode | undefined {
-    return safeCastTo<ColorMode | undefined>(getLeadingDocusaurusColorMode(selector, {
-        allowRootLight: true,
-    }));
+    return safeCastTo<ColorMode | undefined>(
+        getLeadingDocusaurusColorMode(selector, {
+            allowRootLight: true,
+        })
+    );
 }
 
 /** Rule implementation for paired color-mode Infima primary-scale overrides. */
@@ -94,7 +96,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
         });
 
         if (modesWithPrimaryScale.size <= 1) {
-            const existingMode = modesWithPrimaryScale.has("dark")
+            const existingMode = setHas(modesWithPrimaryScale, "dark")
                 ? "dark"
                 : "light";
             const missingMode = existingMode === "dark" ? "light" : "dark";

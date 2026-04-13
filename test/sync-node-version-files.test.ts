@@ -1,5 +1,5 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
@@ -20,18 +20,17 @@ interface TempNodeVersionFixtureInput {
 }
 
 function createTempNodeVersionFixture(input: TempNodeVersionFixtureInput = {}) {
-    const enginesNode =
-        input.enginesNode === undefined ? ">=22.0.0" : input.enginesNode;
-    const nodeVersion =
-        input.nodeVersion === undefined ? "25.8.1" : input.nodeVersion;
-    const nvmrcVersion =
-        input.nvmrcVersion === undefined ? nodeVersion : input.nvmrcVersion;
+    const enginesNode = input.enginesNode ?? ">=22.0.0";
+    const nodeVersion = input.nodeVersion ?? "25.8.1";
+    const nvmrcVersion = input.nvmrcVersion ?? nodeVersion;
 
     mkdirSync("temp", { recursive: true });
-    const tempRoot = mkdtempSync(resolve("temp", "sync-node-version-files-"));
-    const packageJsonPath = resolve(tempRoot, "package.json");
-    const nodeVersionFilePath = resolve(tempRoot, ".node-version");
-    const nvmrcFilePath = resolve(tempRoot, ".nvmrc");
+    const tempRoot = mkdtempSync(
+        path.resolve("temp", "sync-node-version-files-")
+    );
+    const packageJsonPath = path.resolve(tempRoot, "package.json");
+    const nodeVersionFilePath = path.resolve(tempRoot, ".node-version");
+    const nvmrcFilePath = path.resolve(tempRoot, ".nvmrc");
 
     writeFileSync(
         packageJsonPath,
@@ -106,7 +105,7 @@ describe("sync-node-version-files script", () => {
     it("writes both Node version files from the preferred runtime version", async () => {
         expect.hasAssertions();
 
-        const logger = { log: vi.fn() };
+        const logger = { log: vi.fn<(message: string) => void>() };
         const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.0.0",
@@ -142,7 +141,7 @@ describe("sync-node-version-files script", () => {
             synchronizeNodeVersionFiles({
                 argumentList: ["--check-current"],
                 currentRuntimeVersion: "25.8.1",
-                logger: { log: vi.fn() },
+                logger: { log: vi.fn<(message: string) => void>() },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,
@@ -155,7 +154,7 @@ describe("sync-node-version-files script", () => {
     it("still supports sync-only validation when callers explicitly request --check", async () => {
         expect.hasAssertions();
 
-        const logger = { log: vi.fn() };
+        const logger = { log: vi.fn<(message: string) => void>() };
         const { nodeVersionFilePath, nvmrcFilePath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.9.0",
@@ -188,7 +187,7 @@ describe("sync-node-version-files script", () => {
             synchronizeNodeVersionFiles({
                 argumentList: ["--check"],
                 currentRuntimeVersion: "25.8.1",
-                logger: { log: vi.fn() },
+                logger: { log: vi.fn<(message: string) => void>() },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,
@@ -209,7 +208,7 @@ describe("sync-node-version-files script", () => {
         await expect(
             validateVersionFiles({
                 expectedVersion: null,
-                logger: { log: vi.fn() },
+                logger: { log: vi.fn<(message: string) => void>() },
                 minimumEngineVersion: "22.0.0",
                 nodeVersionFilePath,
                 nvmrcFilePath,
@@ -228,7 +227,7 @@ describe("sync-node-version-files script", () => {
         await expect(
             synchronizeNodeVersionFiles({
                 argumentList: ["--version", "21.9.0"],
-                logger: { log: vi.fn() },
+                logger: { log: vi.fn<(message: string) => void>() },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,
@@ -241,9 +240,9 @@ describe("sync-node-version-files script", () => {
     it("rejects preferred versions that fall below shorthand >=major engines.node ranges", () => {
         expect.hasAssertions();
 
-        expect(() =>
-            { assertPreferredVersionSupported("21.9.0", "22.0.0"); }
-        ).toThrow(
+        expect(() => {
+            assertPreferredVersionSupported("21.9.0", "22.0.0");
+        }).toThrow(
             "Preferred Node.js version is below package.json engines.node. Preferred: 21.9.0. Minimum engine: 22.0.0."
         );
     });
@@ -251,7 +250,10 @@ describe("sync-node-version-files script", () => {
     it("uses a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "sync-node-version-files.mjs");
+        const scriptPath = path.resolve(
+            "scripts",
+            "sync-node-version-files.mjs"
+        );
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -263,7 +265,10 @@ describe("sync-node-version-files script", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "sync-node-version-files.test.ts"),
+                argvEntry: path.resolve(
+                    "test",
+                    "sync-node-version-files.test.ts"
+                ),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();

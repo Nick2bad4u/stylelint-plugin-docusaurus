@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -52,7 +52,8 @@ describe("sync-configs-rules-matrix automation", () => {
         await expect(
             resolveConfigDocTargets({
                 configNames: ["recommended", "strict"],
-                hasDocFile: async (path) => path.endsWith("recommended.md"),
+                hasDocFile: (filePath) =>
+                    Promise.resolve(filePath.endsWith("recommended.md")),
                 repositoryRoot: "C:/repo",
             })
         ).rejects.toThrow(
@@ -145,28 +146,29 @@ describe("sync-configs-rules-matrix automation", () => {
         await expect(
             loadBuiltPluginMetadata({
                 builtPluginPath: "C:/repo/dist/plugin.js",
-                importModule: async () => ({
-                    configNames: ["strict"],
-                    configs: {
-                        strict: {
-                            rules: {
-                                "docusaurus/strict-rule": true,
+                importModule: () =>
+                    Promise.resolve({
+                        configNames: ["strict"],
+                        configs: {
+                            strict: {
+                                rules: {
+                                    "docusaurus/strict-rule": true,
+                                },
                             },
                         },
-                    },
-                    rules: {
-                        "strict-rule": {
-                            docs: {
-                                description: "Strict-only rule.",
-                                recommended: false,
-                                url: "https://example.test/docs/rules/strict-rule",
-                            },
-                            meta: {
-                                fixable: true,
+                        rules: {
+                            "strict-rule": {
+                                docs: {
+                                    description: "Strict-only rule.",
+                                    recommended: false,
+                                    url: "https://example.test/docs/rules/strict-rule",
+                                },
+                                meta: {
+                                    fixable: true,
+                                },
                             },
                         },
-                    },
-                }),
+                    }),
             })
         ).resolves.toStrictEqual({
             configNames: ["strict"],
@@ -201,7 +203,7 @@ describe("sync-configs-rules-matrix automation", () => {
             filePath: string;
         }[] = [];
         const result = await syncConfigDocs({
-            hasDocFile: async () => true,
+            hasDocFile: () => Promise.resolve(true),
             metadata: {
                 configNames: ["strict"],
                 configs: {
@@ -224,28 +226,34 @@ describe("sync-configs-rules-matrix automation", () => {
                     },
                 },
             },
-            readFileFn: async () =>
-                [
-                    "# strict",
-                    "",
-                    "## Rules in this config",
-                    "",
-                    "stale table",
-                ].join("\n"),
+            readFileFn: () =>
+                Promise.resolve(
+                    [
+                        "# strict",
+                        "",
+                        "## Rules in this config",
+                        "",
+                        "stale table",
+                    ].join("\n")
+                ),
             repositoryRootPath: "C:/repo",
             writeChanges: true,
-            writeFileFn: async (filePath, contents, encoding) => {
+            writeFileFn: (filePath, contents, encoding) => {
                 writes.push({
                     contents,
                     encoding,
                     filePath,
                 });
+
+                return Promise.resolve();
             },
         });
 
         expect(result).toStrictEqual({
             changed: true,
-            updatedFilePaths: [String.raw`C:\repo\docs\rules\configs\strict.md`],
+            updatedFilePaths: [
+                String.raw`C:\repo\docs\rules\configs\strict.md`,
+            ],
         });
         expect(writes).toHaveLength(1);
         expect(writes[0]?.encoding).toBe("utf8");
@@ -260,7 +268,7 @@ describe("sync-configs-rules-matrix automation", () => {
 
         await expect(
             syncConfigDocs({
-                hasDocFile: async () => true,
+                hasDocFile: () => Promise.resolve(true),
                 metadata: {
                     configNames: ["strict"],
                     configs: {
@@ -280,8 +288,10 @@ describe("sync-configs-rules-matrix automation", () => {
                         },
                     },
                 },
-                readFileFn: async () =>
-                    "# strict\n\n## Rules in this config\n\nstale table\n",
+                readFileFn: () =>
+                    Promise.resolve(
+                        "# strict\n\n## Rules in this config\n\nstale table\n"
+                    ),
                 repositoryRootPath: "C:/repo",
                 writeChanges: false,
             })
@@ -293,7 +303,10 @@ describe("sync-configs-rules-matrix automation", () => {
     it("exposes a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "sync-configs-rules-matrix.mjs");
+        const scriptPath = path.resolve(
+            "scripts",
+            "sync-configs-rules-matrix.mjs"
+        );
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -304,7 +317,10 @@ describe("sync-configs-rules-matrix automation", () => {
         ).toBeTruthy();
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "sync-configs-rules-matrix.test.ts"),
+                argvEntry: path.resolve(
+                    "test",
+                    "sync-configs-rules-matrix.test.ts"
+                ),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();

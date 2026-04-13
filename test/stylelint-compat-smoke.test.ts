@@ -103,9 +103,11 @@ describe("stylelint compatibility smoke script", () => {
     it("normalizes Stylelint runtimes from namespace and default-export module shapes", () => {
         expect.hasAssertions();
 
-        const lint = vi.fn(async () => ({
-            results: [],
-        }));
+        const lint = vi.fn<
+            () => Promise<{
+                results: [];
+            }>
+        >(() => Promise.resolve({ results: [] }));
 
         expect(normalizeStylelintRuntime({ lint })).toStrictEqual({ lint });
         expect(normalizeStylelintRuntime({ default: { lint } })).toStrictEqual({
@@ -120,29 +122,36 @@ describe("stylelint compatibility smoke script", () => {
         expect.hasAssertions();
 
         const codeFilenames: string[] = [];
-        const lint = vi.fn(
-            async (input: Parameters<StylelintLike["lint"]>[0]) => {
-                codeFilenames.push(input.codeFilename);
+        const lint = vi.fn<
+            (input: Readonly<Parameters<StylelintLike["lint"]>[0]>) => Promise<{
+                results: {
+                    invalidOptionWarnings: [];
+                    parseErrors: [];
+                    warnings: [];
+                }[];
+            }>
+        >((input) => {
+            codeFilenames.push(input.codeFilename);
 
-                return {
-                    results: [
-                        {
-                            invalidOptionWarnings: [],
-                            parseErrors: [],
-                            warnings: [],
-                        },
-                    ],
-                };
-            }
-        );
+            return Promise.resolve({
+                results: [
+                    {
+                        invalidOptionWarnings: [],
+                        parseErrors: [],
+                        warnings: [],
+                    },
+                ],
+            });
+        });
         const logger = {
-            log: vi.fn(),
+            log: vi.fn<(...messages: readonly unknown[]) => void>(),
         };
 
         await runStylelintCompatSmoke({
-            loadBuiltPluginSurfaceFn: async () =>
-                createMockBuiltPluginSurface(),
-            loadStylelintFn: async () => ({ lint }) satisfies StylelintLike,
+            loadBuiltPluginSurfaceFn: () =>
+                Promise.resolve(createMockBuiltPluginSurface()),
+            loadStylelintFn: () =>
+                Promise.resolve({ lint } satisfies StylelintLike),
             logger,
             stylelintRuntimeVersion: "16.22.0",
         });
@@ -160,18 +169,21 @@ describe("stylelint compatibility smoke script", () => {
     it("fails early when the installed Stylelint major does not match the requested runtime", async () => {
         expect.hasAssertions();
 
-        const lint = vi.fn(async () => ({
-            results: [],
-        }));
+        const lint = vi.fn<
+            () => Promise<{
+                results: [];
+            }>
+        >(() => Promise.resolve({ results: [] }));
 
         await expect(
             runStylelintCompatSmoke({
                 argv: ["--expect-stylelint-major=16"],
-                loadBuiltPluginSurfaceFn: async () =>
-                    createMockBuiltPluginSurface(),
-                loadStylelintFn: async () => ({ lint }) satisfies StylelintLike,
+                loadBuiltPluginSurfaceFn: () =>
+                    Promise.resolve(createMockBuiltPluginSurface()),
+                loadStylelintFn: () =>
+                    Promise.resolve({ lint } satisfies StylelintLike),
                 logger: {
-                    log: vi.fn(),
+                    log: vi.fn<(...messages: readonly unknown[]) => void>(),
                 },
                 stylelintRuntimeVersion: "17.0.1",
             })
@@ -184,18 +196,16 @@ describe("stylelint compatibility smoke script", () => {
 
         await expect(
             runStylelintCompatSmoke({
-                loadBuiltPluginSurfaceFn: async () => {
-                    throw new Error(
-                        "Cannot find module '/repo/dist/plugin.js'"
-                    );
-                },
-                loadStylelintFn: async () => ({
-                    lint: async () => ({
-                        results: [],
+                loadBuiltPluginSurfaceFn: () =>
+                    Promise.reject(
+                        new Error("Cannot find module '/repo/dist/plugin.js'")
+                    ),
+                loadStylelintFn: () =>
+                    Promise.resolve({
+                        lint: () => Promise.resolve({ results: [] }),
                     }),
-                }),
                 logger: {
-                    log: vi.fn(),
+                    log: vi.fn<(...messages: readonly unknown[]) => void>(),
                 },
                 stylelintRuntimeVersion: "16.0.0",
             })

@@ -1,5 +1,5 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
@@ -43,9 +43,11 @@ describe("sync-peer-stylelint-range script", () => {
         expect.hasAssertions();
 
         mkdirSync("temp", { recursive: true });
-        const tempRoot = mkdtempSync(resolve("temp", "sync-peer-stylelint-"));
-        const packageJsonPath = resolve(tempRoot, "package.json");
-        const logger = { log: vi.fn() };
+        const tempRoot = mkdtempSync(
+            path.resolve("temp", "sync-peer-stylelint-")
+        );
+        const packageJsonPath = path.resolve(tempRoot, "package.json");
+        const logger = { log: vi.fn<(message: string) => void>() };
 
         writeFileSync(
             packageJsonPath,
@@ -69,9 +71,13 @@ describe("sync-peer-stylelint-range script", () => {
 
         const updatedPackageJson = JSON.parse(
             readFileSync(packageJsonPath, "utf8")
-        );
+        ) as {
+            peerDependencies?: {
+                stylelint?: string;
+            };
+        };
 
-        expect(updatedPackageJson.peerDependencies.stylelint).toBe(
+        expect(updatedPackageJson.peerDependencies?.stylelint).toBe(
             "^16.0.0 || ^17.7.0"
         );
         expect(logger.log).toHaveBeenCalledWith(
@@ -83,9 +89,11 @@ describe("sync-peer-stylelint-range script", () => {
         expect.hasAssertions();
 
         mkdirSync("temp", { recursive: true });
-        const tempRoot = mkdtempSync(resolve("temp", "sync-peer-stylelint-"));
-        const packageJsonPath = resolve(tempRoot, "package.json");
-        const logger = { log: vi.fn() };
+        const tempRoot = mkdtempSync(
+            path.resolve("temp", "sync-peer-stylelint-")
+        );
+        const packageJsonPath = path.resolve(tempRoot, "package.json");
+        const logger = { log: vi.fn<(message: string) => void>() };
 
         writeFileSync(
             packageJsonPath,
@@ -107,9 +115,13 @@ describe("sync-peer-stylelint-range script", () => {
 
         const updatedPackageJson = JSON.parse(
             readFileSync(packageJsonPath, "utf8")
-        );
+        ) as {
+            peerDependencies?: {
+                stylelint?: string;
+            };
+        };
 
-        expect(updatedPackageJson.peerDependencies.stylelint).toBe(
+        expect(updatedPackageJson.peerDependencies?.stylelint).toBe(
             "^16.0.0 || ^17.7.0"
         );
     });
@@ -117,7 +129,10 @@ describe("sync-peer-stylelint-range script", () => {
     it("uses a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "sync-peer-stylelint-range.mjs");
+        const scriptPath = path.resolve(
+            "scripts",
+            "sync-peer-stylelint-range.mjs"
+        );
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -129,7 +144,10 @@ describe("sync-peer-stylelint-range script", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "sync-peer-stylelint-range.test.ts"),
+                argvEntry: path.resolve(
+                    "test",
+                    "sync-peer-stylelint-range.test.ts"
+                ),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();

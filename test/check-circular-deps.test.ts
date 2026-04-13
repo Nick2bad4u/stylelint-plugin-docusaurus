@@ -1,4 +1,4 @@
-import { join, resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
@@ -17,19 +17,19 @@ describe("check-circular-deps script", () => {
         const excludeRegExp = createMadgeExcludeRegExp();
 
         expect(
-            excludeRegExp.test(join("src", ".cache", "file.ts"))
+            excludeRegExp.test(path.join("src", ".cache", "file.ts"))
         ).toBeTruthy();
         expect(
             excludeRegExp.test(
-                join("docs", "docusaurus", ".docusaurus", "app.js")
+                path.join("docs", "docusaurus", ".docusaurus", "app.js")
             )
         ).toBeTruthy();
-        expect(excludeRegExp.test(join("src", "styles.css"))).toBeTruthy();
+        expect(excludeRegExp.test(path.join("src", "styles.css"))).toBeTruthy();
         expect(
-            excludeRegExp.test(join("src", "scache", "file.ts"))
+            excludeRegExp.test(path.join("src", "scache", "file.ts"))
         ).toBeFalsy();
         expect(
-            excludeRegExp.test(join("src", "adocusaurus", "file.ts"))
+            excludeRegExp.test(path.join("src", "adocusaurus", "file.ts"))
         ).toBeFalsy();
     });
 
@@ -50,7 +50,7 @@ describe("check-circular-deps script", () => {
                 "cts",
                 "mts",
             ],
-            tsConfig: resolve("C:/repo", "tsconfig.json"),
+            tsConfig: path.resolve("C:/repo", "tsconfig.json"),
         });
     });
 
@@ -80,10 +80,12 @@ describe("check-circular-deps script", () => {
         expect.hasAssertions();
 
         const successLogger = {
-            error: vi.fn(),
-            log: vi.fn(),
+            error: vi.fn<(message?: unknown) => void>(),
+            log: vi.fn<(message?: unknown) => void>(),
         };
-        const successAnalyzer = vi.fn(async () => ({ circular: () => [] }));
+        const successAnalyzer = vi.fn<
+            () => Promise<{ circular: () => string[][] }>
+        >(() => Promise.resolve({ circular: () => [] }));
 
         await expect(
             runCli({
@@ -93,7 +95,7 @@ describe("check-circular-deps script", () => {
             })
         ).resolves.toBe(0);
         expect(successAnalyzer).toHaveBeenCalledWith(
-            resolve("C:/repo", "src"),
+            path.resolve("C:/repo", "src"),
             createMadgeOptions({ repositoryRootPath: "C:/repo" })
         );
         expect(successLogger.log).toHaveBeenCalledWith(
@@ -101,21 +103,22 @@ describe("check-circular-deps script", () => {
         );
 
         const failureLogger = {
-            error: vi.fn(),
-            log: vi.fn(),
+            error: vi.fn<(message?: unknown) => void>(),
+            log: vi.fn<(message?: unknown) => void>(),
         };
 
         await expect(
             runCli({
-                analyzeWithMadge: async () => ({
-                    circular: () => [
-                        [
-                            "src/a.ts",
-                            "src/b.ts",
-                            "src/a.ts",
+                analyzeWithMadge: () =>
+                    Promise.resolve({
+                        circular: () => [
+                            [
+                                "src/a.ts",
+                                "src/b.ts",
+                                "src/a.ts",
+                            ],
                         ],
-                    ],
-                }),
+                    }),
                 logger: failureLogger,
                 repositoryRootPath: "C:/repo",
             })
@@ -133,7 +136,7 @@ describe("check-circular-deps script", () => {
     it("uses a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "check-circular-deps.mjs");
+        const scriptPath = path.resolve("scripts", "check-circular-deps.mjs");
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -145,7 +148,7 @@ describe("check-circular-deps script", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "check-circular-deps.test.ts"),
+                argvEntry: path.resolve("test", "check-circular-deps.test.ts"),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();

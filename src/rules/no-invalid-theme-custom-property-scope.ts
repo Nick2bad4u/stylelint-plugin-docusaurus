@@ -1,3 +1,5 @@
+import type { Rule } from "postcss";
+
 import stylelint, { type RuleBase } from "stylelint";
 import { isDefined } from "ts-extras";
 
@@ -38,16 +40,13 @@ const docs = {
 } as const;
 
 /** Boundary-aware fallback for exact `.DocSearch` root class detection. */
-const docSearchRootClassPattern =
-    /(^|[^\w-])\.DocSearch(?![\w-])/u;
+const docSearchRootClassPattern = /(?:^|[^\w-])\.DocSearch(?![\w-])/u;
 
 /**
  * Check whether every selector in a rule scopes DocSearch variables to the
  * DocSearch UI surface.
  */
-function isAllowedDocSearchScopeRule(
-    ruleNode: Readonly<import("postcss").Rule>
-): boolean {
+function isAllowedDocSearchScopeRule(ruleNode: Readonly<Rule>): boolean {
     const parsedSelectorList = parseSelectorList(ruleNode.selector);
 
     if (isDefined(parsedSelectorList)) {
@@ -58,7 +57,7 @@ function isAllowedDocSearchScopeRule(
             selectors.every((selector) =>
                 selectorTrailingCompoundHasClass(
                     selector,
-                    (className) => className === "DocSearch"
+                    (cssClassName) => cssClassName === "DocSearch"
                 )
             )
         );
@@ -93,12 +92,13 @@ const ruleFunction: RuleBase<boolean, undefined> =
                 return;
             }
 
-            if (isDocsearchThemeCustomPropertyName(declaration.prop) && (
-                    isAllowedThemeScopeRule(containingRule) ||
-                    isAllowedDocSearchScopeRule(containingRule)
-                )) {
-                    return;
-                }
+            if (
+                isDocsearchThemeCustomPropertyName(declaration.prop) &&
+                (isAllowedThemeScopeRule(containingRule) ||
+                    isAllowedDocSearchScopeRule(containingRule))
+            ) {
+                return;
+            }
 
             if (isAllowedThemeScopeRule(containingRule)) {
                 return;

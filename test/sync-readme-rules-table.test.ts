@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
@@ -37,9 +37,10 @@ describe("sync-readme-rules-table automation", () => {
         await expect(
             loadBuiltRules({
                 builtPluginPath: "C:/repo/dist/plugin.js",
-                importModule: async () => ({
-                    rules: builtRules,
-                }),
+                importModule: () =>
+                    Promise.resolve({
+                        rules: builtRules,
+                    }),
             })
         ).resolves.toStrictEqual(builtRules);
     });
@@ -53,18 +54,20 @@ describe("sync-readme-rules-table automation", () => {
             filePath: string;
         }[] = [];
         const result = await syncReadmeRulesTable({
-            readFileFn: async () =>
-                [
-                    "# Repo",
-                    "",
-                    "## Rules",
-                    "",
-                    "stale table",
-                    "",
-                    "## Next",
-                    "",
-                    "tail",
-                ].join("\n"),
+            readFileFn: () =>
+                Promise.resolve(
+                    [
+                        "# Repo",
+                        "",
+                        "## Rules",
+                        "",
+                        "stale table",
+                        "",
+                        "## Next",
+                        "",
+                        "tail",
+                    ].join("\n")
+                ),
             readmeFilePath: "C:/repo/README.md",
             rules: {
                 "alpha-rule": {
@@ -89,12 +92,14 @@ describe("sync-readme-rules-table automation", () => {
                 },
             },
             writeChanges: true,
-            writeFileFn: async (filePath, contents, encoding) => {
+            writeFileFn: (filePath, contents, encoding) => {
                 writes.push({
                     contents,
                     encoding,
                     filePath,
                 });
+
+                return Promise.resolve();
             },
         });
 
@@ -149,18 +154,26 @@ describe("sync-readme-rules-table automation", () => {
                 },
             },
         });
-        const writeSpy = vi.fn();
+        const writeSpy = vi.fn<
+            (
+                filePath: string,
+                contents: string,
+                encoding: string
+            ) => Promise<void>
+        >(() => Promise.resolve());
         const result = await syncReadmeRulesTable({
-            readFileFn: async () =>
-                [
-                    "# Repo",
-                    "",
-                    generatedSection.trimEnd(),
-                    "",
-                    "## Next",
-                    "",
-                    "tail",
-                ].join("\n"),
+            readFileFn: () =>
+                Promise.resolve(
+                    [
+                        "# Repo",
+                        "",
+                        generatedSection.trimEnd(),
+                        "",
+                        "## Next",
+                        "",
+                        "tail",
+                    ].join("\n")
+                ),
             readmeFilePath: "C:/repo/README.md",
             rules: {
                 "alpha-rule": {
@@ -189,7 +202,7 @@ describe("sync-readme-rules-table automation", () => {
         expect.hasAssertions();
 
         const packageJson = JSON.parse(
-            readFileSync(resolve("package.json"), "utf8")
+            readFileSync(path.resolve("package.json"), "utf8")
         ) as {
             scripts?: Record<string, string>;
         };
@@ -205,7 +218,10 @@ describe("sync-readme-rules-table automation", () => {
     it("exposes a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "sync-readme-rules-table.mjs");
+        const scriptPath = path.resolve(
+            "scripts",
+            "sync-readme-rules-table.mjs"
+        );
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -217,7 +233,10 @@ describe("sync-readme-rules-table automation", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "sync-readme-rules-table.test.ts"),
+                argvEntry: path.resolve(
+                    "test",
+                    "sync-readme-rules-table.test.ts"
+                ),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();

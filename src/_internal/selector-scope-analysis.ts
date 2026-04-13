@@ -1,5 +1,9 @@
+/* eslint-disable perfectionist/sort-modules -- exported function order is intentionally arranged to avoid no-use-before-define conflicts while keeping public API readable */
 import type { Rule } from "postcss";
 import type { Node } from "postcss-selector-parser";
+import type { Except } from "type-fest";
+
+import { isDefined, setHas } from "ts-extras";
 
 import {
     isLikelyDocusaurusGlobalThemeClassName,
@@ -28,14 +32,157 @@ export type SelectorScopeAnchorOptions = Readonly<{
     includeGlobal?: boolean;
 }>;
 
+/**
+ * Check whether a selector has a meaningful scope anchor such as a component
+ * class, a stable Docusaurus wrapper, a custom id, or a non-root data
+ * attribute.
+ */
+function computeSelectorHasScopeAnchor(
+    selector: Readonly<ParsedSelector>,
+    {
+        additionalAnchorClassNames,
+        additionalIgnoredAttributeNames,
+        ancestorHasScopeAnchor = false,
+        includeGlobal = false,
+    }: SelectorScopeAnchorOptions = {}
+): boolean {
+    /** Check whether one selector node lives under any named ancestor pseudo. */
+    function hasNamedAncestorPseudo(
+        node: Readonly<Node>,
+        pseudoNames: ReadonlySet<string>
+    ): boolean {
+        let currentNode: Node | undefined = node.parent as Node | undefined;
+
+        while (isDefined(currentNode)) {
+            const parentNode = currentNode.parent as Node | undefined;
+
+            if (
+                currentNode.type === "pseudo" &&
+                setHas(pseudoNames, currentNode.value)
+            ) {
+                return true;
+            }
+
+            currentNode = parentNode;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check whether one selector node should be ignored for positive scope
+     * anchoring.
+     */
+    function shouldIgnoreScopeAnchorNode(
+        node: Readonly<Node>,
+        includeGlobalScope: boolean
+    ): boolean {
+        if (!includeGlobalScope && isInsideGlobalPseudo(node)) {
+            return true;
+        }
+
+        return hasNamedAncestorPseudo(node, nonPositiveScopeAnchorPseudoNames);
+    }
+
+    if (ancestorHasScopeAnchor) {
+        return true;
+    }
+
+    let hasMeaningfulScopeAnchor = false;
+
+    selector.walkClasses((cssClassNode) => {
+        if (hasMeaningfulScopeAnchor) {
+            return;
+        }
+
+        if (shouldIgnoreScopeAnchorNode(cssClassNode, includeGlobal)) {
+            return;
+        }
+
+        if (
+            isDefined(additionalAnchorClassNames) &&
+            setHas(additionalAnchorClassNames, cssClassNode.value)
+        ) {
+            hasMeaningfulScopeAnchor = true;
+
+            return;
+        }
+
+        if (isLikelyDocusaurusGlobalThemeClassName(cssClassNode.value)) {
+            return;
+        }
+
+        hasMeaningfulScopeAnchor = true;
+    });
+
+    if (hasMeaningfulScopeAnchor) {
+        return true;
+    }
+
+    selector.walkIds((idNode) => {
+        if (hasMeaningfulScopeAnchor) {
+            return;
+        }
+
+        if (shouldIgnoreScopeAnchorNode(idNode, includeGlobal)) {
+            return;
+        }
+
+        if (setHas(rootOnlyIgnoredIdNames, idNode.value)) {
+            return;
+        }
+
+        hasMeaningfulScopeAnchor = true;
+    });
+
+    if (hasMeaningfulScopeAnchor) {
+        return true;
+    }
+
+    selector.walkAttributes((attributeNode) => {
+        if (hasMeaningfulScopeAnchor) {
+            return;
+        }
+
+        if (shouldIgnoreScopeAnchorNode(attributeNode, includeGlobal)) {
+            return;
+        }
+
+        const attributeName = attributeNode.attribute.toLowerCase();
+
+        if (setHas(rootOnlyIgnoredAttributeNames, attributeName)) {
+            return;
+        }
+
+        if (
+            isDefined(additionalIgnoredAttributeNames) &&
+            setHas(additionalIgnoredAttributeNames, attributeName)
+        ) {
+            return;
+        }
+
+        hasMeaningfulScopeAnchor = true;
+    });
+
+    return hasMeaningfulScopeAnchor;
+}
+
 /** Check whether any containing ancestor rule provides a useful scope anchor. */
 export function ruleHasScopeAnchorInAncestors(
     ruleNode: Readonly<Rule>,
-    options: Omit<SelectorScopeAnchorOptions, "ancestorHasScopeAnchor"> = {}
+    options: Except<SelectorScopeAnchorOptions, "ancestorHasScopeAnchor"> = {}
 ): boolean {
-    return getContainingRules(ruleNode).some((ancestorRule) =>
-        selectorListHasScopeAnchor(ancestorRule.selector, options)
-    );
+    return getContainingRules(ruleNode).some((ancestorRule) => {
+        const parsedSelectorList = parseSelectorList(ancestorRule.selector);
+
+        if (!isDefined(parsedSelectorList)) {
+            return false;
+        }
+
+        return getSelectors(parsedSelectorList).some((selector) =>
+            computeSelectorHasScopeAnchor(selector, options)
+        );
+    });
 }
 
 /**
@@ -45,139 +192,28 @@ export function ruleHasScopeAnchorInAncestors(
  */
 export function selectorHasScopeAnchor(
     selector: Readonly<ParsedSelector>,
-    {
-        additionalAnchorClassNames,
-        additionalIgnoredAttributeNames,
-        ancestorHasScopeAnchor = false,
-        includeGlobal = false,
-    }: SelectorScopeAnchorOptions = {}
+    options: SelectorScopeAnchorOptions = {}
 ): boolean {
-    if (ancestorHasScopeAnchor) {
-        return true;
-    }
-
-    let hasMeaningfulScopeAnchor = false;
-
-    selector.walkClasses((classNode) => {
-        if (shouldIgnoreScopeAnchorNode(classNode, includeGlobal)) {
-            return;
-        }
-
-        if (
-            additionalAnchorClassNames !== undefined &&
-            additionalAnchorClassNames.has(classNode.value)
-        ) {
-            hasMeaningfulScopeAnchor = true;
-
-            return false;
-        }
-
-        if (isLikelyDocusaurusGlobalThemeClassName(classNode.value)) {
-            return;
-        }
-
-        hasMeaningfulScopeAnchor = true;
-
-        return false;
-    });
-
-    if (hasMeaningfulScopeAnchor) {
-        return true;
-    }
-
-    selector.walkIds((idNode) => {
-        if (shouldIgnoreScopeAnchorNode(idNode, includeGlobal)) {
-            return;
-        }
-
-        if (rootOnlyIgnoredIdNames.has(idNode.value)) {
-            return;
-        }
-
-        hasMeaningfulScopeAnchor = true;
-
-        return false;
-    });
-
-    if (hasMeaningfulScopeAnchor) {
-        return true;
-    }
-
-    selector.walkAttributes((attributeNode) => {
-        if (shouldIgnoreScopeAnchorNode(attributeNode, includeGlobal)) {
-            return;
-        }
-
-        const attributeName = attributeNode.attribute.toLowerCase();
-
-        if (rootOnlyIgnoredAttributeNames.has(attributeName)) {
-            return;
-        }
-
-        if (
-            additionalIgnoredAttributeNames !== undefined &&
-            additionalIgnoredAttributeNames.has(attributeName)
-        ) {
-            return;
-        }
-
-        hasMeaningfulScopeAnchor = true;
-
-        return false;
-    });
-
-    return hasMeaningfulScopeAnchor;
+    return computeSelectorHasScopeAnchor(selector, options);
 }
 
-/** Check whether any selector in one selector list has a meaningful scope
-anchor. */
+/**
+ * Check whether any selector in one selector list has a meaningful scope
+ * anchor.
+ */
 export function selectorListHasScopeAnchor(
     selectorList: string,
     options: SelectorScopeAnchorOptions = {}
 ): boolean {
     const parsedSelectorList = parseSelectorList(selectorList);
 
-    if (parsedSelectorList === undefined) {
+    if (!isDefined(parsedSelectorList)) {
         return false;
     }
 
     return getSelectors(parsedSelectorList).some((selector) =>
-        selectorHasScopeAnchor(selector, options)
+        computeSelectorHasScopeAnchor(selector, options)
     );
 }
 
-/** Check whether one selector node lives under any named ancestor pseudo. */
-function hasNamedAncestorPseudo(
-    node: Readonly<Node>,
-    pseudoNames: ReadonlySet<string>
-): boolean {
-    let currentNode: Node | undefined = node.parent as Node | undefined;
-
-    while (currentNode !== undefined) {
-        const parentNode = currentNode.parent as Node | undefined;
-
-        if (
-            currentNode.type === "pseudo" &&
-            pseudoNames.has(currentNode.value)
-        ) {
-            return true;
-        }
-
-        currentNode = parentNode;
-    }
-
-    return false;
-}
-
-/** Check whether one selector node should be ignored for positive scope
-anchoring. */
-function shouldIgnoreScopeAnchorNode(
-    node: Readonly<Node>,
-    includeGlobal: boolean
-): boolean {
-    if (!includeGlobal && isInsideGlobalPseudo(node)) {
-        return true;
-    }
-
-    return hasNamedAncestorPseudo(node, nonPositiveScopeAnchorPseudoNames);
-}
+/* eslint-enable perfectionist/sort-modules -- restore default ordering checks outside this intentionally ordered module */

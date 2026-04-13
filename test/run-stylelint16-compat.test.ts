@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -88,21 +88,31 @@ describe("run-stylelint16-compat wrapper", () => {
 
         await expect(
             runStylelint16Compat({
-                copyFileFn: async (sourcePath, destinationPath) => {
-                    copiedFiles.push(`${sourcePath}->${destinationPath}`);
+                copyFileFn: (sourcePath, destinationPath) => {
+                    copiedFiles.push(
+                        `${String(sourcePath)}->${String(destinationPath)}`
+                    );
+
+                    return Promise.resolve();
                 },
-                cpFn: async (sourcePath, destinationPath) => {
-                    restoredFiles.push(`${sourcePath}->${destinationPath}`);
+                cpFn: (sourcePath, destinationPath) => {
+                    restoredFiles.push(
+                        `${String(sourcePath)}->${String(destinationPath)}`
+                    );
+
+                    return Promise.resolve();
                 },
-                mkdtempFn: async () => tempBackupDirectory,
+                mkdtempFn: () => Promise.resolve(tempBackupDirectory),
                 nodeCommand: "node",
                 npmCommand: "npm",
                 packageJsonPath: "/repo/package.json",
                 packageLockJsonPath: "/repo/package-lock.json",
                 platform: "linux",
                 repositoryRootPath: "/repo",
-                rmFn: async (targetPath) => {
+                rmFn: (targetPath) => {
                     removedPaths.push(String(targetPath));
+
+                    return Promise.resolve();
                 },
                 runCommandFn: (input) => {
                     executedCommands.push(
@@ -122,12 +132,12 @@ describe("run-stylelint16-compat wrapper", () => {
         ).rejects.toThrow("simulated smoke failure");
 
         expect(copiedFiles).toStrictEqual([
-            `/repo/package.json->${join(tempBackupDirectory, "package.json")}`,
-            `/repo/package-lock.json->${join(tempBackupDirectory, "package-lock.json")}`,
+            `/repo/package.json->${path.join(tempBackupDirectory, "package.json")}`,
+            `/repo/package-lock.json->${path.join(tempBackupDirectory, "package-lock.json")}`,
         ]);
         expect(restoredFiles).toStrictEqual([
-            `${join(tempBackupDirectory, "package.json")}->/repo/package.json`,
-            `${join(tempBackupDirectory, "package-lock.json")}->/repo/package-lock.json`,
+            `${path.join(tempBackupDirectory, "package.json")}->/repo/package.json`,
+            `${path.join(tempBackupDirectory, "package-lock.json")}->/repo/package-lock.json`,
         ]);
         expect(executedCommands).toStrictEqual([
             "npm run build",
@@ -144,18 +154,20 @@ describe("run-stylelint16-compat wrapper", () => {
         const executedCommands: string[] = [];
         let invocationIndex = 0;
 
+        let thrownError: unknown = undefined;
+
         try {
             await runStylelint16Compat({
-                copyFileFn: async () => {},
-                cpFn: async () => {},
-                mkdtempFn: async () => "/temp/stylelint16-backup",
+                copyFileFn: () => Promise.resolve(),
+                cpFn: () => Promise.resolve(),
+                mkdtempFn: () => Promise.resolve("/temp/stylelint16-backup"),
                 nodeCommand: "node",
                 npmCommand: "npm",
                 packageJsonPath: "/repo/package.json",
                 packageLockJsonPath: "/repo/package-lock.json",
                 platform: "linux",
                 repositoryRootPath: "/repo",
-                rmFn: async () => {},
+                rmFn: () => Promise.resolve(),
                 runCommandFn: (input) => {
                     executedCommands.push(
                         `${input.command} ${input.args.join(" ")}`
@@ -175,27 +187,24 @@ describe("run-stylelint16-compat wrapper", () => {
                 tmpDirectoryPath: "/temp",
                 windowsCommandShell: "cmd.exe",
             });
-
-            throw new Error("Expected the compatibility run to fail.");
         } catch (error) {
-            expect(error).toBeInstanceOf(AggregateError);
-
-            if (!(error instanceof AggregateError)) {
-                throw error;
-            }
-
-            const messages = error.errors.map((item: unknown) =>
-                item instanceof Error ? item.message : String(item)
-            );
-
-            expect(error.message).toContain(
-                "cleanup encountered additional errors"
-            );
-            expect(messages).toContain("simulated smoke failure");
-            expect(messages).toContain(
-                "Failed to restore dependencies after the Stylelint 16 compatibility check."
-            );
+            thrownError = error;
         }
+
+        expect(thrownError).toBeInstanceOf(AggregateError);
+
+        const aggregateError = thrownError as AggregateError;
+        const messages = aggregateError.errors.map((item: unknown) =>
+            item instanceof Error ? item.message : String(item)
+        );
+
+        expect(aggregateError.message).toContain(
+            "cleanup encountered additional errors"
+        );
+        expect(messages).toContain("simulated smoke failure");
+        expect(messages).toContain(
+            "Failed to restore dependencies after the Stylelint 16 compatibility check."
+        );
 
         expect(executedCommands).toStrictEqual([
             "npm run build",
@@ -210,16 +219,16 @@ describe("run-stylelint16-compat wrapper", () => {
 
         await expect(
             runStylelint16Compat({
-                copyFileFn: async () => {},
-                cpFn: async () => {},
-                mkdtempFn: async () => "/temp/stylelint16-backup",
+                copyFileFn: () => Promise.resolve(),
+                cpFn: () => Promise.resolve(),
+                mkdtempFn: () => Promise.resolve("/temp/stylelint16-backup"),
                 nodeCommand: "node",
                 npmCommand: "npm",
                 packageJsonPath: "/repo/package.json",
                 packageLockJsonPath: "/repo/package-lock.json",
                 platform: "linux",
                 repositoryRootPath: "/repo",
-                rmFn: async () => {
+                rmFn: () => {
                     throw new Error("simulated temp cleanup failure");
                 },
                 runCommandFn: () => {},
@@ -228,7 +237,7 @@ describe("run-stylelint16-compat wrapper", () => {
                 tmpDirectoryPath: "/temp",
                 windowsCommandShell: "cmd.exe",
             })
-        ).rejects.toThrowError(
+        ).rejects.toThrow(
             "Failed to remove temporary backup directory: /temp/stylelint16-backup"
         );
     });

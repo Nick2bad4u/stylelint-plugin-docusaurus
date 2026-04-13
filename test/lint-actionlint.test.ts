@@ -1,4 +1,4 @@
-import { join, resolve } from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
@@ -27,10 +27,10 @@ describe("lint-actionlint wrapper", () => {
 
         expect(hasActionlintFlag(plan.userArgs, "-config-file")).toBeTruthy();
         expect(plan.userArgs).not.toContain("C:/repo/ActionLintConfig.yaml");
-        expect(plan.userArgs).not.toEqual(
+        expect(plan.userArgs).not.toStrictEqual(
             expect.arrayContaining(["-shellcheck", ""])
         );
-        expect(plan.userArgs).not.toEqual(
+        expect(plan.userArgs).not.toStrictEqual(
             expect.arrayContaining(["-pyflakes", ""])
         );
     });
@@ -87,8 +87,8 @@ describe("lint-actionlint wrapper", () => {
                 repoRootPath: "C:/repo",
             }).targetFiles
         ).toStrictEqual([
-            join("C:/repo", ".github", "workflows", "a.yaml"),
-            join("C:/repo", ".github", "workflows", "z.yml"),
+            path.join("C:/repo", ".github", "workflows", "a.yaml"),
+            path.join("C:/repo", ".github", "workflows", "z.yml"),
         ]);
 
         expect(
@@ -98,21 +98,21 @@ describe("lint-actionlint wrapper", () => {
                 repoRootPath: "C:/repo",
             }).targetFiles
         ).toStrictEqual([
-            join("C:/repo", ".github", "workflows", "a.yaml"),
-            join(
+            path.join("C:/repo", ".github", "workflows", "a.yaml"),
+            path.join(
                 "C:/repo",
                 ".github",
                 "workflows",
                 "FILL_EXCLUDED_FILES_HERE.yml"
             ),
-            join("C:/repo", ".github", "workflows", "z.yml"),
+            path.join("C:/repo", ".github", "workflows", "z.yml"),
         ]);
     });
 
     it("uses a direct-execution guard so imports do not run the CLI", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "lint-actionlint.mjs");
+        const scriptPath = path.resolve("scripts", "lint-actionlint.mjs");
         const scriptUrl = pathToFileURL(scriptPath).href;
 
         expect(
@@ -124,7 +124,7 @@ describe("lint-actionlint wrapper", () => {
 
         expect(
             isDirectExecution({
-                argvEntry: resolve("test", "lint-actionlint.test.ts"),
+                argvEntry: path.resolve("test", "lint-actionlint.test.ts"),
                 currentImportUrl: scriptUrl,
             })
         ).toBeFalsy();
@@ -133,16 +133,16 @@ describe("lint-actionlint wrapper", () => {
     it("resolves the repository root from the script location", () => {
         expect.hasAssertions();
 
-        const scriptPath = resolve("scripts", "lint-actionlint.mjs");
+        const scriptPath = path.resolve("scripts", "lint-actionlint.mjs");
         const scriptUrl = pathToFileURL(scriptPath).href;
 
-        expect(getRepositoryRootPath(scriptUrl)).toBe(resolve("."));
+        expect(getRepositoryRootPath(scriptUrl)).toBe(path.resolve("."));
     });
 
     it("uses the script-resolved repository root even when process.cwd differs", () => {
         expect.hasAssertions();
 
-        const repositoryRootPath = resolve(".");
+        const repositoryRootPath = path.resolve(".");
         const cwdSpy = vi
             .spyOn(process, "cwd")
             .mockReturnValue("C:/different-cwd");
@@ -158,14 +158,14 @@ describe("lint-actionlint wrapper", () => {
             });
 
             expect(visitedDirectories).toStrictEqual([
-                join(repositoryRootPath, ".github", "workflows"),
+                path.join(repositoryRootPath, ".github", "workflows"),
             ]);
             expect(plan.userArgs).toContain("-config-file");
             expect(plan.userArgs).toContain(
-                join(repositoryRootPath, "ActionLintConfig.yaml")
+                path.join(repositoryRootPath, "ActionLintConfig.yaml")
             );
             expect(plan.userArgs).not.toContain(
-                join("C:/different-cwd", "ActionLintConfig.yaml")
+                path.join("C:/different-cwd", "ActionLintConfig.yaml")
             );
         } finally {
             cwdSpy.mockRestore();
