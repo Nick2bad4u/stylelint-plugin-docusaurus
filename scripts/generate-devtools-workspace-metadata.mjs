@@ -32,7 +32,7 @@ export function isValidUuid(value) {
 /**
  * Determine whether the CLI should force a new UUID.
  *
- * @param {readonly string[]} [cliArgs=process.argv.slice(2)] - CLI arguments.
+ * @param {readonly string[]} [cliArgs] - CLI arguments.
  *   Default is `process.argv.slice(2)`
  *
  * @returns {boolean} Whether a new UUID should be generated.
@@ -45,9 +45,9 @@ export function shouldRegenerateUuid(cliArgs = process.argv.slice(2)) {
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry=process.argv[1]] - Entry path
+ * @param {string | undefined} [input.argvEntry] - Entry path
  *   from process arguments. Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl=import.meta.url] - Current module
+ * @param {string} [input.currentImportUrl] - Current module
  *   URL. Default is `import.meta.url`
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
@@ -67,7 +67,7 @@ export function isDirectExecution({
  * Load the repository package.json contents with explicit filesystem and JSON
  * parse error handling.
  *
- * @param {string} [packageJsonPath=repositoryPackageJsonPath] - Package.json
+ * @param {string} [packageJsonPath] - Package.json
  *   path. Default is `repositoryPackageJsonPath`
  *
  * @returns {Record<string, unknown>} Parsed package.json object.
@@ -111,7 +111,7 @@ export function loadRepositoryPackageJson(
 /**
  * Read the existing metadata UUID if present and valid.
  *
- * @param {string} [metadataOutputPath=outputPath] - Metadata file path. Default
+ * @param {string} [metadataOutputPath] - Metadata file path. Default
  *   is `outputPath`
  *
  * @returns {string | undefined} Existing UUID value.
@@ -168,10 +168,10 @@ export function readExistingUuid(metadataOutputPath = outputPath) {
  * Resolve the UUID to persist for the workspace metadata file.
  *
  * @param {object} input - UUID selection input.
- * @param {readonly string[]} [input.cliArgs=[]] - CLI arguments. Default is
+ * @param {readonly string[]} [input.cliArgs] - CLI arguments. Default is
  *   `[]`
  * @param {string | undefined} [input.existingUuid] - Existing UUID value.
- * @param {() => string} [input.createUuid=randomUUID] - UUID factory. Default
+ * @param {() => string} [input.createUuid] - UUID factory. Default
  *   is `randomUUID`
  *
  * @returns {string} UUID to persist.
@@ -217,15 +217,15 @@ export function createWorkspaceMetadataJson({
  * Generate the Chrome DevTools workspace metadata file.
  *
  * @param {object} [input] - Generation input.
- * @param {readonly string[]} [input.cliArgs=[]] - CLI arguments. Default is
+ * @param {readonly string[]} [input.cliArgs] - CLI arguments. Default is
  *   `[]`
- * @param {() => string} [input.createUuid=randomUUID] - UUID factory. Default
+ * @param {() => string} [input.createUuid] - UUID factory. Default
  *   is `randomUUID`
- * @param {string} [input.metadataOutputPath=outputPath] - Output file path.
+ * @param {string} [input.metadataOutputPath] - Output file path.
  *   Default is `outputPath`
- * @param {string} [input.packageJsonPath=repositoryPackageJsonPath] -
+ * @param {string} [input.packageJsonPath]
  *   Package.json path. Default is `repositoryPackageJsonPath`
- * @param {string} [input.repositoryRootPath=repositoryRoot] - Repository root
+ * @param {string} [input.repositoryRootPath] - Repository root
  *   path. Default is `repositoryRoot`
  *
  * @returns {{
@@ -287,11 +287,11 @@ export function generateDevToolsWorkspaceMetadata({
  * Run the CLI entrypoint.
  *
  * @param {object} [input] - CLI input.
- * @param {readonly string[]} [input.cliArgs=process.argv.slice(2)] - CLI
+ * @param {readonly string[]} [input.cliArgs] - CLI
  *   arguments. Default is `process.argv.slice(2)`
- * @param {() => string} [input.createUuid=randomUUID] - UUID factory. Default
+ * @param {() => string} [input.createUuid] - UUID factory. Default
  *   is `randomUUID`
- * @param {{
+ * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
  * }} [input.logger=console]

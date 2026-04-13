@@ -14,7 +14,7 @@ describe("docusaurus-media-query helpers", () => {
                 "print and (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("does not treat negated desktop guards as providing a minimum width", () => {
@@ -25,7 +25,7 @@ describe("docusaurus-media-query helpers", () => {
                 "not all and (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("still recognizes non-negated top-level branches inside comma-separated media queries", () => {
@@ -36,6 +36,6 @@ describe("docusaurus-media-query helpers", () => {
                 "print, (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 });

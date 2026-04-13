@@ -1,22 +1,21 @@
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
+import { resolve } from "node:path";
 import { remark } from "remark";
 import { VFile } from "vfile";
 import { describe, expect, it } from "vitest";
 
 import type { RemarkLintRuleDocHeadingsOptions } from "../scripts/remark-lint-rule-doc-headings.d.mts";
+
 import remarkLintRuleDocHeadings from "../scripts/remark-lint-rule-doc-headings.mjs";
 
-const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = resolve(import.meta.dirname, "..");
 const sampleRuleDocPath = resolve(repositoryRoot, "docs/rules/sample-rule.md");
 
-type RuleDocMarkdownOverrides = {
+interface RuleDocMarkdownOverrides {
     deprecatedSection?: string;
     furtherReadingSection?: string;
     includePackageDocumentation?: boolean;
     packageDocumentationSection?: string;
-};
+}
 
 const createRuleDocMarkdown = (
     overrides: RuleDocMarkdownOverrides = {}
@@ -134,7 +133,7 @@ describe("remark-lint-rule-doc-headings", () => {
                     "> **Rule catalog ID:** R999",
                     "```",
                 ].join("\n"),
-            }).replace(/\n> \*\*Rule catalog ID:\*\* R123\n/u, "\n"),
+            }).replace(/\n> \*\*Rule catalog ID:\*\* R123\n/v, "\n"),
             {
                 requireRuleCatalogId: true,
             }

@@ -1,7 +1,6 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -14,11 +13,11 @@ import {
     writeVersionFiles,
 } from "../scripts/sync-node-version-files.mjs";
 
-type TempNodeVersionFixtureInput = {
+interface TempNodeVersionFixtureInput {
     enginesNode?: string;
     nodeVersion?: string;
     nvmrcVersion?: string;
-};
+}
 
 function createTempNodeVersionFixture(input: TempNodeVersionFixtureInput = {}) {
     const enginesNode =
@@ -51,8 +50,8 @@ function createTempNodeVersionFixture(input: TempNodeVersionFixtureInput = {}) {
     writeFileSync(nvmrcFilePath, `${nvmrcVersion}\n`, "utf8");
 
     return {
-        nvmrcFilePath,
         nodeVersionFilePath,
+        nvmrcFilePath,
         packageJsonPath,
     };
 }
@@ -108,7 +107,7 @@ describe("sync-node-version-files script", () => {
         expect.hasAssertions();
 
         const logger = { log: vi.fn() };
-        const { nvmrcFilePath, nodeVersionFilePath, packageJsonPath } =
+        const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.0.0",
             });
@@ -118,8 +117,8 @@ describe("sync-node-version-files script", () => {
                 argumentList: [],
                 currentRuntimeVersion: "25.8.1",
                 logger,
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
                 packageJsonPath,
             })
         ).resolves.toBe("updated");
@@ -134,7 +133,7 @@ describe("sync-node-version-files script", () => {
     it("catches stale but internally synchronized files in --check-current mode", async () => {
         expect.hasAssertions();
 
-        const { nvmrcFilePath, nodeVersionFilePath, packageJsonPath } =
+        const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.9.0",
             });
@@ -144,8 +143,8 @@ describe("sync-node-version-files script", () => {
                 argumentList: ["--check-current"],
                 currentRuntimeVersion: "25.8.1",
                 logger: { log: vi.fn() },
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
                 packageJsonPath,
             })
         ).rejects.toThrow(
@@ -157,7 +156,7 @@ describe("sync-node-version-files script", () => {
         expect.hasAssertions();
 
         const logger = { log: vi.fn() };
-        const { nvmrcFilePath, nodeVersionFilePath } =
+        const { nodeVersionFilePath, nvmrcFilePath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.9.0",
             });
@@ -166,8 +165,8 @@ describe("sync-node-version-files script", () => {
             validateVersionFiles({
                 expectedVersion: null,
                 logger,
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
             })
         ).resolves.toBe("24.9.0");
 
@@ -179,7 +178,7 @@ describe("sync-node-version-files script", () => {
     it("rejects --check validation when synchronized files fall below package.json engines.node", async () => {
         expect.hasAssertions();
 
-        const { nvmrcFilePath, nodeVersionFilePath, packageJsonPath } =
+        const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture({
                 enginesNode: ">=22.0.0",
                 nodeVersion: "21.9.0",
@@ -190,8 +189,8 @@ describe("sync-node-version-files script", () => {
                 argumentList: ["--check"],
                 currentRuntimeVersion: "25.8.1",
                 logger: { log: vi.fn() },
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
                 packageJsonPath,
             })
         ).rejects.toThrow(
@@ -202,7 +201,7 @@ describe("sync-node-version-files script", () => {
     it("checks the file version against the minimum engine in the direct validator helper", async () => {
         expect.hasAssertions();
 
-        const { nvmrcFilePath, nodeVersionFilePath } =
+        const { nodeVersionFilePath, nvmrcFilePath } =
             createTempNodeVersionFixture({
                 nodeVersion: "21.9.0",
             });
@@ -212,8 +211,8 @@ describe("sync-node-version-files script", () => {
                 expectedVersion: null,
                 logger: { log: vi.fn() },
                 minimumEngineVersion: "22.0.0",
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
             })
         ).rejects.toThrow(
             "Preferred Node.js version is below package.json engines.node. Preferred: 21.9.0. Minimum engine: 22.0.0."
@@ -223,15 +222,15 @@ describe("sync-node-version-files script", () => {
     it("rejects preferred versions that fall below package.json engines.node", async () => {
         expect.hasAssertions();
 
-        const { nvmrcFilePath, nodeVersionFilePath, packageJsonPath } =
+        const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture();
 
         await expect(
             synchronizeNodeVersionFiles({
                 argumentList: ["--version", "21.9.0"],
                 logger: { log: vi.fn() },
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
                 packageJsonPath,
             })
         ).rejects.toThrow(
@@ -243,7 +242,7 @@ describe("sync-node-version-files script", () => {
         expect.hasAssertions();
 
         expect(() =>
-            assertPreferredVersionSupported("21.9.0", "22.0.0")
+            { assertPreferredVersionSupported("21.9.0", "22.0.0"); }
         ).toThrow(
             "Preferred Node.js version is below package.json engines.node. Preferred: 21.9.0. Minimum engine: 22.0.0."
         );
@@ -273,16 +272,16 @@ describe("sync-node-version-files script", () => {
     it("writes exact normalized content through the direct helper", async () => {
         expect.hasAssertions();
 
-        const { nvmrcFilePath, nodeVersionFilePath } =
+        const { nodeVersionFilePath, nvmrcFilePath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.0.0",
             });
 
         await expect(
             writeVersionFiles({
-                preferredVersion: "v25.8.1",
-                nvmrcFilePath,
                 nodeVersionFilePath,
+                nvmrcFilePath,
+                preferredVersion: "v25.8.1",
             })
         ).resolves.toBe("25.8.1");
 

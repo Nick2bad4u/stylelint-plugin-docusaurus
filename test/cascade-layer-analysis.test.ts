@@ -10,7 +10,7 @@ describe("cascade-layer-analysis helpers", () => {
         expect.hasAssertions();
 
         expect(
-            getDeclaredCascadeLayerNames("docusaurus\\2e infima, app")
+            getDeclaredCascadeLayerNames(String.raw`docusaurus\2e infima, app`)
         ).toStrictEqual(["docusaurus.infima", "app"]);
     });
 
@@ -19,7 +19,7 @@ describe("cascade-layer-analysis helpers", () => {
 
         expect(
             getImportedCascadeLayerNames(
-                "url('./theme.css') \\6c ayer(docusaurus\\2e widgets)"
+                String.raw`url('./theme.css') \6c ayer(docusaurus\2e widgets)`
             )
         ).toStrictEqual(["docusaurus.widgets"]);
     });

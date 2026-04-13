@@ -31,7 +31,7 @@ As the plugin grows, `all` should remain the exhaustive opt-in surface for teams
 | Rule | Fix | Description |
 | --- | :-: | --- |
 | [`no-broad-all-resets-outside-isolation-subtrees`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-broad-all-resets-outside-isolation-subtrees) | — | Disallow broad all: initial\|revert\|unset resets outside explicitly isolated local subtrees. |
-| [`no-direct-theme-token-consumption-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-direct-theme-token-consumption-in-css-modules) | — | Disallow direct --ifm-* and --docsearch-* token consumption in CSS Modules declarations. |
+| [`no-direct-theme-token-consumption-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-direct-theme-token-consumption-in-css-modules) | — | Disallow direct --ifm-*and --docsearch-* token consumption in CSS Modules declarations. |
 | [`no-docusaurus-layer-name-collisions`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-docusaurus-layer-name-collisions) | — | Disallow author-defined cascade layer names that collide with reserved Docusaurus-managed layer prefixes. |
 | [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) | — | Disallow declaring Docusaurus theme custom properties outside global theme scopes, except for DocSearch variables scoped to the DocSearch UI. |
 | [`no-mobile-navbar-backdrop-filter`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-backdrop-filter) | — | Disallow backdrop-filter on Docusaurus navbar selectors unless it is guarded behind the desktop breakpoint. |

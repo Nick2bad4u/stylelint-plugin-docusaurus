@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -10,8 +12,6 @@ import {
     resolveConfigDocTargets,
     syncConfigDocs,
 } from "../scripts/sync-configs-rules-matrix.mjs";
-import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 
 describe("sync-configs-rules-matrix automation", () => {
     it("preserves exported config name order instead of hardcoding only recommended/all", () => {
@@ -42,7 +42,7 @@ describe("sync-configs-rules-matrix automation", () => {
         expect.hasAssertions();
 
         expect(
-            normalizeConfigNames(undefined, { strict: {}, all: {} })
+            normalizeConfigNames(undefined, { all: {}, strict: {} })
         ).toStrictEqual(["all", "strict"]);
     });
 
@@ -56,7 +56,7 @@ describe("sync-configs-rules-matrix automation", () => {
                 repositoryRoot: "C:/repo",
             })
         ).rejects.toThrow(
-            "Missing config documentation file for exported config 'strict': C:\\repo\\docs\\rules\\configs\\strict.md"
+            String.raw`Missing config documentation file for exported config 'strict': C:\repo\docs\rules\configs\strict.md`
         );
     });
 
@@ -92,7 +92,7 @@ describe("sync-configs-rules-matrix automation", () => {
         );
         expect(generatedSection).toContain("🔧");
         expect(getConfigDocPath("strict", "C:/repo")).toBe(
-            "C:\\repo\\docs\\rules\\configs\\strict.md"
+            String.raw`C:\repo\docs\rules\configs\strict.md`
         );
     });
 
@@ -195,11 +195,11 @@ describe("sync-configs-rules-matrix automation", () => {
     it("rewrites stale config doc rule tables from canonical plugin metadata", async () => {
         expect.hasAssertions();
 
-        const writes: Array<{
+        const writes: {
             contents: string;
             encoding: string;
             filePath: string;
-        }> = [];
+        }[] = [];
         const result = await syncConfigDocs({
             hasDocFile: async () => true,
             metadata: {
@@ -245,7 +245,7 @@ describe("sync-configs-rules-matrix automation", () => {
 
         expect(result).toStrictEqual({
             changed: true,
-            updatedFilePaths: ["C:\\repo\\docs\\rules\\configs\\strict.md"],
+            updatedFilePaths: [String.raw`C:\repo\docs\rules\configs\strict.md`],
         });
         expect(writes).toHaveLength(1);
         expect(writes[0]?.encoding).toBe("utf8");

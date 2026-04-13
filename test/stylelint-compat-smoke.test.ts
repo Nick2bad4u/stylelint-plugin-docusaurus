@@ -4,6 +4,7 @@ import type {
     BuiltPluginSurface,
     StylelintLike,
 } from "../scripts/stylelint-compat-smoke.mjs";
+
 import {
     isDirectExecution,
     normalizeStylelintRuntime,

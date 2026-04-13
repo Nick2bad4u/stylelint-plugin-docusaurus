@@ -1,6 +1,6 @@
+import { docsCatalogStats } from "@stylelint-plugin-docusaurus/docs/src/data/docsCatalog";
 import { describe, expect, it } from "vitest";
 
-import { docsCatalogStats } from "../docs/docusaurus/src/data/docsCatalog";
 import { configNames, ruleNames } from "../src/plugin";
 
 describe("docs site catalog metadata", () => {

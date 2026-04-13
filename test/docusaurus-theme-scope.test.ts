@@ -35,9 +35,9 @@ describe("docusaurus theme-scope helpers", () => {
     it("still accepts global-wrapped standalone theme scopes", () => {
         expect.hasAssertions();
 
-        expect(isAllowedThemeScopeSelector(":global(:root)")).toBe(true);
+        expect(isAllowedThemeScopeSelector(":global(:root)")).toBeTruthy();
         expect(
             isAllowedThemeScopeSelector(":global(html[data-theme='dark'])")
-        ).toBe(true);
+        ).toBeTruthy();
     });
 });

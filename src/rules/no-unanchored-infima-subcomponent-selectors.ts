@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined } from "ts-extras";
+import { arrayFind, isDefined  } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -8,6 +8,10 @@ import {
     infimaSubcomponentAnchorClassNames,
     isTargetedInfimaSubcomponentClassName,
 } from "../_internal/docusaurus-selector-contracts.js";
+import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
 import {
     getClassNamesOutsideGlobal,
     getSelectors,
@@ -18,10 +22,6 @@ import {
     selectorHasScopeAnchor,
 } from "../_internal/selector-scope-analysis.js";
 import { isCssModuleRoot } from "../_internal/source-file-context.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -57,9 +57,7 @@ function findUnanchoredInfimaSelector(
     }
 
     for (const selector of getSelectors(parsedSelectorList)) {
-        const targetedClassName = getClassNamesOutsideGlobal(selector).find(
-            (className) => isTargetedInfimaSubcomponentClassName(className)
-        );
+        const targetedClassName = arrayFind(getClassNamesOutsideGlobal(selector), (className) => isTargetedInfimaSubcomponentClassName(className));
 
         if (!isDefined(targetedClassName)) {
             continue;

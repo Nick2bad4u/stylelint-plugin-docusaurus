@@ -6,15 +6,15 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import { isLikelyDocusaurusGlobalThemeClassName } from "../_internal/docusaurus-selector-contracts.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getClassNamesOutsideGlobal,
     getSelectors,
     parseSelectorList,
 } from "../_internal/selector-parser-utils.js";
 import { isCssModuleRoot } from "../_internal/source-file-context.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 

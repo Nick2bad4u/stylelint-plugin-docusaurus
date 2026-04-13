@@ -8,7 +8,7 @@ const {
     resolveChangedUrlsFromManifest,
 } = indexNowModule;
 
-describe("IndexNow route-manifest helpers", () => {
+describe("indexNow route-manifest helpers", () => {
     it("rejects route sources that escape the configured Docusaurus site directory", () => {
         expect.hasAssertions();
 

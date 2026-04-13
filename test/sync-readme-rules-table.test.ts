@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -16,7 +15,7 @@ describe("sync-readme-rules-table automation", () => {
     it("resolves README paths from the repository root instead of the current working directory", () => {
         expect.hasAssertions();
 
-        expect(getReadmePath("C:/repo")).toBe("C:\\repo\\README.md");
+        expect(getReadmePath("C:/repo")).toBe(String.raw`C:\repo\README.md`);
     });
 
     it("loads built rules lazily through an injectable module loader", async () => {
@@ -48,11 +47,11 @@ describe("sync-readme-rules-table automation", () => {
     it("rewrites the README rules section with sorted canonical rule rows", async () => {
         expect.hasAssertions();
 
-        const writes: Array<{
+        const writes: {
             contents: string;
             encoding: string;
             filePath: string;
-        }> = [];
+        }[] = [];
         const result = await syncReadmeRulesTable({
             readFileFn: async () =>
                 [
@@ -68,16 +67,6 @@ describe("sync-readme-rules-table automation", () => {
                 ].join("\n"),
             readmeFilePath: "C:/repo/README.md",
             rules: {
-                "zeta-rule": {
-                    docs: {
-                        description: "Zeta rule.",
-                        recommended: false,
-                        url: "https://example.test/docs/rules/zeta-rule",
-                    },
-                    meta: {
-                        fixable: false,
-                    },
-                },
                 "alpha-rule": {
                     docs: {
                         description: "Alpha rule.",
@@ -86,6 +75,16 @@ describe("sync-readme-rules-table automation", () => {
                     },
                     meta: {
                         fixable: true,
+                    },
+                },
+                "zeta-rule": {
+                    docs: {
+                        description: "Zeta rule.",
+                        recommended: false,
+                        url: "https://example.test/docs/rules/zeta-rule",
+                    },
+                    meta: {
+                        fixable: false,
                     },
                 },
             },

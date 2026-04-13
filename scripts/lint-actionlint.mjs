@@ -21,7 +21,7 @@ import pc from "picocolors";
  * Resolve the repository root from the script location rather than from the
  * caller's current working directory.
  *
- * @param {string} [currentImportUrl=import.meta.url] - Script module URL.
+ * @param {string} [currentImportUrl] - Script module URL.
  *   Default is `import.meta.url`
  *
  * @returns {string} Repository root path.
@@ -48,9 +48,9 @@ const flagsWithValues = new Set([
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry=process.argv[1]] - Entry path.
+ * @param {string | undefined} [input.argvEntry] - Entry path.
  *   Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl=import.meta.url] - Current module
+ * @param {string} [input.currentImportUrl] - Current module
  *   URL. Default is `import.meta.url`
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
@@ -96,7 +96,7 @@ export function hasAnyActionlintFlag(args, flags) {
 /**
  * Parse raw wrapper CLI arguments into actionlint args and explicit file args.
  *
- * @param {readonly string[]} [rawArgs=process.argv.slice(2)] - Raw CLI
+ * @param {readonly string[]} [rawArgs] - Raw CLI
  *   arguments. Default is `process.argv.slice(2)`
  *
  * @returns {{
@@ -167,9 +167,9 @@ export function isActionlintPassThroughMode(userArgs) {
  * Resolve the workflow file targets for a default wrapper invocation.
  *
  * @param {object} input - Target resolution input.
- * @param {boolean} [input.overrideExcluded=false] - Whether to include excluded
+ * @param {boolean} [input.overrideExcluded] - Whether to include excluded
  *   files. Default is `false`
- * @param {string} [input.repoRootPath=repositoryRootPath] - Repository root
+ * @param {string} [input.repoRootPath] - Repository root
  *   path. Default is `repositoryRootPath`
  * @param {(
  *     directoryPath: string
@@ -208,13 +208,13 @@ export function resolveDefaultWorkflowTargets({
  * Build the final actionlint invocation plan for the wrapper.
  *
  * @param {object} [input] - Planning input.
- * @param {readonly string[]} [input.rawArgs=process.argv.slice(2)] - Raw CLI
+ * @param {readonly string[]} [input.rawArgs] - Raw CLI
  *   arguments. Default is `process.argv.slice(2)`
  * @param {(
  *     directoryPath: string
  * ) => readonly { readonly isFile: () => boolean; readonly name: string }[]} [input.readDirectoryEntries]
  *   - Directory reader.
- * @param {string} [input.repoRootPath=repositoryRootPath] - Repository root
+ * @param {string} [input.repoRootPath] - Repository root
  *   path. Default is `repositoryRootPath`
  *
  * @returns {{
@@ -283,7 +283,7 @@ export function createActionlintExecutionPlan({
  * Run the actionlint wrapper CLI.
  *
  * @param {object} [input] - CLI input.
- * @param {{
+ * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
  * }} [input.logger=console]

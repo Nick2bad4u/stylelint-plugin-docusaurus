@@ -66,9 +66,9 @@ export const isRecord = (value) => typeof value === "object" && value !== null;
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input]
- * @param {string | undefined} [input.argvEntry=process.argv[1]] Default is
+ * @param {string | undefined} [input.argvEntry] - Default is
  *   `process.argv[1]`
- * @param {string} [input.currentImportUrl=import.meta.url] Default is
+ * @param {string} [input.currentImportUrl] - Default is
  *   `import.meta.url`
  *
  * @returns {boolean}
@@ -166,7 +166,7 @@ export const parseArguments = (argumentList) => {
 /**
  * Read and parse package.json.
  *
- * @param {string} [filePath=packageJsonPath] Default is `packageJsonPath`
+ * @param {string} [filePath] - Default is `packageJsonPath`
  *
  * @returns {Promise<Record<string, unknown>>}
  */
@@ -313,9 +313,9 @@ export const readOptionalVersionFile = async (filePath) => {
  *
  * @param {object} input
  * @param {string} input.preferredVersion
- * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ * @param {string} [input.nvmrcFilePath] - Default is
  *   `nvmrcFilePath`
  *
  * @returns {Promise<string>}
@@ -341,12 +341,12 @@ export const writeVersionFiles = async ({
  *
  * @param {object} input
  * @param {string | null} input.expectedVersion
- * @param {string | null} [input.minimumEngineVersion=null] Default is `null`
- * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ * @param {string | null} [input.minimumEngineVersion] - Default is `null`
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger]
  *   Default is `console`
- * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ * @param {string} [input.nvmrcFilePath] - Default is
  *   `nvmrcFilePath`
  *
  * @returns {Promise<string>}
@@ -413,17 +413,17 @@ export const validateVersionFiles = async ({
  * Synchronize or validate the repository's Node version files.
  *
  * @param {object} [input]
- * @param {readonly string[]} [input.argumentList=process.argv.slice(2)]
+ * @param {readonly string[]} [input.argumentList]
  *   Default is `process.argv.slice(2)`
- * @param {string} [input.currentRuntimeVersion=process.versions.node] Default
+ * @param {string} [input.currentRuntimeVersion] - Default
  *   is `process.versions.node`
- * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger]
  *   Default is `console`
- * @param {string} [input.packageJsonPath=packageJsonPath] Default is
+ * @param {string} [input.packageJsonPath] - Default is
  *   `packageJsonPath`
- * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
+ * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
+ * @param {string} [input.nvmrcFilePath] - Default is
  *   `nvmrcFilePath`
  *
  * @returns {Promise<NodeVersionSyncResult>}
@@ -485,11 +485,11 @@ export const synchronizeNodeVersionFiles = async ({
  * CLI entrypoint.
  *
  * @param {object} [input]
- * @param {readonly string[]} [input.argumentList=process.argv.slice(2)]
+ * @param {readonly string[]} [input.argumentList]
  *   Default is `process.argv.slice(2)`
- * @param {string} [input.currentRuntimeVersion=process.versions.node] Default
+ * @param {string} [input.currentRuntimeVersion] - Default
  *   is `process.versions.node`
- * @param {{
+ * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
  * }} [input.logger=console]

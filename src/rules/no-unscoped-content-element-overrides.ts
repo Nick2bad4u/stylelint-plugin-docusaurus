@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined } from "ts-extras";
+import { arrayFind, isDefined  } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -9,6 +9,10 @@ import {
     stableDocusaurusThemeClassNames,
 } from "../_internal/docusaurus-selector-contracts.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     getTypeNamesOutsideGlobal,
     parseSelectorList,
@@ -17,10 +21,6 @@ import {
     ruleHasScopeAnchorInAncestors,
     selectorHasScopeAnchor,
 } from "../_internal/selector-scope-analysis.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -66,9 +66,7 @@ function findUnscopedContentElementSelector(
             continue;
         }
 
-        const contentElementName = getTypeNamesOutsideGlobal(selector).find(
-            (typeName) => isDocusaurusContentElementName(typeName)
-        );
+        const contentElementName = arrayFind(getTypeNamesOutsideGlobal(selector), (typeName) => isDocusaurusContentElementName(typeName));
 
         if (!isDefined(contentElementName)) {
             continue;

@@ -6,19 +6,19 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import {
     getContainingRule,
-    isDocsearchThemeCustomPropertyName,
     isAllowedThemeScopeRule,
+    isDocsearchThemeCustomPropertyName,
     isDocusaurusThemeCustomPropertyName,
 } from "../_internal/docusaurus-theme-scope.js";
+import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
 import {
     getSelectors,
     parseSelectorList,
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -39,7 +39,7 @@ const docs = {
 
 /** Boundary-aware fallback for exact `.DocSearch` root class detection. */
 const docSearchRootClassPattern =
-    /(^|[^A-Za-z0-9_-])\.DocSearch(?![A-Za-z0-9_-])/u;
+    /(^|[^\w-])\.DocSearch(?![\w-])/u;
 
 /**
  * Check whether every selector in a rule scopes DocSearch variables to the
@@ -93,14 +93,12 @@ const ruleFunction: RuleBase<boolean, undefined> =
                 return;
             }
 
-            if (isDocsearchThemeCustomPropertyName(declaration.prop)) {
-                if (
+            if (isDocsearchThemeCustomPropertyName(declaration.prop) && (
                     isAllowedThemeScopeRule(containingRule) ||
                     isAllowedDocSearchScopeRule(containingRule)
-                ) {
+                )) {
                     return;
                 }
-            }
 
             if (isAllowedThemeScopeRule(containingRule)) {
                 return;

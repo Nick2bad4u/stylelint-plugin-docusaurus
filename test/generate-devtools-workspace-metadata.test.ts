@@ -1,7 +1,6 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-
 import { describe, expect, it } from "vitest";
 
 import {
@@ -77,7 +76,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
                 createUuid: () => replacementUuid,
                 metadataOutputPath,
                 packageJsonPath,
-                repositoryRootPath: "C:\\Workspace\\Example Repo",
+                repositoryRootPath: String.raw`C:\Workspace\Example Repo`,
             })
         ).toThrow(
             `Existing DevTools workspace metadata file contains an invalid workspace.uuid: ${metadataOutputPath}. Fix the file or rerun with --regenerate to replace it.`
@@ -120,7 +119,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
             createUuid: () => replacementUuid,
             metadataOutputPath,
             packageJsonPath,
-            repositoryRootPath: "C:\\Workspace\\Example Repo",
+            repositoryRootPath: String.raw`C:\Workspace\Example Repo`,
         });
         const writtenMetadata = JSON.parse(
             readFileSync(metadataOutputPath, "utf8")
@@ -134,7 +133,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
         expect(result).toStrictEqual({
             metadataOutputPath,
             packageName: "fixture-devtools-workspace",
-            repositoryRoot: "C:\\Workspace\\Example Repo",
+            repositoryRoot: String.raw`C:\Workspace\Example Repo`,
             workspaceUuid: replacementUuid,
         });
         expect(readExistingUuid(metadataOutputPath)).toBe(replacementUuid);
@@ -178,7 +177,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
 
         expect(
             createWorkspaceMetadataJson({
-                repositoryRootPath: "C:\\Workspace\\Example Repo",
+                repositoryRootPath: String.raw`C:\Workspace\Example Repo`,
                 workspaceUuid: "123e4567-e89b-42d3-a456-426614174000",
             })
         ).toContain('"root": "C:/Workspace/Example Repo"');

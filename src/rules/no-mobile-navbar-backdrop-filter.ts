@@ -10,16 +10,16 @@ import {
 } from "../_internal/docusaurus-media-query.js";
 import { getContainingRule } from "../_internal/docusaurus-theme-scope.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     parseSelectorList,
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
-/* eslint-disable @typescript-eslint/no-use-before-define -- This file keeps hoisted helper declarations in module-sorted order to satisfy the repository's ordering rules. */
+ 
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -91,7 +91,7 @@ function selectorTargetsDocusaurusNavbar(selectorList: string): boolean {
     );
 }
 
-/* eslint-enable @typescript-eslint/no-use-before-define -- Helper block ends here. */
+ 
 
 /**
  * Rule implementation for preventing mobile-breaking backdrop filters on the

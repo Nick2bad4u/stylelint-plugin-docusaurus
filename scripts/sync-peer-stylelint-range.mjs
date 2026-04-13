@@ -20,9 +20,9 @@ export const minimumSupportedStylelintRange = "^16.0.0";
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry=process.argv[1]] - Entry path.
+ * @param {string | undefined} [input.argvEntry] - Entry path.
  *   Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl=import.meta.url] - Current module
+ * @param {string} [input.currentImportUrl] - Current module
  *   URL. Default is `import.meta.url`
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
@@ -101,7 +101,7 @@ const getStylelintRangeClauses = (range) =>
  *
  * @param {object} input
  * @param {unknown} input.devDependencyStylelintRange
- * @param {string} [input.minimumRange=minimumSupportedStylelintRange] Default
+ * @param {string} [input.minimumRange] - Default
  *   is `minimumSupportedStylelintRange`
  *
  * @returns {string}
@@ -127,8 +127,8 @@ export const createPeerStylelintRange = ({
  * Synchronize `peerDependencies.stylelint` to the current supported range.
  *
  * @param {object} [input]
- * @param {string} [input.filePath=packageJsonPath] Default is `packageJsonPath`
- * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger=console]
+ * @param {string} [input.filePath] - Default is `packageJsonPath`
+ * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger]
  *   Default is `console`
  *
  * @returns {Promise<"updated" | "unchanged">}
@@ -174,8 +174,8 @@ export const synchronizePeerStylelintRange = async ({
  * CLI entrypoint.
  *
  * @param {object} [input]
- * @param {string} [input.filePath=packageJsonPath] Default is `packageJsonPath`
- * @param {{
+ * @param {string} [input.filePath] - Default is `packageJsonPath`
+ * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
  * }} [input.logger=console]

@@ -6,11 +6,11 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import { findFirstCssVarCustomPropertyReference } from "../_internal/css-value-analysis.js";
 import { isDocusaurusThemeCustomPropertyName } from "../_internal/docusaurus-theme-scope.js";
-import { isCssModuleRoot } from "../_internal/source-file-context.js";
 import {
     createRuleDocsUrl,
     createRuleName,
 } from "../_internal/plugin-constants.js";
+import { isCssModuleRoot } from "../_internal/source-file-context.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 

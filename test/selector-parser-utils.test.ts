@@ -28,7 +28,7 @@ describe("selector-parser-utils positive-scope matching", () => {
                 getFirstSelector(":not(.navbar--dark) .DocSearch-Button"),
                 (className) => className === "navbar--dark"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("still treats classes inside positive wrappers such as :is(...) as positive class matches", () => {
@@ -41,7 +41,7 @@ describe("selector-parser-utils positive-scope matching", () => {
                 ),
                 (className) => className === "navbar--dark"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("does not treat attributes hidden inside :not(...) as positive attribute matches", () => {
@@ -53,6 +53,6 @@ describe("selector-parser-utils positive-scope matching", () => {
                 (attributeNode) =>
                     attributeNode.attribute.toLowerCase() === "data-theme"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 });

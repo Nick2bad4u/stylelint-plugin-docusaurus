@@ -66,7 +66,7 @@ export function createMadgeExcludeRegExp() {
  * Create the Madge options object for this repository.
  *
  * @param {object} [input] - Options input.
- * @param {string} [input.repositoryRootPath=repositoryRoot] - Repository root
+ * @param {string} [input.repositoryRootPath] - Repository root
  *   path. Default is `repositoryRoot`
  *
  * @returns {{
@@ -104,9 +104,9 @@ export function formatCircularDependencies(circularDependencies) {
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry=process.argv[1]] - Entry path.
+ * @param {string | undefined} [input.argvEntry] - Entry path.
  *   Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl=import.meta.url] - Current module
+ * @param {string} [input.currentImportUrl] - Current module
  *   URL. Default is `import.meta.url`
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
@@ -126,7 +126,7 @@ export function isDirectExecution({
  * Run the circular-dependency CLI.
  *
  * @param {object} [input] - CLI input.
- * @param {(
+ * @param {([input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge]
  *     sourcePath: string,
  *     options: {
  *         excludeRegExp: RegExp[];

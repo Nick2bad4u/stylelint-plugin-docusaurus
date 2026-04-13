@@ -6,14 +6,14 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import { unsafeThemeInternalSelectorFragments } from "../_internal/docusaurus-selector-contracts.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     findClassAttributeFragmentMatch,
     getSelectors,
     parseSelectorList,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 

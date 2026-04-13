@@ -10,14 +10,14 @@ import {
 } from "../_internal/docusaurus-media-query.js";
 import { getContainingRule } from "../_internal/docusaurus-theme-scope.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     parseSelectorList,
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 /* eslint-disable @typescript-eslint/no-use-before-define -- This file keeps hoisted helper declarations in module-sorted order to satisfy the repository's ordering rules. */
 
@@ -97,65 +97,6 @@ function isNavbarTargetCssToken(cssToken: string): boolean {
 }
 
 /**
- * Split one comma-separated token list while trimming empty entries.
- */
-function splitCommaSeparatedTokens(value: string): readonly string[] {
-    const tokens: string[] = [];
-
-    let currentToken = "";
-
-    for (const character of value) {
-        if (character === ",") {
-            const normalizedToken = currentToken.trim();
-
-            if (normalizedToken.length > 0) {
-                tokens.push(normalizedToken);
-            }
-
-            currentToken = "";
-            continue;
-        }
-
-        currentToken += character;
-    }
-
-    const normalizedToken = currentToken.trim();
-
-    if (normalizedToken.length > 0) {
-        tokens.push(normalizedToken);
-    }
-
-    return tokens;
-}
-
-/**
- * Split one whitespace-separated token list while trimming empty entries.
- */
-function splitWhitespaceSeparatedTokens(value: string): readonly string[] {
-    const tokens: string[] = [];
-    let currentToken = "";
-
-    for (const character of value) {
-        if (isWhitespaceCharacter(character)) {
-            if (currentToken.length > 0) {
-                tokens.push(currentToken);
-                currentToken = "";
-            }
-
-            continue;
-        }
-
-        currentToken += character;
-    }
-
-    if (currentToken.length > 0) {
-        tokens.push(currentToken);
-    }
-
-    return tokens;
-}
-
-/**
  * Check whether a property is one of the risky navbar containing-block or
  * stacking-context properties.
  */
@@ -212,6 +153,65 @@ function selectorTargetsDocusaurusNavbar(selectorList: string): boolean {
     return getSelectors(parsedSelectorList).some((selector) =>
         selectorTrailingCompoundHasClass(selector, isNavbarTargetCssToken)
     );
+}
+
+/**
+ * Split one comma-separated token list while trimming empty entries.
+ */
+function splitCommaSeparatedTokens(value: string): readonly string[] {
+    const tokens: string[] = [];
+
+    let currentToken = "";
+
+    for (const character of value) {
+        if (character === ",") {
+            const normalizedToken = currentToken.trim();
+
+            if (normalizedToken.length > 0) {
+                tokens.push(normalizedToken);
+            }
+
+            currentToken = "";
+            continue;
+        }
+
+        currentToken += character;
+    }
+
+    const normalizedToken = currentToken.trim();
+
+    if (normalizedToken.length > 0) {
+        tokens.push(normalizedToken);
+    }
+
+    return tokens;
+}
+
+/**
+ * Split one whitespace-separated token list while trimming empty entries.
+ */
+function splitWhitespaceSeparatedTokens(value: string): readonly string[] {
+    const tokens: string[] = [];
+    let currentToken = "";
+
+    for (const character of value) {
+        if (isWhitespaceCharacter(character)) {
+            if (currentToken.length > 0) {
+                tokens.push(currentToken);
+                currentToken = "";
+            }
+
+            continue;
+        }
+
+        currentToken += character;
+    }
+
+    if (currentToken.length > 0) {
+        tokens.push(currentToken);
+    }
+
+    return tokens;
 }
 
 /* eslint-enable @typescript-eslint/no-use-before-define -- Helper block ends here. */

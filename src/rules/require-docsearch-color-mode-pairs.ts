@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined } from "ts-extras";
+import { isDefined, safeCastTo  } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -11,14 +11,14 @@ import {
     walkThemeScopeDeclarations,
 } from "../_internal/docusaurus-theme-scope.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     parseSelectorList,
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -68,7 +68,7 @@ function getDocSearchColorMode(selector: string): ColorMode | undefined {
         return undefined;
     }
 
-    return getLeadingDocusaurusColorMode(selector) as ColorMode | undefined;
+    return safeCastTo<ColorMode | undefined>(getLeadingDocusaurusColorMode(selector));
 }
 
 /** Rule implementation for paired light/dark DocSearch overrides. */

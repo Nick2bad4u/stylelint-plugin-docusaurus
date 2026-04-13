@@ -1,6 +1,5 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -15,7 +14,7 @@ describe("sync-presets-rules-matrix legacy alias", () => {
         expect.hasAssertions();
 
         expect(getConfigDocPath("strict", "C:/repo")).toBe(
-            "C:\\repo\\docs\\rules\\configs\\strict.md"
+            String.raw`C:\repo\docs\rules\configs\strict.md`
         );
         expect(
             normalizeConfigNames(
@@ -43,10 +42,7 @@ describe("sync-presets-rules-matrix legacy alias", () => {
             warn,
         });
 
-        expect(warn).toHaveBeenCalledOnce();
-        expect(warn).toHaveBeenCalledWith(
-            "sync-presets-rules-matrix.mjs is deprecated in this Stylelint template. Use sync-configs-rules-matrix.mjs instead."
-        );
+        expect(warn).toHaveBeenCalledExactlyOnceWith("sync-presets-rules-matrix.mjs is deprecated in this Stylelint template. Use sync-configs-rules-matrix.mjs instead.");
         expect(runConfigMatrixCli).toHaveBeenCalledWith({
             legacyAlias: true,
         });

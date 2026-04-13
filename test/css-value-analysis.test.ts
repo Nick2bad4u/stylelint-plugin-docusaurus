@@ -14,7 +14,7 @@ describe("css value analysis helpers", () => {
                 "VAR(--ifm-navbar-background-color)",
                 "--ifm-navbar-background-color"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("treats standalone CSS keywords case-insensitively", () => {
@@ -22,7 +22,7 @@ describe("css value analysis helpers", () => {
 
         expect(
             cssValueHasStandaloneIdentifier("REVERT-LAYER", "revert-layer")
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("does not treat raw url() contents as standalone identifiers", () => {
@@ -33,6 +33,6 @@ describe("css value analysis helpers", () => {
                 "url(/assets/revert-layer.svg)",
                 "revert-layer"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 });

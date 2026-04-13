@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined } from "ts-extras";
+import { isDefined, isInteger, setHas   } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -13,14 +13,14 @@ import {
     type WidthBreakpointConstraint,
 } from "../_internal/docusaurus-media-query.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     parseSelectorList,
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -47,9 +47,23 @@ const navbarResponsiveSurfaceClassNames = new Set([
     "theme-layout-navbar-sidebar",
 ]);
 
-/** Format one pixel breakpoint for readable diagnostics. */
-function formatPixels(pixels: number): string {
-    return Number.isInteger(pixels) ? `${pixels}px` : `${pixels.toFixed(2)}px`;
+/** Find the first non-default Docusaurus breakpoint in a media-query chain. */
+function findNonDefaultNavbarBreakpoint(
+    mediaQueries: readonly import("postcss").AtRule[]
+): undefined | WidthBreakpointConstraint {
+    for (const mediaQuery of mediaQueries) {
+        for (const constraint of extractWidthBreakpointConstraints(
+            mediaQuery.params
+        )) {
+            if (isDefaultDocusaurusNavbarBreakpoint(constraint)) {
+                continue;
+            }
+
+            return constraint;
+        }
+    }
+
+    return undefined;
 }
 
 /** Find the first responsive navbar/sidebar selector in one selector list. */
@@ -65,7 +79,7 @@ function findResponsiveNavbarSelector(
     for (const selector of getSelectors(parsedSelectorList)) {
         if (
             !selectorTrailingCompoundHasClass(selector, (className) =>
-                navbarResponsiveSurfaceClassNames.has(className)
+                setHas(navbarResponsiveSurfaceClassNames, className)
             )
         ) {
             continue;
@@ -77,23 +91,9 @@ function findResponsiveNavbarSelector(
     return undefined;
 }
 
-/** Find the first non-default Docusaurus breakpoint in a media-query chain. */
-function findNonDefaultNavbarBreakpoint(
-    mediaQueries: readonly import("postcss").AtRule[]
-): WidthBreakpointConstraint | undefined {
-    for (const mediaQuery of mediaQueries) {
-        for (const constraint of extractWidthBreakpointConstraints(
-            mediaQuery.params
-        )) {
-            if (isDefaultDocusaurusNavbarBreakpoint(constraint)) {
-                continue;
-            }
-
-            return constraint;
-        }
-    }
-
-    return undefined;
+/** Format one pixel breakpoint for readable diagnostics. */
+function formatPixels(pixels: number): string {
+    return isInteger(pixels) ? `${pixels}px` : `${pixels.toFixed(2)}px`;
 }
 
 /** Rule implementation for Docusaurus navbar breakpoint desynchronization. */

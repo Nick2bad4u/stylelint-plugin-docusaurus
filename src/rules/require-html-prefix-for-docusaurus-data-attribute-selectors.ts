@@ -1,5 +1,5 @@
 import stylelint, { type RuleBase } from "stylelint";
-import { isDefined, setHas } from "ts-extras";
+import { arrayFind, isDefined, isEmpty, setHas   } from "ts-extras";
 
 import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js";
 
@@ -9,6 +9,10 @@ import {
     rootOnlyIgnoredIdNames,
 } from "../_internal/docusaurus-selector-contracts.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     classifyLeadingRootAttributeNode,
     getAttributeNodesOutsideGlobal,
     getIdNamesOutsideGlobal,
@@ -16,10 +20,6 @@ import {
     parseSelectorList,
     selectorHasClassOutsideGlobal,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -75,7 +75,7 @@ function findMissingHtmlPrefixSelector(selectorList: string):
             }))
             .filter((attributeMatch) => isDefined(attributeMatch.kind));
 
-        if (relevantAttributeMatches.length === 0) {
+        if (isEmpty(relevantAttributeMatches)) {
             continue;
         }
 
@@ -91,9 +91,7 @@ function findMissingHtmlPrefixSelector(selectorList: string):
             continue;
         }
 
-        const bareAttributeMatch = relevantAttributeMatches.find(
-            (attributeMatch) => attributeMatch.kind === "bare"
-        );
+        const bareAttributeMatch = arrayFind(relevantAttributeMatches, (attributeMatch) => attributeMatch.kind === "bare");
 
         if (!isDefined(bareAttributeMatch)) {
             continue;

@@ -12,7 +12,7 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("does not treat classes hidden inside :has(...) as positive scope anchors", () => {
@@ -23,7 +23,7 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("still treats positive wrapper pseudos such as :is(...) as scope anchors", () => {
@@ -34,6 +34,6 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBe(true);
+        ).toBeTruthy();
     });
 });

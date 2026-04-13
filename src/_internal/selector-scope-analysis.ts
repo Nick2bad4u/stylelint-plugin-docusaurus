@@ -1,17 +1,17 @@
 import type { Rule } from "postcss";
 import type { Node } from "postcss-selector-parser";
 
-import { getContainingRules } from "./docusaurus-theme-scope.js";
 import {
     isLikelyDocusaurusGlobalThemeClassName,
     rootOnlyIgnoredAttributeNames,
     rootOnlyIgnoredIdNames,
 } from "./docusaurus-selector-contracts.js";
+import { getContainingRules } from "./docusaurus-theme-scope.js";
 import {
     getSelectors,
     isInsideGlobalPseudo,
-    parseSelectorList,
     type ParsedSelector,
+    parseSelectorList,
 } from "./selector-parser-utils.js";
 
 /** Pseudo selectors whose nested selectors must not count as positive anchors. */
@@ -20,42 +20,6 @@ const nonPositiveScopeAnchorPseudoNames: ReadonlySet<string> = new Set([
     ":not",
 ]);
 
-/** Check whether one selector node lives under any named ancestor pseudo. */
-function hasNamedAncestorPseudo(
-    node: Readonly<Node>,
-    pseudoNames: ReadonlySet<string>
-): boolean {
-    let currentNode: Node | undefined = node.parent as Node | undefined;
-
-    while (currentNode !== undefined) {
-        const parentNode = currentNode.parent as Node | undefined;
-
-        if (
-            currentNode.type === "pseudo" &&
-            pseudoNames.has(currentNode.value)
-        ) {
-            return true;
-        }
-
-        currentNode = parentNode;
-    }
-
-    return false;
-}
-
-/** Check whether one selector node should be ignored for positive scope
-anchoring. */
-function shouldIgnoreScopeAnchorNode(
-    node: Readonly<Node>,
-    includeGlobal: boolean
-): boolean {
-    if (!includeGlobal && isInsideGlobalPseudo(node)) {
-        return true;
-    }
-
-    return hasNamedAncestorPseudo(node, nonPositiveScopeAnchorPseudoNames);
-}
-
 /** Options for deciding whether a selector has a meaningful scope anchor. */
 export type SelectorScopeAnchorOptions = Readonly<{
     additionalAnchorClassNames?: ReadonlySet<string>;
@@ -63,6 +27,16 @@ export type SelectorScopeAnchorOptions = Readonly<{
     ancestorHasScopeAnchor?: boolean;
     includeGlobal?: boolean;
 }>;
+
+/** Check whether any containing ancestor rule provides a useful scope anchor. */
+export function ruleHasScopeAnchorInAncestors(
+    ruleNode: Readonly<Rule>,
+    options: Omit<SelectorScopeAnchorOptions, "ancestorHasScopeAnchor"> = {}
+): boolean {
+    return getContainingRules(ruleNode).some((ancestorRule) =>
+        selectorListHasScopeAnchor(ancestorRule.selector, options)
+    );
+}
 
 /**
  * Check whether a selector has a meaningful scope anchor such as a component
@@ -172,12 +146,38 @@ export function selectorListHasScopeAnchor(
     );
 }
 
-/** Check whether any containing ancestor rule provides a useful scope anchor. */
-export function ruleHasScopeAnchorInAncestors(
-    ruleNode: Readonly<Rule>,
-    options: Omit<SelectorScopeAnchorOptions, "ancestorHasScopeAnchor"> = {}
+/** Check whether one selector node lives under any named ancestor pseudo. */
+function hasNamedAncestorPseudo(
+    node: Readonly<Node>,
+    pseudoNames: ReadonlySet<string>
 ): boolean {
-    return getContainingRules(ruleNode).some((ancestorRule) =>
-        selectorListHasScopeAnchor(ancestorRule.selector, options)
-    );
+    let currentNode: Node | undefined = node.parent as Node | undefined;
+
+    while (currentNode !== undefined) {
+        const parentNode = currentNode.parent as Node | undefined;
+
+        if (
+            currentNode.type === "pseudo" &&
+            pseudoNames.has(currentNode.value)
+        ) {
+            return true;
+        }
+
+        currentNode = parentNode;
+    }
+
+    return false;
+}
+
+/** Check whether one selector node should be ignored for positive scope
+anchoring. */
+function shouldIgnoreScopeAnchorNode(
+    node: Readonly<Node>,
+    includeGlobal: boolean
+): boolean {
+    if (!includeGlobal && isInsideGlobalPseudo(node)) {
+        return true;
+    }
+
+    return hasNamedAncestorPseudo(node, nonPositiveScopeAnchorPseudoNames);
 }

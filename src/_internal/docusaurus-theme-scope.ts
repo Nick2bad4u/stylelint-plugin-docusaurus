@@ -1,4 +1,3 @@
-import selectorParser from "postcss-selector-parser";
 import type { AtRule, Declaration, Node, Rule } from "postcss";
 import type {
     Attribute as SelectorAttribute,
@@ -6,11 +5,12 @@ import type {
     Pseudo as SelectorPseudo,
 } from "postcss-selector-parser";
 
-import { arrayIncludes, isDefined, setHas, stringSplit } from "ts-extras";
+import selectorParser from "postcss-selector-parser";
+import { arrayIncludes, isDefined, isEmpty, setHas, stringSplit  } from "ts-extras";
 
 import {
-    getSelectors,
     getLeadingSimpleSelectorNodes,
+    getSelectors,
     type ParsedSelector,
     parseSelectorList,
 } from "./selector-parser-utils.js";
@@ -61,21 +61,6 @@ export const requiredIfmColorPrimaryScaleVariables: readonly [
     "--ifm-color-primary-lighter",
     "--ifm-color-primary-lightest",
 ];
-
-/** Resolve one exact legacy theme class name to its color mode. */
-function getLegacyThemeColorModeFromClassName(
-    className: string
-): DocusaurusColorMode | undefined {
-    if (className === "theme-light") {
-        return "light";
-    }
-
-    if (className === "theme-dark") {
-        return "dark";
-    }
-
-    return undefined;
-}
 
 /**
  * Detect the first legacy class-based color-mode selector token in a selector.
@@ -147,6 +132,32 @@ export function getContainingRules(node: Readonly<Node>): readonly Rule[] {
 }
 
 /**
+ * Resolve the explicit Docusaurus color mode from the leading root scope of one
+ * selector.
+ */
+export function getLeadingDocusaurusColorMode(
+    selector: string,
+    options: LeadingColorModeOptions = {}
+): DocusaurusColorMode | undefined {
+    const parsedSelectorList = parseSelectorList(selector);
+
+    if (!isDefined(parsedSelectorList)) {
+        return undefined;
+    }
+
+    const [parsedSelector] = getSelectors(parsedSelectorList);
+
+    if (!isDefined(parsedSelector)) {
+        return undefined;
+    }
+
+    return getColorModeFromLeadingNodes(
+        getLeadingSimpleSelectorNodes(parsedSelector),
+        options
+    );
+}
+
+/**
  * Check whether every selector in a rule belongs to an allowed global theme
  * scope.
  */
@@ -154,75 +165,6 @@ export function isAllowedThemeScopeRule(rule: Readonly<Rule>): boolean {
     const selectors = normalizeSelectorList(rule.selector);
 
     return selectors.length > 0 && selectors.every(isAllowedThemeScopeSelector);
-}
-
-/** Check whether one parsed selector is a standalone global theme scope. */
-function isStandaloneThemeScopeParsedSelector(
-    selector: Readonly<ParsedSelector>
-): boolean {
-    let hasMeaningfulNode = false;
-
-    for (const selectorNode of selector.nodes) {
-        if (selectorNode.type === "comment") {
-            continue;
-        }
-
-        if (
-            selectorNode.type === "combinator" ||
-            selectorNode.type === "nesting"
-        ) {
-            return false;
-        }
-
-        if (selectorNode.type === "tag") {
-            if (selectorNode.value.toLowerCase() !== "html") {
-                return false;
-            }
-
-            hasMeaningfulNode = true;
-            continue;
-        }
-
-        if (selectorNode.type === "attribute") {
-            if (!isDefined(getDataThemeAttributeColorMode(selectorNode))) {
-                return false;
-            }
-
-            hasMeaningfulNode = true;
-            continue;
-        }
-
-        if (selectorNode.type !== "pseudo") {
-            return false;
-        }
-
-        if (selectorNode.value === ":root") {
-            hasMeaningfulNode = true;
-            continue;
-        }
-
-        if (
-            !allowedThemeScopeWrapperPseudoNames.has(selectorNode.value) ||
-            !Array.isArray(selectorNode.nodes) ||
-            selectorNode.nodes.length === 0
-        ) {
-            return false;
-        }
-
-        if (
-            !selectorNode.nodes.every(
-                (nestedNode) =>
-                    nestedNode.type === "selector" &&
-                    isStandaloneThemeScopeParsedSelector(nestedNode)
-            )
-        ) {
-            return false;
-        }
-
-        hasMeaningfulNode = true;
-    }
-
-    return hasMeaningfulNode;
 }
 
 /**
@@ -252,6 +194,15 @@ export function isAllowedThemeScopeSelector(selector: string): boolean {
 }
 
 /**
+ * Check whether a custom property belongs to the DocSearch theming surface.
+ */
+export function isDocsearchThemeCustomPropertyName(
+    propertyName: string
+): boolean {
+    return propertyName.startsWith("--docsearch-");
+}
+
+/**
  * Check whether a custom property belongs to the Docusaurus/Infima global theme
  * token surface.
  */
@@ -262,15 +213,6 @@ export function isDocusaurusThemeCustomPropertyName(
         propertyName.startsWith("--ifm-") ||
         propertyName.startsWith("--docsearch-")
     );
-}
-
-/**
- * Check whether a custom property belongs to the DocSearch theming surface.
- */
-export function isDocsearchThemeCustomPropertyName(
-    propertyName: string
-): boolean {
-    return propertyName.startsWith("--docsearch-");
 }
 
 /**
@@ -327,64 +269,42 @@ export function normalizeLegacyThemeColorModeSelectors(
     return hasReplacements ? parsedSelectorList.toString() : selector;
 }
 
-/** Resolve one explicit `data-theme` attribute node to a color mode. */
-function getDataThemeAttributeColorMode(
-    attributeNode: Readonly<SelectorAttribute>
-): DocusaurusColorMode | undefined {
-    if (attributeNode.attribute.toLowerCase() !== "data-theme") {
-        return undefined;
+/**
+ * Split a selector list into trimmed individual selectors while preserving
+ * commas that belong to nested selector functions such as `:is(...)`.
+ */
+export function normalizeSelectorList(selectorList: string): readonly string[] {
+    const parsedSelectorList = parseSelectorList(selectorList);
+
+    if (isDefined(parsedSelectorList)) {
+        return getSelectors(parsedSelectorList)
+            .map((selector) => selector.toString().trim())
+            .filter((selector) => selector.length > 0);
     }
 
-    if (attributeNode.operator !== "=") {
-        return undefined;
-    }
-
-    return attributeNode.value === "dark" || attributeNode.value === "light"
-        ? attributeNode.value
-        : undefined;
+    return stringSplit(selectorList, ",")
+        .map((selector) => selector.trim())
+        .filter((selector) => selector.length > 0);
 }
 
-/** Resolve one functional pseudo wrapper such as `:global(...)`/`:is(...)` to a
-color mode. */
-function getColorModeFromPseudoFunction(
-    pseudoNode: Readonly<SelectorPseudo>,
-    options: LeadingColorModeOptions
-): DocusaurusColorMode | undefined {
-    if (
-        !allowedThemeScopeWrapperPseudoNames.has(pseudoNode.value) ||
-        !Array.isArray(pseudoNode.nodes) ||
-        pseudoNode.nodes.length === 0
-    ) {
-        return undefined;
-    }
-
-    let resolvedColorMode: DocusaurusColorMode | undefined;
-
-    for (const nestedNode of pseudoNode.nodes) {
-        if (nestedNode.type !== "selector") {
+/**
+ * Walk only declarations that belong to the same logical theme scope, allowing
+ * nested at-rules but intentionally skipping nested rules.
+ */
+export function walkThemeScopeDeclarations(
+    container: Readonly<AtRule | Rule>,
+    onDeclaration: (declaration: Readonly<Declaration>) => void
+): void {
+    for (const childNode of container.nodes ?? []) {
+        if (childNode.type === "decl") {
+            onDeclaration(childNode);
             continue;
         }
 
-        const nestedColorMode = getColorModeFromLeadingNodes(
-            getLeadingSimpleSelectorNodes(nestedNode),
-            options
-        );
-
-        if (!isDefined(nestedColorMode)) {
-            return undefined;
-        }
-
-        if (!isDefined(resolvedColorMode)) {
-            resolvedColorMode = nestedColorMode;
-            continue;
-        }
-
-        if (resolvedColorMode !== nestedColorMode) {
-            return undefined;
+        if (childNode.type === "atrule") {
+            walkThemeScopeDeclarations(childNode, onDeclaration);
         }
     }
-
-    return resolvedColorMode;
 }
 
 /** Resolve leading compound-selector nodes to an explicit Docusaurus color mode. */
@@ -498,66 +418,146 @@ function getColorModeFromLeadingNodes(
     return hasRecognizedRootNode ? resolvedColorMode : undefined;
 }
 
-/**
- * Resolve the explicit Docusaurus color mode from the leading root scope of one
- * selector.
- */
-export function getLeadingDocusaurusColorMode(
-    selector: string,
-    options: LeadingColorModeOptions = {}
+/** Resolve one functional pseudo wrapper such as `:global(...)`/`:is(...)` to a
+color mode. */
+function getColorModeFromPseudoFunction(
+    pseudoNode: Readonly<SelectorPseudo>,
+    options: LeadingColorModeOptions
 ): DocusaurusColorMode | undefined {
-    const parsedSelectorList = parseSelectorList(selector);
-
-    if (!isDefined(parsedSelectorList)) {
+    if (
+        !allowedThemeScopeWrapperPseudoNames.has(pseudoNode.value) ||
+        !Array.isArray(pseudoNode.nodes) ||
+        isEmpty(pseudoNode.nodes)
+    ) {
         return undefined;
     }
 
-    const [parsedSelector] = getSelectors(parsedSelectorList);
+    let resolvedColorMode: DocusaurusColorMode | undefined;
 
-    if (!isDefined(parsedSelector)) {
-        return undefined;
-    }
-
-    return getColorModeFromLeadingNodes(
-        getLeadingSimpleSelectorNodes(parsedSelector),
-        options
-    );
-}
-
-/**
- * Split a selector list into trimmed individual selectors while preserving
- * commas that belong to nested selector functions such as `:is(...)`.
- */
-export function normalizeSelectorList(selectorList: string): readonly string[] {
-    const parsedSelectorList = parseSelectorList(selectorList);
-
-    if (isDefined(parsedSelectorList)) {
-        return getSelectors(parsedSelectorList)
-            .map((selector) => selector.toString().trim())
-            .filter((selector) => selector.length > 0);
-    }
-
-    return stringSplit(selectorList, ",")
-        .map((selector) => selector.trim())
-        .filter((selector) => selector.length > 0);
-}
-
-/**
- * Walk only declarations that belong to the same logical theme scope, allowing
- * nested at-rules but intentionally skipping nested rules.
- */
-export function walkThemeScopeDeclarations(
-    container: Readonly<AtRule | Rule>,
-    onDeclaration: (declaration: Readonly<Declaration>) => void
-): void {
-    for (const childNode of container.nodes ?? []) {
-        if (childNode.type === "decl") {
-            onDeclaration(childNode);
+    for (const nestedNode of pseudoNode.nodes) {
+        if (nestedNode.type !== "selector") {
             continue;
         }
 
-        if (childNode.type === "atrule") {
-            walkThemeScopeDeclarations(childNode, onDeclaration);
+        const nestedColorMode = getColorModeFromLeadingNodes(
+            getLeadingSimpleSelectorNodes(nestedNode),
+            options
+        );
+
+        if (!isDefined(nestedColorMode)) {
+            return undefined;
+        }
+
+        if (!isDefined(resolvedColorMode)) {
+            resolvedColorMode = nestedColorMode;
+            continue;
+        }
+
+        if (resolvedColorMode !== nestedColorMode) {
+            return undefined;
         }
     }
+
+    return resolvedColorMode;
+}
+
+/** Resolve one explicit `data-theme` attribute node to a color mode. */
+function getDataThemeAttributeColorMode(
+    attributeNode: Readonly<SelectorAttribute>
+): DocusaurusColorMode | undefined {
+    if (attributeNode.attribute.toLowerCase() !== "data-theme") {
+        return undefined;
+    }
+
+    if (attributeNode.operator !== "=") {
+        return undefined;
+    }
+
+    return attributeNode.value === "dark" || attributeNode.value === "light"
+        ? attributeNode.value
+        : undefined;
+}
+
+/** Resolve one exact legacy theme class name to its color mode. */
+function getLegacyThemeColorModeFromClassName(
+    className: string
+): DocusaurusColorMode | undefined {
+    if (className === "theme-light") {
+        return "light";
+    }
+
+    if (className === "theme-dark") {
+        return "dark";
+    }
+
+    return undefined;
+}
+
+/** Check whether one parsed selector is a standalone global theme scope. */
+function isStandaloneThemeScopeParsedSelector(
+    selector: Readonly<ParsedSelector>
+): boolean {
+    let hasMeaningfulNode = false;
+
+    for (const selectorNode of selector.nodes) {
+        if (selectorNode.type === "comment") {
+            continue;
+        }
+
+        if (
+            selectorNode.type === "combinator" ||
+            selectorNode.type === "nesting"
+        ) {
+            return false;
+        }
+
+        if (selectorNode.type === "tag") {
+            if (selectorNode.value.toLowerCase() !== "html") {
+                return false;
+            }
+
+            hasMeaningfulNode = true;
+            continue;
+        }
+
+        if (selectorNode.type === "attribute") {
+            if (!isDefined(getDataThemeAttributeColorMode(selectorNode))) {
+                return false;
+            }
+
+            hasMeaningfulNode = true;
+            continue;
+        }
+
+        if (selectorNode.type !== "pseudo") {
+            return false;
+        }
+
+        if (selectorNode.value === ":root") {
+            hasMeaningfulNode = true;
+            continue;
+        }
+
+        if (
+            !allowedThemeScopeWrapperPseudoNames.has(selectorNode.value) ||
+            !Array.isArray(selectorNode.nodes) ||
+            isEmpty(selectorNode.nodes)
+        ) {
+            return false;
+        }
+
+        if (
+            !selectorNode.nodes.every(
+                (nestedNode) =>
+                    nestedNode.type === "selector" &&
+                    isStandaloneThemeScopeParsedSelector(nestedNode)
+            )
+        ) {
+            return false;
+        }
+
+        hasMeaningfulNode = true;
+    }
+
+    return hasMeaningfulNode;
 }

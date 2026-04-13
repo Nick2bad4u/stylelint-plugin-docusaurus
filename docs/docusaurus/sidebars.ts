@@ -37,7 +37,7 @@ const generatedApiSidebarCategory = {
 };
 
 /** Main sidebar configuration for the primary documentation section. */
-const sidebars: SidebarsConfig = {
+const sidebars = {
     docs: [
         {
             id: "developer/index",
@@ -51,6 +51,6 @@ const sidebars: SidebarsConfig = {
         },
         ...(hasGeneratedApiDocs ? [generatedApiSidebarCategory] : []),
     ],
-};
+} satisfies SidebarsConfig;
 
 export default sidebars;

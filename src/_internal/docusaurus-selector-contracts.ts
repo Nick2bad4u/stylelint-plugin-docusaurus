@@ -1,4 +1,6 @@
 /** Common markdown/content element names that often need a wrapper scope. */
+import { setHas } from "ts-extras";
+
 export const docusaurusContentElementNames: ReadonlySet<string> = new Set([
     "a",
     "blockquote",
@@ -69,8 +71,8 @@ export const rootOnlyIgnoredAttributeNames: ReadonlySet<string> = new Set([
 /** Known Docusaurus CSS-module/internal fragments with no stable CSS contract. */
 export const unsafeThemeInternalSelectorFragments: ReadonlySet<string> =
     new Set([
-        "announcementBarContent",
         "announcementBarClose",
+        "announcementBarContent",
         "docItemContainer",
         "tableOfContents",
         "tocCollapsible",
@@ -175,6 +177,11 @@ export const structuralTokenRecommendations: readonly StructuralTokenRecommendat
         },
     ];
 
+/** Check whether one element name is part of the content-element allowlist. */
+export function isDocusaurusContentElementName(elementName: string): boolean {
+    return setHas(docusaurusContentElementNames, elementName.toLowerCase());
+}
+
 /** Check whether a class name looks like a global Docusaurus/Infima selector. */
 export function isLikelyDocusaurusGlobalThemeClassName(
     className: string
@@ -193,9 +200,4 @@ export function isTargetedInfimaSubcomponentClassName(
     return targetedInfimaSubcomponentClassPrefixes.some((prefix) =>
         className.startsWith(prefix)
     );
-}
-
-/** Check whether one element name is part of the content-element allowlist. */
-export function isDocusaurusContentElementName(elementName: string): boolean {
-    return docusaurusContentElementNames.has(elementName.toLowerCase());
 }

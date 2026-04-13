@@ -181,7 +181,7 @@ function toRecord(value) {
  * @returns {value is StylelintLike}
  */
 function hasLintFunction(value) {
-    if (!(typeof value === "function" || isRecord(value))) {
+    if (typeof value !== "function" && !isRecord(value)) {
         return false;
     }
 

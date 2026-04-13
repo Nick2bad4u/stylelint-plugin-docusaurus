@@ -5,15 +5,15 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getSelectors,
     parseSelectorList,
     selectorHasAttributeInPositiveScope,
     selectorHasClassInPositiveScope,
 } from "../_internal/selector-parser-utils.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
@@ -31,11 +31,6 @@ const docs = {
     recommended: false,
     url: createRuleDocsUrl("prefer-data-theme-docsearch-overrides"),
 } as const;
-
-/** Check whether one class token belongs to a DocSearch UI surface. */
-function isDocSearchSurfaceClassName(className: string): boolean {
-    return className === "DocSearch" || className.startsWith("DocSearch-");
-}
 
 /**
  * Find the first selector that uses `.navbar--dark` as a DocSearch color-mode
@@ -83,6 +78,11 @@ function findInvalidDocSearchOverrideSelector(
     }
 
     return undefined;
+}
+
+/** Check whether one class token belongs to a DocSearch UI surface. */
+function isDocSearchSurfaceClassName(className: string): boolean {
+    return className === "DocSearch" || className.startsWith("DocSearch-");
 }
 
 /**

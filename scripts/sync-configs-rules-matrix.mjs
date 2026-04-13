@@ -26,6 +26,7 @@ import { escapeMarkdownTableCell } from "./_internal/escape-markdown-table-cell.
  *     Record<string, { rules?: Readonly<Record<string, unknown>> }>
  * >} ConfigMap
  */
+
 /**
  * @typedef {Readonly<{
  *     configNames?: unknown;
@@ -33,6 +34,7 @@ import { escapeMarkdownTableCell } from "./_internal/escape-markdown-table-cell.
  *     rules?: RulesMap;
  * }>} BuiltPluginModule
  */
+
 /**
  * @typedef {Readonly<{
  *     configNames: readonly string[];

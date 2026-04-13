@@ -5,15 +5,15 @@ import type { StylelintPluginRule } from "../_internal/create-stylelint-rule.js"
 
 import { createStylelintRule } from "../_internal/create-stylelint-rule.js";
 import {
+    createRuleDocsUrl,
+    createRuleName,
+} from "../_internal/plugin-constants.js";
+import {
     getClassNamesOutsideGlobal,
     getSelectors,
     parseSelectorList,
 } from "../_internal/selector-parser-utils.js";
 import { isCssModuleRoot } from "../_internal/source-file-context.js";
-import {
-    createRuleDocsUrl,
-    createRuleName,
-} from "../_internal/plugin-constants.js";
 
 /* eslint-disable @typescript-eslint/no-use-before-define -- This file keeps hoisted helper declarations in module-sorted order to satisfy the repository's ordering rules. */
 
@@ -123,7 +123,7 @@ function isGeneratedHashSuffix(suffix: string): boolean {
     let containsUppercaseLetterOrDigit = false;
 
     for (const character of suffix) {
-        if (!/^[A-Za-z0-9_-]$/u.test(character)) {
+        if (!/^[\w-]$/u.test(character)) {
             return false;
         }
 
