@@ -8,27 +8,38 @@
 // @ts-check
 
 import {
-    generateRulesSectionFromConfig,
-    getConfigDocPath,
-    isDirectExecution,
-    loadBuiltPluginMetadata,
-    normalizeConfigNames,
-    parseCliArgs,
-    resolveConfigDocTargets,
+    generateRulesSectionFromConfig as generateRulesSectionFromConfigCompat,
+    getConfigDocPath as getConfigDocPathCompat,
+    isDirectExecution as isDirectExecutionCompat,
+    loadBuiltPluginMetadata as loadBuiltPluginMetadataCompat,
+    normalizeConfigNames as normalizeConfigNamesCompat,
+    parseCliArgs as parseCliArgsCompat,
+    resolveConfigDocTargets as resolveConfigDocTargetsCompat,
     runCli as runConfigMatrixCli,
-    syncConfigDocs,
+    syncConfigDocs as syncConfigDocsCompat,
 } from "./sync-configs-rules-matrix.mjs";
 
-export {
-    generateRulesSectionFromConfig,
-    getConfigDocPath,
-    isDirectExecution,
-    loadBuiltPluginMetadata,
-    normalizeConfigNames,
-    parseCliArgs,
-    resolveConfigDocTargets,
-    syncConfigDocs,
-};
+/** @type {typeof generateRulesSectionFromConfigCompat} */
+export const generateRulesSectionFromConfig = (...input) =>
+    generateRulesSectionFromConfigCompat(...input);
+/** @type {typeof getConfigDocPathCompat} */
+export const getConfigDocPath = (...input) => getConfigDocPathCompat(...input);
+/** @type {typeof isDirectExecutionCompat} */
+export const isDirectExecution = (...input) =>
+    isDirectExecutionCompat(...input);
+/** @type {typeof loadBuiltPluginMetadataCompat} */
+export const loadBuiltPluginMetadata = (...input) =>
+    loadBuiltPluginMetadataCompat(...input);
+/** @type {typeof normalizeConfigNamesCompat} */
+export const normalizeConfigNames = (...input) =>
+    normalizeConfigNamesCompat(...input);
+/** @type {typeof parseCliArgsCompat} */
+export const parseCliArgs = (...input) => parseCliArgsCompat(...input);
+/** @type {typeof resolveConfigDocTargetsCompat} */
+export const resolveConfigDocTargets = (...input) =>
+    resolveConfigDocTargetsCompat(...input);
+/** @type {typeof syncConfigDocsCompat} */
+export const syncConfigDocs = (...input) => syncConfigDocsCompat(...input);
 
 /**
  * CLI entrypoint for the legacy preset-matrix alias.

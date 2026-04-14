@@ -94,6 +94,7 @@ const getSidebarCategoryDocIds = (
 const configDocIds = getSidebarCategoryDocIds("configs");
 const ruleDocIds = getSidebarCategoryDocIds("rules");
 
+/** Aggregated docs-site catalog counts and IDs used by homepage UI surfaces. */
 export const docsCatalogStats: DocsCatalogStats = Object.freeze({
     configDocIds,
     publicRuleCount: ruleDocIds.length,

@@ -64,9 +64,10 @@ export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
  */
 export const loadBuiltRules = async ({
     builtPluginPath = builtPluginModulePath,
-    importModule = async (modulePath) =>
+    importModule = async () =>
         /** @type {Promise<Readonly<{ rules?: RulesMap | undefined }>>} */ (
-            import(pathToFileURL(modulePath).href)
+            // eslint-disable-next-line no-unsanitized/method -- builtPluginPath is a trusted repository-local build artifact path
+            import(pathToFileURL(builtPluginPath).href)
         ),
 } = {}) => {
     try {

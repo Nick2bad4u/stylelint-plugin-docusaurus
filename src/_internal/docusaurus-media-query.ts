@@ -1,6 +1,9 @@
 import type { AtRule, Node } from "postcss";
 
-import { isDefined, setHas  } from "ts-extras";
+import { isDefined, isFinite, setHas } from "ts-extras";
+
+/* eslint-disable @typescript-eslint/no-use-before-define -- this module keeps exported parsing utilities first and local helpers below for API readability */
+/* eslint-disable security/detect-unsafe-regex, sonarjs/slow-regex, regexp/no-super-linear-move -- media-query matcher regexes are constrained to short parser input and do not process unbounded attacker-controlled payloads */
 
 /** Default Docusaurus desktop/mobile breakpoint boundary in pixels. */
 export const docusaurusDesktopNavbarMinWidthPx = 997;
@@ -35,32 +38,40 @@ export function extractWidthBreakpointConstraints(
     const widthConstraints: WidthBreakpointConstraint[] = [];
 
     for (const match of mediaQuery.matchAll(
-        /(max|min)-width\s*:\s*([\d.]+)\s*(em|px|rem)/giu
+        /(?<kind>max|min)-width\s*:\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giu
     )) {
-        const parsedLength = parseLengthMatch(match[2], match[3]);
+        const kind = match.groups?.["kind"];
+        const parsedLength = parseLengthMatch(
+            match.groups?.["numericText"],
+            match.groups?.["unitText"]
+        );
 
-        if (!isDefined(parsedLength)) {
+        if (!isDefined(kind) || !isDefined(parsedLength)) {
             continue;
         }
 
         widthConstraints.push({
             inclusive: true,
-            kind: match[1] === "min" ? "min" : "max",
+            kind: kind === "min" ? "min" : "max",
             pixels: parsedLength.pixels,
         });
     }
 
     for (const match of mediaQuery.matchAll(
-        /width\s*(<=|<|>=|>)\s*([\d.]+)\s*(em|px|rem)/giu
+        /width\s*(?<operatorText><=|<|>=|>)\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giu
     )) {
-        const parsedLength = parseLengthMatch(match[2], match[3]);
+        const operatorText = match.groups?.["operatorText"];
+        const parsedLength = parseLengthMatch(
+            match.groups?.["numericText"],
+            match.groups?.["unitText"]
+        );
 
-        if (!isDefined(parsedLength)) {
+        if (!isDefined(operatorText) || !isDefined(parsedLength)) {
             continue;
         }
 
         const constraint = createTrailingWidthConstraint(
-            match[1] ?? "",
+            operatorText,
             parsedLength.pixels
         );
 
@@ -72,16 +83,20 @@ export function extractWidthBreakpointConstraints(
     }
 
     for (const match of mediaQuery.matchAll(
-        /([\d.]+)\s*(em|px|rem)\s*(<=|<|>=|>)\s*width/giu
+        /(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)\s*(?<operatorText><=|<|>=|>)\s*width/giu
     )) {
-        const parsedLength = parseLengthMatch(match[1], match[2]);
+        const operatorText = match.groups?.["operatorText"];
+        const parsedLength = parseLengthMatch(
+            match.groups?.["numericText"],
+            match.groups?.["unitText"]
+        );
 
-        if (!isDefined(parsedLength)) {
+        if (!isDefined(operatorText) || !isDefined(parsedLength)) {
             continue;
         }
 
         const constraint = createLeadingWidthConstraint(
-            match[3] ?? "",
+            operatorText,
             parsedLength.pixels
         );
 
@@ -263,14 +278,44 @@ function isNegatedMediaQueryBranch(mediaQueryBranch: string): boolean {
 function mediaQueryBranchUsesScreenCompatibleMediaType(
     mediaQueryBranch: string
 ): boolean {
-    const explicitMediaTypeMatch =
-        /^\s*(?:only\s+)?([-a-z]+)(?:\s+and\b|\s*$)/iu.exec(mediaQueryBranch);
+    const normalizedMediaQueryBranch = mediaQueryBranch.trim().toLowerCase();
+    const mediaQueryBranchWithoutOnlyPrefix =
+        normalizedMediaQueryBranch.startsWith("only ")
+            ? normalizedMediaQueryBranch.slice(5).trimStart()
+            : normalizedMediaQueryBranch;
 
-    if (!isDefined(explicitMediaTypeMatch?.[1])) {
+    if (
+        mediaQueryBranchWithoutOnlyPrefix.length === 0 ||
+        mediaQueryBranchWithoutOnlyPrefix.startsWith("(")
+    ) {
         return true;
     }
 
-    return setHas(screenCompatibleMediaTypes, explicitMediaTypeMatch[1].toLowerCase());
+    let mediaTypeToken = "";
+
+    for (const character of mediaQueryBranchWithoutOnlyPrefix) {
+        const isAlphaCharacter = character >= "a" && character <= "z";
+
+        if (!isAlphaCharacter && character !== "-") {
+            break;
+        }
+
+        mediaTypeToken += character;
+    }
+
+    if (mediaTypeToken.length === 0) {
+        return true;
+    }
+
+    const mediaTypeSuffix = mediaQueryBranchWithoutOnlyPrefix.slice(
+        mediaTypeToken.length
+    );
+
+    if (mediaTypeSuffix.length > 0 && !/^\s+and\b/iu.test(mediaTypeSuffix)) {
+        return true;
+    }
+
+    return setHas(screenCompatibleMediaTypes, mediaTypeToken);
 }
 
 /** Parse a CSS length token from a regex match tuple. */
@@ -284,7 +329,7 @@ function parseLengthMatch(
 
     const numericValue = Number(numericText);
 
-    if (!Number.isFinite(numericValue)) {
+    if (!isFinite(numericValue)) {
         return undefined;
     }
 
@@ -343,3 +388,6 @@ function toPixels(value: number, unit: SupportedLengthUnit): number {
 
     return value * 16;
 }
+
+/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */
+/* eslint-enable security/detect-unsafe-regex, sonarjs/slow-regex, regexp/no-super-linear-move -- restore default regex safety checks outside this module */

@@ -1,5 +1,8 @@
 import { isDefined } from "ts-extras";
 
+/* eslint-disable @typescript-eslint/no-use-before-define -- parsing helpers are intentionally declared below exports for readability */
+/* eslint-disable sonarjs/updated-loop-counter -- index-jump scanning is intentional for lexer-style parser loops */
+
 /** Extract declared cascade layer names from one `@layer` parameter list. */
 export function getDeclaredCascadeLayerNames(
     layerParameters: string
@@ -105,7 +108,7 @@ function consumeCssEscape(
 
     const escapedCharacter = value[startIndex + 1];
 
-    if (escapedCharacter === undefined) {
+    if (!isDefined(escapedCharacter)) {
         return {
             decodedText: "",
             nextIndex: value.length,
@@ -271,8 +274,10 @@ function isIdentifierCharacter(character: string | undefined): boolean {
     return typeof character === "string" && /[\w-]/u.test(character);
 }
 
-/** Collapse one layer-name fragment by removing comments and insignificant
-whitespace. */
+/**
+ * Collapse one layer-name fragment by removing comments and insignificant
+ * whitespace.
+ */
 function normalizeCascadeLayerNameText(value: string): string | undefined {
     let normalizedLayerName = "";
 
@@ -421,3 +426,6 @@ function splitTopLevelCommaSeparatedValues(value: string): readonly string[] {
         .map((segment) => segment.trim())
         .filter((segment) => segment.length > 0);
 }
+
+/* eslint-enable sonarjs/updated-loop-counter -- restore default loop-counter checks outside this parser module */
+/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this parser module */

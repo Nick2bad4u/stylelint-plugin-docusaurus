@@ -47,7 +47,7 @@ describe("sync-peer-stylelint-range script", () => {
             path.resolve("temp", "sync-peer-stylelint-")
         );
         const packageJsonPath = path.resolve(tempRoot, "package.json");
-        const logger = { log: vi.fn<(message: string) => void>() };
+        const logger = { log: vi.fn<(...args: readonly unknown[]) => void>() };
 
         writeFileSync(
             packageJsonPath,
@@ -93,7 +93,7 @@ describe("sync-peer-stylelint-range script", () => {
             path.resolve("temp", "sync-peer-stylelint-")
         );
         const packageJsonPath = path.resolve(tempRoot, "package.json");
-        const logger = { log: vi.fn<(message: string) => void>() };
+        const logger = { log: vi.fn<(...args: readonly unknown[]) => void>() };
 
         writeFileSync(
             packageJsonPath,

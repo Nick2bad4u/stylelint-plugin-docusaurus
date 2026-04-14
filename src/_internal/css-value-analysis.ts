@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-use-before-define -- function declarations are intentionally grouped below exports for discoverability in this small analysis helper */
+import { isDefined } from "ts-extras";
+
 /**
  * Check whether a CSS value references one custom property via `var(...)`,
  * ignoring quoted text and comments.
  */
-import { isDefined } from "ts-extras";
-
 export function cssValueHasCustomPropertyReference(
     value: string,
     propertyName: string
 ): boolean {
-    return (
-        isDefined(findFirstCssVarCustomPropertyReference(
+    return isDefined(
+        findFirstCssVarCustomPropertyReference(
             value,
             (candidatePropertyName) => candidatePropertyName === propertyName
-        ))
+        )
     );
 }
 
@@ -24,13 +25,39 @@ export function cssValueHasStandaloneIdentifier(
     value: string,
     identifier: string
 ): boolean {
-    const sanitizedValue = stripCssStringsAndComments(value);
-    const identifierPattern = new RegExp(
-        `(?<![A-Za-z0-9_-])${escapeForRegularExpression(identifier)}(?![A-Za-z0-9_-])`,
-        "iu"
-    );
+    if (identifier.length === 0) {
+        return false;
+    }
 
-    return identifierPattern.test(sanitizedValue);
+    const sanitizedValue = stripCssStringsAndComments(value).toLowerCase();
+    const normalizedIdentifier = identifier.toLowerCase();
+    let searchIndex = 0;
+
+    while (searchIndex < sanitizedValue.length) {
+        const matchIndex = sanitizedValue.indexOf(
+            normalizedIdentifier,
+            searchIndex
+        );
+
+        if (matchIndex === -1) {
+            return false;
+        }
+
+        const precedingCharacter = sanitizedValue[matchIndex - 1];
+        const trailingCharacter =
+            sanitizedValue[matchIndex + normalizedIdentifier.length];
+
+        if (
+            !isIdentifierCharacter(precedingCharacter) &&
+            !isIdentifierCharacter(trailingCharacter)
+        ) {
+            return true;
+        }
+
+        searchIndex = matchIndex + 1;
+    }
+
+    return false;
 }
 
 /**
@@ -43,14 +70,14 @@ export function findFirstCssVarCustomPropertyReference(
 ): string | undefined {
     const sanitizedValue = stripCssStringsAndComments(value);
     const customPropertyReferencePattern =
-        /(?<![\w-])var\(\s*(--[\w-]+)/giu;
+        /(?<![\w-])var\(\s*(?<propertyName>--[\w-]+)/giu;
 
     for (const match of sanitizedValue.matchAll(
         customPropertyReferencePattern
     )) {
-        const propertyName = match[1];
+        const propertyName = match.groups?.["propertyName"];
 
-        if (typeof propertyName !== "string" || !predicate(propertyName)) {
+        if (!isDefined(propertyName) || !predicate(propertyName)) {
             continue;
         }
 
@@ -58,11 +85,6 @@ export function findFirstCssVarCustomPropertyReference(
     }
 
     return undefined;
-}
-
-/** Escape one string for safe use inside a regular expression. */
-function escapeForRegularExpression(value: string): string {
-    return value.replaceAll(/[$()*+.?[\\\]^{|}]/gu, String.raw`\$&`);
 }
 
 /** Check whether one character can participate in a CSS identifier. */
@@ -150,20 +172,25 @@ function skipParenthesizedFunction(
 /** Replace quoted strings and block comments with whitespace placeholders. */
 function stripCssStringsAndComments(value: string): string {
     let sanitizedValue = "";
-    let activeQuote: "'" | '"' | undefined;
+    let activeQuote: "'" | '"' | undefined = undefined;
+    let index = 0;
 
-    for (let index = 0; index < value.length; index += 1) {
+    while (index < value.length) {
         const currentCharacter = value[index];
         const nextCharacter = value[index + 1];
 
-        if (activeQuote !== undefined) {
+        if (isDefined(activeQuote)) {
             if (currentCharacter === "\\") {
                 sanitizedValue += " ";
 
-                if (nextCharacter !== undefined) {
+                if (isDefined(nextCharacter)) {
                     sanitizedValue += " ";
-                    index += 1;
+                    index += 2;
+
+                    continue;
                 }
+
+                index += 1;
 
                 continue;
             }
@@ -174,12 +201,15 @@ function stripCssStringsAndComments(value: string): string {
                 activeQuote = undefined;
             }
 
+            index += 1;
+
             continue;
         }
 
         if (currentCharacter === '"' || currentCharacter === "'") {
             activeQuote = currentCharacter;
             sanitizedValue += " ";
+            index += 1;
             continue;
         }
 
@@ -189,9 +219,10 @@ function stripCssStringsAndComments(value: string): string {
             "url"
         );
 
-        if (urlFunctionEndIndex !== undefined) {
+        if (isDefined(urlFunctionEndIndex)) {
             sanitizedValue += " ".repeat(urlFunctionEndIndex - index);
-            index = urlFunctionEndIndex - 1;
+            index = urlFunctionEndIndex;
+
             continue;
         }
 
@@ -214,14 +245,19 @@ function stripCssStringsAndComments(value: string): string {
                 index += 1;
             }
 
+            index += 1;
+
             continue;
         }
 
         sanitizedValue += currentCharacter;
+        index += 1;
     }
 
     return sanitizedValue;
 }
+
+/* eslint-enable @typescript-eslint/no-use-before-define -- restore default ordering checks outside this module */
 
 /** Try to consume one named CSS function call at the current character index. */
 function tryConsumeNamedFunctionCall(

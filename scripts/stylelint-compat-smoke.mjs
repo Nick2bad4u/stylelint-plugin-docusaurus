@@ -140,9 +140,7 @@ export function parseExpectedStylelintMajor(argv) {
         );
     }
 
-    const majorValue = Number.parseInt(majorString, 10);
-
-    return majorValue;
+    return Number.parseInt(majorString, 10);
 }
 
 /**
@@ -250,15 +248,15 @@ export function normalizeStylelintRuntime(runtimeCandidate) {
 
 /**
  * @param {Readonly<{
- *     importModuleFn?: ((specifier: string) => Promise<unknown>) | undefined;
+ *     importModuleFn?: (() => Promise<unknown>) | undefined;
  * }>} [input]
  *
  * @returns {Promise<StylelintLike>}
  */
 async function loadStylelintRuntime({
-    importModuleFn = (specifier) => import(specifier),
+    importModuleFn = () => import("stylelint"),
 } = {}) {
-    const importedModule = await importModuleFn("stylelint");
+    const importedModule = await importModuleFn();
 
     return normalizeStylelintRuntime(importedModule);
 }
@@ -375,20 +373,21 @@ function createSurfaceSnapshot(candidate) {
 
 /**
  * @param {Readonly<{
- *     importModuleFn?: ((specifier: string) => Promise<unknown>) | undefined;
+ *     importModuleFn?: (() => Promise<unknown>) | undefined;
  *     requireFn?: NodeJS.Require | undefined;
  * }>} [input]
  *
  * @returns {Promise<BuiltPluginSurface>}
  */
 async function loadBuiltPluginSurface({
-    importModuleFn = (specifier) => import(specifier),
+    // eslint-disable-next-line no-unsanitized/method -- builtPluginModuleUrl is an internal fixed file URL under this repository
+    importModuleFn = () => import(builtPluginModuleUrl.href),
     requireFn = createRequire(import.meta.url),
 } = {}) {
     try {
         const builtPluginModule =
             /** @type {Readonly<Record<string, unknown>>} */ (
-                await importModuleFn(builtPluginModuleUrl.href)
+                await importModuleFn()
             );
         const builtPluginCjs = requireFn(builtPluginCjsPath);
 

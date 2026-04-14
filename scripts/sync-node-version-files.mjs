@@ -66,10 +66,8 @@ export const isRecord = (value) => typeof value === "object" && value !== null;
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input]
- * @param {string | undefined} [input.argvEntry] - Default is
- *   `process.argv[1]`
- * @param {string} [input.currentImportUrl] - Default is
- *   `import.meta.url`
+ * @param {string | undefined} [input.argvEntry] - Default is `process.argv[1]`
+ * @param {string} [input.currentImportUrl] - Default is `import.meta.url`
  *
  * @returns {boolean}
  */
@@ -315,8 +313,7 @@ export const readOptionalVersionFile = async (filePath) => {
  * @param {string} input.preferredVersion
  * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath] - Default is
- *   `nvmrcFilePath`
+ * @param {string} [input.nvmrcFilePath] - Default is `nvmrcFilePath`
  *
  * @returns {Promise<string>}
  */
@@ -346,8 +343,7 @@ export const writeVersionFiles = async ({
  *   Default is `console`
  * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath] - Default is
- *   `nvmrcFilePath`
+ * @param {string} [input.nvmrcFilePath] - Default is `nvmrcFilePath`
  *
  * @returns {Promise<string>}
  */
@@ -413,18 +409,16 @@ export const validateVersionFiles = async ({
  * Synchronize or validate the repository's Node version files.
  *
  * @param {object} [input]
- * @param {readonly string[]} [input.argumentList]
- *   Default is `process.argv.slice(2)`
- * @param {string} [input.currentRuntimeVersion] - Default
- *   is `process.versions.node`
+ * @param {readonly string[]} [input.argumentList] - Default is
+ *   `process.argv.slice(2)`
+ * @param {string} [input.currentRuntimeVersion] - Default is
+ *   `process.versions.node`
  * @param {{ log: (...args: readonly unknown[]) => void }} [input.logger]
  *   Default is `console`
- * @param {string} [input.packageJsonPath] - Default is
- *   `packageJsonPath`
+ * @param {string} [input.packageJsonPath] - Default is `packageJsonPath`
  * @param {string} [input.nodeVersionFilePath] - Default is
  *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath] - Default is
- *   `nvmrcFilePath`
+ * @param {string} [input.nvmrcFilePath] - Default is `nvmrcFilePath`
  *
  * @returns {Promise<NodeVersionSyncResult>}
  */
@@ -485,21 +479,19 @@ export const synchronizeNodeVersionFiles = async ({
  * CLI entrypoint.
  *
  * @param {object} [input]
- * @param {readonly string[]} [input.argumentList]
- *   Default is `process.argv.slice(2)`
- * @param {string} [input.currentRuntimeVersion] - Default
- *   is `process.versions.node`
- * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
+ * @param {readonly string[]} [input.argumentList] - Defaults to
+ *   `process.argv.slice(2)`.
+ * @param {string} [input.currentRuntimeVersion] - Defaults to
+ *   `process.versions.node`.
+ * @param {{
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
- * }} [input.logger=console]
- *   Default is `console`
- * @param {string} [input.packageJsonPath=packageJsonPath] Default is
- *   `packageJsonPath`
- * @param {string} [input.nodeVersionFilePath=nodeVersionFilePath] Default is
- *   `nodeVersionFilePath`
- * @param {string} [input.nvmrcFilePath=nvmrcFilePath] Default is
- *   `nvmrcFilePath`
+ * }} [input.logger]
+ *   - Defaults to `console`.
+ * @param {string} [input.packageJsonPath] - Defaults to `packageJsonPath`.
+ * @param {string} [input.nodeVersionFilePath] - Defaults to
+ *   `nodeVersionFilePath`.
+ * @param {string} [input.nvmrcFilePath] - Defaults to `nvmrcFilePath`.
  *
  * @returns {Promise<number>}
  */

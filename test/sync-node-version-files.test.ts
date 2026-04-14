@@ -105,7 +105,7 @@ describe("sync-node-version-files script", () => {
     it("writes both Node version files from the preferred runtime version", async () => {
         expect.hasAssertions();
 
-        const logger = { log: vi.fn<(message: string) => void>() };
+        const logger = { log: vi.fn<(...args: readonly unknown[]) => void>() };
         const { nodeVersionFilePath, nvmrcFilePath, packageJsonPath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.0.0",
@@ -141,7 +141,9 @@ describe("sync-node-version-files script", () => {
             synchronizeNodeVersionFiles({
                 argumentList: ["--check-current"],
                 currentRuntimeVersion: "25.8.1",
-                logger: { log: vi.fn<(message: string) => void>() },
+                logger: {
+                    log: vi.fn<(...args: readonly unknown[]) => void>(),
+                },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,
@@ -154,7 +156,7 @@ describe("sync-node-version-files script", () => {
     it("still supports sync-only validation when callers explicitly request --check", async () => {
         expect.hasAssertions();
 
-        const logger = { log: vi.fn<(message: string) => void>() };
+        const logger = { log: vi.fn<(...args: readonly unknown[]) => void>() };
         const { nodeVersionFilePath, nvmrcFilePath } =
             createTempNodeVersionFixture({
                 nodeVersion: "24.9.0",
@@ -187,7 +189,9 @@ describe("sync-node-version-files script", () => {
             synchronizeNodeVersionFiles({
                 argumentList: ["--check"],
                 currentRuntimeVersion: "25.8.1",
-                logger: { log: vi.fn<(message: string) => void>() },
+                logger: {
+                    log: vi.fn<(...args: readonly unknown[]) => void>(),
+                },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,
@@ -208,7 +212,9 @@ describe("sync-node-version-files script", () => {
         await expect(
             validateVersionFiles({
                 expectedVersion: null,
-                logger: { log: vi.fn<(message: string) => void>() },
+                logger: {
+                    log: vi.fn<(...args: readonly unknown[]) => void>(),
+                },
                 minimumEngineVersion: "22.0.0",
                 nodeVersionFilePath,
                 nvmrcFilePath,
@@ -227,7 +233,9 @@ describe("sync-node-version-files script", () => {
         await expect(
             synchronizeNodeVersionFiles({
                 argumentList: ["--version", "21.9.0"],
-                logger: { log: vi.fn<(message: string) => void>() },
+                logger: {
+                    log: vi.fn<(...args: readonly unknown[]) => void>(),
+                },
                 nodeVersionFilePath,
                 nvmrcFilePath,
                 packageJsonPath,

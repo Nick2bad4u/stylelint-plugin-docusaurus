@@ -116,9 +116,10 @@ export const parseCliArgs = (cliArgs) => {
  */
 export const loadBuiltPluginMetadata = async ({
     builtPluginPath = builtPluginModulePath,
-    importModule = async (modulePath) =>
+    importModule = async () =>
         /** @type {Promise<BuiltPluginModule>} */ (
-            import(pathToFileURL(modulePath).href)
+            // eslint-disable-next-line no-unsanitized/method -- builtPluginPath is a trusted repository-local build artifact path
+            import(pathToFileURL(builtPluginPath).href)
         ),
 } = {}) => {
     try {

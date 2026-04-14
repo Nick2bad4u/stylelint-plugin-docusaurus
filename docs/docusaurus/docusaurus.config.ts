@@ -615,10 +615,10 @@ const config = {
             ],
             logo: {
                 alt: "stylelint-plugin-docusaurus logo",
-                height: 48,
+                height: 32,
                 href: baseUrl,
-                src: "img/logo.svg",
-                width: 48,
+                src: "img/favicon.ico",
+                width: 32,
             },
             title: "stylelint-plugin-docusaurus",
         },

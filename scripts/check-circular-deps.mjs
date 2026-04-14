@@ -66,8 +66,8 @@ export function createMadgeExcludeRegExp() {
  * Create the Madge options object for this repository.
  *
  * @param {object} [input] - Options input.
- * @param {string} [input.repositoryRootPath] - Repository root
- *   path. Default is `repositoryRoot`
+ * @param {string} [input.repositoryRootPath] - Repository root path. Default is
+ *   `repositoryRoot`
  *
  * @returns {{
  *     excludeRegExp: RegExp[];
@@ -104,10 +104,10 @@ export function formatCircularDependencies(circularDependencies) {
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry] - Entry path.
- *   Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl] - Current module
- *   URL. Default is `import.meta.url`
+ * @param {string | undefined} [input.argvEntry] - Entry path. Defaults to
+ *   `process.argv[1]`.
+ * @param {string} [input.currentImportUrl] - Current module URL. Defaults to
+ *   `import.meta.url`.
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
  */
@@ -126,22 +126,22 @@ export function isDirectExecution({
  * Run the circular-dependency CLI.
  *
  * @param {object} [input] - CLI input.
- * @param {([input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge][input.analyzeWithMadge]
+ * @param {(
  *     sourcePath: string,
  *     options: {
  *         excludeRegExp: RegExp[];
  *         fileExtensions: string[];
  *         tsConfig: string;
  *     }
- * ) => Promise<{ circular: () => readonly (readonly string[])[] }>} [input.analyzeWithMadge=madge]
- *   - Madge analyzer. Default is `madge`
+ * ) => Promise<{ circular: () => readonly (readonly string[])[] }>} [input.analyzeWithMadge]
+ *   - Madge analyzer. Defaults to `madge`.
  * @param {{
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
- * }} [input.logger=console]
- *   - Logger. Default is `console`
- * @param {string} [input.repositoryRootPath=repositoryRoot] - Repository root
- *   path. Default is `repositoryRoot`
+ * }} [input.logger]
+ *   - Logger. Defaults to `console`.
+ * @param {string} [input.repositoryRootPath] - Repository root path. Defaults
+ *   to `repositoryRoot`.
  *
  * @returns {Promise<number>} Exit code.
  */

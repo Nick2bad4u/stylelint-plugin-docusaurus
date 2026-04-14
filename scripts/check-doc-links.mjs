@@ -15,7 +15,7 @@ import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 
-import { stripMarkdownCode } from "./_internal/strip-markdown-code.mjs";
+import { stripMarkdownCode as stripMarkdownCodeInternal } from "./_internal/strip-markdown-code.mjs";
 
 const argv = process.argv.slice(2);
 const isVerbose = argv.includes("--verbose") || argv.includes("-v");
@@ -215,7 +215,16 @@ function isAnchor(link) {
     return link.startsWith("#");
 }
 
-export { stripMarkdownCode };
+/**
+ * Strip fenced/inline code segments from markdown prose before link scanning.
+ *
+ * @param {string} markdown
+ *
+ * @returns {string}
+ */
+export function stripMarkdownCode(markdown) {
+    return stripMarkdownCodeInternal(markdown);
+}
 
 /**
  * Extract markdown links and images from prose content after stripping code.

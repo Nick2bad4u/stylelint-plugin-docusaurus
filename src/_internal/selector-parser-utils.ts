@@ -5,7 +5,10 @@ import selectorParser, {
     type Root,
     type Selector,
 } from "postcss-selector-parser";
-import { isDefined, isEmpty, safeCastTo   } from "ts-extras";
+import { isDefined, isEmpty, safeCastTo, setHas } from "ts-extras";
+
+/* eslint-disable @typescript-eslint/no-use-before-define -- parser helpers are intentionally layered for public API readability despite recursive references */
+/* eslint-disable @typescript-eslint/consistent-return -- selector-parser walk callbacks intentionally return false to stop traversal early */
 
 /** Parsed individual selector used by multiple Docusaurus selector helpers. */
 export type ParsedSelector = Selector;
@@ -15,8 +18,10 @@ export type ParsedSelectorList = Root;
 /** Supported selector containers that expose the standard traversal helpers. */
 type SelectorContainer = Root | Selector;
 
-/** Positive pseudo wrappers whose trailing compound can still target the
-element. */
+/**
+ * Positive pseudo wrappers whose trailing compound can still target the
+ * element.
+ */
 const positiveTrailingCompoundPseudoNames: ReadonlySet<string> = new Set([
     ":global",
     ":is",
@@ -29,8 +34,10 @@ const nonPositiveSelectorMatchPseudoNames: ReadonlySet<string> = new Set([
     ":not",
 ]);
 
-/** Match details for one class-attribute fragment selector outside
-`:global(...)`. */
+/**
+ * Match details for one class-attribute fragment selector outside
+ * `:global(...)`.
+ */
 export type ClassAttributeFragmentMatch = Readonly<{
     attributeSelector: string;
     fragment: string;
@@ -82,9 +89,7 @@ export function classifyLeadingRootAttributeNode(
         }
 
         const leadingNodes = getLeadingSimpleSelectorNodes(containingSelector);
-        const directChildIndex = leadingNodes.indexOf(
-            directChild
-        );
+        const directChildIndex = leadingNodes.indexOf(directChild);
 
         if (directChildIndex === -1) {
             return undefined;
@@ -153,7 +158,7 @@ export function findClassAttributeFragmentMatch(
 
     for (const attributeNode of attributeNodes) {
         for (const fragment of fragments) {
-            if (!classAttributeMatchesFragment(attributeNode, fragment)) {
+            if (!cssClassAttributeMatchesFragment(attributeNode, fragment)) {
                 continue;
             }
 
@@ -197,17 +202,17 @@ export function getAttributeNodesOutsideGlobal(
 export function getClassNamesOutsideGlobal(
     selectorContainer: Readonly<SelectorContainer>
 ): readonly string[] {
-    const classNames = new Set<string>();
+    const cssClassNames = new Set<string>();
 
-    selectorContainer.walkClasses((classNode) => {
-        if (isInsideGlobalPseudo(classNode)) {
+    selectorContainer.walkClasses((cssClassNode) => {
+        if (isInsideGlobalPseudo(cssClassNode)) {
             return;
         }
 
-        classNames.add(classNode.value);
+        cssClassNames.add(cssClassNode.value);
     });
 
-    return [...classNames];
+    return [...cssClassNames];
 }
 
 /** Collect id names outside CSS Modules `:global(...)` wrappers. */
@@ -395,12 +400,12 @@ export function selectorHasAttributeOutsideGlobal(
 /** Check whether a selector has a matching class name in any scope. */
 export function selectorHasClass(
     selectorContainer: Readonly<SelectorContainer>,
-    predicate: (className: string) => boolean
+    predicate: (cssClassName: string) => boolean
 ): boolean {
     let hasMatchingClass = false;
 
-    selectorContainer.walkClasses((classNode) => {
-        if (!predicate(classNode.value)) {
+    selectorContainer.walkClasses((cssClassNode) => {
+        if (!predicate(cssClassNode.value)) {
             return;
         }
 
@@ -415,17 +420,19 @@ export function selectorHasClass(
 /** Check whether a selector has a matching class in positive selector scope. */
 export function selectorHasClassInPositiveScope(
     selectorContainer: Readonly<SelectorContainer>,
-    predicate: (className: string) => boolean,
+    predicate: (cssClassName: string) => boolean,
     { includeGlobal = true }: PositiveSelectorMatchOptions = {}
 ): boolean {
     let hasMatchingClass = false;
 
-    selectorContainer.walkClasses((classNode) => {
-        if (shouldIgnorePositiveSelectorMatchNode(classNode, includeGlobal)) {
+    selectorContainer.walkClasses((cssClassNode) => {
+        if (
+            shouldIgnorePositiveSelectorMatchNode(cssClassNode, includeGlobal)
+        ) {
             return;
         }
 
-        if (!predicate(classNode.value)) {
+        if (!predicate(cssClassNode.value)) {
             return;
         }
 
@@ -440,16 +447,16 @@ export function selectorHasClassInPositiveScope(
 /** Check whether a selector has a matching class name outside `:global(...)`. */
 export function selectorHasClassOutsideGlobal(
     selectorContainer: Readonly<SelectorContainer>,
-    predicate: (className: string) => boolean
+    predicate: (cssClassName: string) => boolean
 ): boolean {
     let hasMatchingClass = false;
 
-    selectorContainer.walkClasses((classNode) => {
-        if (isInsideGlobalPseudo(classNode)) {
+    selectorContainer.walkClasses((cssClassNode) => {
+        if (isInsideGlobalPseudo(cssClassNode)) {
             return;
         }
 
-        if (!predicate(classNode.value)) {
+        if (!predicate(cssClassNode.value)) {
             return;
         }
 
@@ -531,7 +538,7 @@ export function selectorHasNesting(
  */
 export function selectorTrailingCompoundHasClass(
     selector: Readonly<ParsedSelector>,
-    predicate: (className: string) => boolean
+    predicate: (cssClassName: string) => boolean
 ): boolean {
     return getTrailingSimpleSelectorNodes(selector).some((selectorNode) =>
         trailingSimpleSelectorNodeHasMatchingClass(selectorNode, predicate)
@@ -539,7 +546,7 @@ export function selectorTrailingCompoundHasClass(
 }
 
 /** Check whether one class attribute node matches one exact authored fragment. */
-function classAttributeMatchesFragment(
+function cssClassAttributeMatchesFragment(
     attributeNode: Readonly<Attribute>,
     fragment: string
 ): boolean {
@@ -554,9 +561,8 @@ function classAttributeMatchesFragment(
         return false;
     }
 
-    const comparisonFragment = attributeNode.insensitive
-        ? fragment.toLowerCase()
-        : fragment;
+    const comparisonFragment =
+        attributeNode.insensitive === true ? fragment.toLowerCase() : fragment;
 
     if (attributeNode.operator === "*=" || attributeNode.operator === "^=") {
         return normalizedAttributeValue === comparisonFragment;
@@ -605,7 +611,7 @@ function hasNamedAncestorPseudo(
 ): boolean {
     let currentNode: Node | undefined = node.parent as Node | undefined;
 
-    while (currentNode !== undefined) {
+    while (isDefined(currentNode)) {
         const parentNode = currentNode.parent as Node | undefined;
 
         if (currentNode.type === "pseudo" && currentNode.value === pseudoName) {
@@ -625,12 +631,12 @@ function hasNamedAncestorPseudoInSet(
 ): boolean {
     let currentNode: Node | undefined = node.parent as Node | undefined;
 
-    while (currentNode !== undefined) {
+    while (isDefined(currentNode)) {
         const parentNode = currentNode.parent as Node | undefined;
 
         if (
             currentNode.type === "pseudo" &&
-            pseudoNames.has(currentNode.value)
+            setHas(pseudoNames, currentNode.value)
         ) {
             return true;
         }
@@ -651,7 +657,7 @@ function normalizeAttributeComparisonValue(
         return undefined;
     }
 
-    return attributeNode.insensitive
+    return attributeNode.insensitive === true
         ? attributeValue.toLowerCase()
         : attributeValue;
 }
@@ -677,7 +683,7 @@ function shouldIgnorePositiveSelectorMatchNode(
  */
 function trailingSimpleSelectorNodeHasMatchingClass(
     selectorNode: Readonly<Node>,
-    predicate: (className: string) => boolean
+    predicate: (cssClassName: string) => boolean
 ): boolean {
     if (selectorNode.type === "class") {
         return predicate(selectorNode.value);
@@ -690,7 +696,7 @@ function trailingSimpleSelectorNodeHasMatchingClass(
     const pseudoNode: Readonly<Pseudo> = selectorNode;
 
     if (
-        !positiveTrailingCompoundPseudoNames.has(pseudoNode.value) ||
+        !setHas(positiveTrailingCompoundPseudoNames, pseudoNode.value) ||
         !Array.isArray(pseudoNode.nodes) ||
         isEmpty(pseudoNode.nodes)
     ) {
@@ -703,3 +709,6 @@ function trailingSimpleSelectorNodeHasMatchingClass(
             selectorTrailingCompoundHasClass(nestedNode, predicate)
     );
 }
+
+/* eslint-enable @typescript-eslint/consistent-return -- restore default callback return checks outside this module */
+/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */

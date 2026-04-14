@@ -6,8 +6,15 @@ import type {
 } from "postcss-selector-parser";
 
 import selectorParser from "postcss-selector-parser";
-import { arrayIncludes, isDefined, isEmpty, setHas, stringSplit  } from "ts-extras";
+import {
+    arrayIncludes,
+    isDefined,
+    isEmpty,
+    setHas,
+    stringSplit,
+} from "ts-extras";
 
+/* eslint-disable @typescript-eslint/no-use-before-define -- recursive selector utilities and public API layout intentionally reference local helpers declared later */
 import {
     getLeadingSimpleSelectorNodes,
     getSelectors,
@@ -74,10 +81,17 @@ export function findLegacyThemeColorModeSelector(
         return undefined;
     }
 
-    let resolvedLegacySelector: ".theme-dark" | ".theme-light" | undefined;
+    let resolvedLegacySelector: ".theme-dark" | ".theme-light" | undefined =
+        undefined;
 
-    parsedSelectorList.walkClasses((classNode) => {
-        const colorMode = getLegacyThemeColorModeFromClassName(classNode.value);
+    parsedSelectorList.walkClasses((cssClassNode) => {
+        if (isDefined(resolvedLegacySelector)) {
+            return;
+        }
+
+        const colorMode = getLegacyThemeColorModeFromClassName(
+            cssClassNode.value
+        );
 
         if (!isDefined(colorMode)) {
             return;
@@ -85,8 +99,6 @@ export function findLegacyThemeColorModeSelector(
 
         resolvedLegacySelector =
             colorMode === "light" ? ".theme-light" : ".theme-dark";
-
-        return false;
     });
 
     if (isDefined(resolvedLegacySelector)) {
@@ -164,7 +176,10 @@ export function getLeadingDocusaurusColorMode(
 export function isAllowedThemeScopeRule(rule: Readonly<Rule>): boolean {
     const selectors = normalizeSelectorList(rule.selector);
 
-    return selectors.length > 0 && selectors.every(isAllowedThemeScopeSelector);
+    return (
+        selectors.length > 0 &&
+        selectors.every((selector) => isAllowedThemeScopeSelector(selector))
+    );
 }
 
 /**
@@ -241,8 +256,10 @@ export function normalizeLegacyThemeColorModeSelectors(
 
     let hasReplacements = false;
 
-    parsedSelectorList.walkClasses((classNode) => {
-        const colorMode = getLegacyThemeColorModeFromClassName(classNode.value);
+    parsedSelectorList.walkClasses((cssClassNode) => {
+        const colorMode = getLegacyThemeColorModeFromClassName(
+            cssClassNode.value
+        );
 
         if (!isDefined(colorMode)) {
             return;
@@ -261,7 +278,7 @@ export function normalizeLegacyThemeColorModeSelectors(
             smart: false,
         });
 
-        classNode.replaceWith(attributeNode);
+        cssClassNode.replaceWith(attributeNode);
 
         hasReplacements = true;
     });
@@ -313,7 +330,7 @@ function getColorModeFromLeadingNodes(
     options: LeadingColorModeOptions
 ): DocusaurusColorMode | undefined {
     let hasRecognizedRootNode = false;
-    let resolvedColorMode: DocusaurusColorMode | undefined;
+    let resolvedColorMode: DocusaurusColorMode | undefined = undefined;
 
     for (const selectorNode of leadingNodes) {
         if (selectorNode.type === "comment") {
@@ -418,21 +435,23 @@ function getColorModeFromLeadingNodes(
     return hasRecognizedRootNode ? resolvedColorMode : undefined;
 }
 
-/** Resolve one functional pseudo wrapper such as `:global(...)`/`:is(...)` to a
-color mode. */
+/**
+ * Resolve one functional pseudo wrapper such as `:global(...)`/`:is(...)` to a
+ * color mode.
+ */
 function getColorModeFromPseudoFunction(
     pseudoNode: Readonly<SelectorPseudo>,
     options: LeadingColorModeOptions
 ): DocusaurusColorMode | undefined {
     if (
-        !allowedThemeScopeWrapperPseudoNames.has(pseudoNode.value) ||
+        !setHas(allowedThemeScopeWrapperPseudoNames, pseudoNode.value) ||
         !Array.isArray(pseudoNode.nodes) ||
         isEmpty(pseudoNode.nodes)
     ) {
         return undefined;
     }
 
-    let resolvedColorMode: DocusaurusColorMode | undefined;
+    let resolvedColorMode: DocusaurusColorMode | undefined = undefined;
 
     for (const nestedNode of pseudoNode.nodes) {
         if (nestedNode.type !== "selector") {
@@ -480,13 +499,13 @@ function getDataThemeAttributeColorMode(
 
 /** Resolve one exact legacy theme class name to its color mode. */
 function getLegacyThemeColorModeFromClassName(
-    className: string
+    cssClassName: string
 ): DocusaurusColorMode | undefined {
-    if (className === "theme-light") {
+    if (cssClassName === "theme-light") {
         return "light";
     }
 
-    if (className === "theme-dark") {
+    if (cssClassName === "theme-dark") {
         return "dark";
     }
 
@@ -539,7 +558,7 @@ function isStandaloneThemeScopeParsedSelector(
         }
 
         if (
-            !allowedThemeScopeWrapperPseudoNames.has(selectorNode.value) ||
+            !setHas(allowedThemeScopeWrapperPseudoNames, selectorNode.value) ||
             !Array.isArray(selectorNode.nodes) ||
             isEmpty(selectorNode.nodes)
         ) {
@@ -561,3 +580,5 @@ function isStandaloneThemeScopeParsedSelector(
 
     return hasMeaningfulNode;
 }
+
+/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */

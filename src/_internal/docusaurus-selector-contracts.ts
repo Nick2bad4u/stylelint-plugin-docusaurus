@@ -1,6 +1,6 @@
-/** Common markdown/content element names that often need a wrapper scope. */
 import { setHas } from "ts-extras";
 
+/** Common markdown/content element names that often need a wrapper scope. */
 export const docusaurusContentElementNames: ReadonlySet<string> = new Set([
     "a",
     "blockquote",
@@ -179,25 +179,32 @@ export const structuralTokenRecommendations: readonly StructuralTokenRecommendat
 
 /** Check whether one element name is part of the content-element allowlist. */
 export function isDocusaurusContentElementName(elementName: string): boolean {
-    return setHas(docusaurusContentElementNames, elementName.toLowerCase());
+    return setHas<string>(
+        docusaurusContentElementNames,
+        elementName.toLowerCase()
+    );
 }
 
 /** Check whether a class name looks like a global Docusaurus/Infima selector. */
 export function isLikelyDocusaurusGlobalThemeClassName(
-    className: string
+    cssClassName: string
 ): boolean {
+    const themeSelectorName = cssClassName;
+
     return (
-        stableDocusaurusThemeClassNames.has(className) ||
-        exactGlobalThemeClassNames.has(className) ||
-        globalThemeClassPrefixes.some((prefix) => className.startsWith(prefix))
+        globalThemeClassPrefixes.some((prefix: string): boolean =>
+            themeSelectorName.startsWith(prefix)
+        ) ||
+        setHas<string>(stableDocusaurusThemeClassNames, themeSelectorName) ||
+        setHas<string>(exactGlobalThemeClassNames, themeSelectorName)
     );
 }
 
 /** Check whether a class name is a curated Infima subcomponent selector. */
 export function isTargetedInfimaSubcomponentClassName(
-    className: string
+    cssClassName: string
 ): boolean {
-    return targetedInfimaSubcomponentClassPrefixes.some((prefix) =>
-        className.startsWith(prefix)
+    return targetedInfimaSubcomponentClassPrefixes.some(
+        (prefix: string): boolean => cssClassName.startsWith(prefix)
     );
 }

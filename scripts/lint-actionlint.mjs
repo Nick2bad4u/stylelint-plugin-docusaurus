@@ -21,8 +21,8 @@ import pc from "picocolors";
  * Resolve the repository root from the script location rather than from the
  * caller's current working directory.
  *
- * @param {string} [currentImportUrl] - Script module URL.
- *   Default is `import.meta.url`
+ * @param {string} [currentImportUrl] - Script module URL. Default is
+ *   `import.meta.url`
  *
  * @returns {string} Repository root path.
  */
@@ -48,10 +48,10 @@ const flagsWithValues = new Set([
  * Determine whether the current module is being executed directly.
  *
  * @param {object} [input] - Direct-execution detection input.
- * @param {string | undefined} [input.argvEntry] - Entry path.
- *   Default is `process.argv[1]`
- * @param {string} [input.currentImportUrl] - Current module
- *   URL. Default is `import.meta.url`
+ * @param {string | undefined} [input.argvEntry] - Entry path. Default is
+ *   `process.argv[1]`
+ * @param {string} [input.currentImportUrl] - Current module URL. Default is
+ *   `import.meta.url`
  *
  * @returns {boolean} Whether this module is the CLI entrypoint.
  */
@@ -96,8 +96,8 @@ export function hasAnyActionlintFlag(args, flags) {
 /**
  * Parse raw wrapper CLI arguments into actionlint args and explicit file args.
  *
- * @param {readonly string[]} [rawArgs] - Raw CLI
- *   arguments. Default is `process.argv.slice(2)`
+ * @param {readonly string[]} [rawArgs] - Raw CLI arguments. Default is
+ *   `process.argv.slice(2)`
  *
  * @returns {{
  *     fileArgs: readonly string[];
@@ -169,8 +169,8 @@ export function isActionlintPassThroughMode(userArgs) {
  * @param {object} input - Target resolution input.
  * @param {boolean} [input.overrideExcluded] - Whether to include excluded
  *   files. Default is `false`
- * @param {string} [input.repoRootPath] - Repository root
- *   path. Default is `repositoryRootPath`
+ * @param {string} [input.repoRootPath] - Repository root path. Default is
+ *   `repositoryRootPath`
  * @param {(
  *     directoryPath: string
  * ) => readonly { readonly isFile: () => boolean; readonly name: string }[]} [input.readDirectoryEntries]
@@ -208,14 +208,14 @@ export function resolveDefaultWorkflowTargets({
  * Build the final actionlint invocation plan for the wrapper.
  *
  * @param {object} [input] - Planning input.
- * @param {readonly string[]} [input.rawArgs] - Raw CLI
- *   arguments. Default is `process.argv.slice(2)`
+ * @param {readonly string[]} [input.rawArgs] - Raw CLI arguments. Default is
+ *   `process.argv.slice(2)`
  * @param {(
  *     directoryPath: string
  * ) => readonly { readonly isFile: () => boolean; readonly name: string }[]} [input.readDirectoryEntries]
  *   - Directory reader.
- * @param {string} [input.repoRootPath] - Repository root
- *   path. Default is `repositoryRootPath`
+ * @param {string} [input.repoRootPath] - Repository root path. Default is
+ *   `repositoryRootPath`
  *
  * @returns {{
  *     overrideExcluded: boolean;
@@ -283,15 +283,15 @@ export function createActionlintExecutionPlan({
  * Run the actionlint wrapper CLI.
  *
  * @param {object} [input] - CLI input.
- * @param {{[input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger][input.logger]
+ * @param {{
  *     error: (...args: readonly unknown[]) => void;
  *     log: (...args: readonly unknown[]) => void;
- * }} [input.logger=console]
- *   - Logger. Default is `console`
- * @param {readonly string[]} [input.rawArgs=process.argv.slice(2)] - Raw CLI
- *   arguments. Default is `process.argv.slice(2)`
- * @param {string} [input.repoRootPath=repositoryRootPath] - Repository root
- *   path. Default is `repositoryRootPath`
+ * }} [input.logger]
+ *   - Logger. Defaults to `console`.
+ * @param {readonly string[]} [input.rawArgs] - Raw CLI arguments. Defaults to
+ *   `process.argv.slice(2)`.
+ * @param {string} [input.repoRootPath] - Repository root path. Defaults to
+ *   `repositoryRootPath`.
  * @param {(
  *     directoryPath: string
  * ) => readonly { readonly isFile: () => boolean; readonly name: string }[]} [input.readDirectoryEntries]

@@ -156,7 +156,7 @@ function computeSelectorHasScopeAnchor(
 
         if (
             isDefined(additionalIgnoredAttributeNames) &&
-            setHas(additionalIgnoredAttributeNames, attributeName)
+            setHas<string>(additionalIgnoredAttributeNames, attributeName)
         ) {
             return;
         }
