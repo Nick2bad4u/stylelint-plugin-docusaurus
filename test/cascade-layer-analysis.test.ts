@@ -52,7 +52,7 @@ describe("cascade-layer-analysis helpers", () => {
     it("stops scanning when a function call has an unclosed parenthesis", () => {
         expect.hasAssertions();
 
-        // findMatchingClosingParenthesis returns undefined → break (line 72)
+        // FindMatchingClosingParenthesis returns undefined → break (line 72)
         expect(getImportedCascadeLayerNames("layer(unclosed")).toStrictEqual(
             []
         );
@@ -101,7 +101,7 @@ describe("cascade-layer-analysis helpers", () => {
 
         // CSS escape: \0 (null codepoint) → U+FFFD replacement char (lines ~195-210)
         // "\\0 abc" in JS = backslash + "0" + " " + "abc"
-        expect(getDeclaredCascadeLayerNames("\\0 abc")).toStrictEqual([
+        expect(getDeclaredCascadeLayerNames(String.raw`\0 abc`)).toStrictEqual([
             "\uFFFDabc",
         ]);
     });
@@ -110,6 +110,8 @@ describe("cascade-layer-analysis helpers", () => {
         expect.hasAssertions();
 
         // CSS escape: \000041 = codepoint 65 = "A" (exercises the loop exit at 6-digit limit)
-        expect(getDeclaredCascadeLayerNames("\\000041")).toStrictEqual(["A"]);
+        expect(getDeclaredCascadeLayerNames(String.raw`\000041`)).toStrictEqual(
+            ["A"]
+        );
     });
 });

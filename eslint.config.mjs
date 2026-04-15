@@ -203,6 +203,8 @@ export default defineConfig([
         "**/CHANGELOG.md",
         ".remarkrc.mjs",
         "test/fixtures/**",
+        "docs/docusaurus/site-contract.config.d.mts",
+        "docs/docusaurus/site-contract.config.mjs",
     ]),
     gitignore({
         name: "Global - .gitignore Rules",
@@ -2081,7 +2083,7 @@ export default defineConfig([
             // Optional metadata for this repository.
             "package-json/require-contributors": "warn",
             "package-json/require-cpu": "off",
-            "package-json/require-dependencies": "off",
+            "package-json/require-dependencies": "warn",
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             // Optional and currently uncommon metadata field.

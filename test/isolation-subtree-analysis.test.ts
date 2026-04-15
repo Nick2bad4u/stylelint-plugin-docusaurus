@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { findFirstSelectorWithoutIsolationAnchor } from "../src/_internal/isolation-subtree-analysis.js";
 
 describe("isolation-subtree-analysis helpers", () => {
-    describe("findFirstSelectorWithoutIsolationAnchor", () => {
+    describe(findFirstSelectorWithoutIsolationAnchor, () => {
         it("returns undefined for an unparseable selector (defensive null-safety path)", () => {
             expect.hasAssertions();
 
@@ -41,7 +41,7 @@ describe("isolation-subtree-analysis helpers", () => {
                 false
             );
 
-            // h2 is the first unanchored selector
+            // H2 is the first unanchored selector
             expect(result).toBe("h2");
         });
 

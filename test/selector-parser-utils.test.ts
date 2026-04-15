@@ -1,20 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    getSelectors,
-    parseSelectorList,
-    selectorHasAttributeInPositiveScope,
-    selectorHasClassInPositiveScope,
-} from "../src/_internal/selector-parser-utils.js";
-
-import {
     getAttributeNamesOutsideGlobal,
     getClassNamesOutsideGlobal,
     getIdNamesOutsideGlobal,
+    getSelectors,
     getTypeNamesOutsideGlobal,
+    parseSelectorList,
     selectorHasAttribute,
+    selectorHasAttributeInPositiveScope,
     selectorHasAttributeOutsideGlobal,
     selectorHasClass,
+    selectorHasClassInPositiveScope,
     selectorHasClassOutsideGlobal,
     selectorHasId,
     selectorHasIdOutsideGlobal,
@@ -81,7 +78,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".navbar .DocSearch"),
                 (cls) => cls === "DocSearch"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasClass returns false when no class matches the predicate", () => {
@@ -92,7 +89,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".navbar .DocSearch"),
                 (cls) => cls === "missing"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasClassOutsideGlobal returns true for a class outside :global()", () => {
@@ -103,7 +100,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".navbar"),
                 (cls) => cls === "navbar"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasClassOutsideGlobal returns false for a class inside :global()", () => {
@@ -114,7 +111,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(":global(.navbar)"),
                 (cls) => cls === "navbar"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasId returns true when an id matches the predicate", () => {
@@ -125,7 +122,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector("#__docusaurus .main"),
                 (id) => id === "__docusaurus"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasId returns false when no id matches the predicate", () => {
@@ -136,7 +133,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".main"),
                 (id) => id === "__docusaurus"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasIdOutsideGlobal returns true for an id outside :global()", () => {
@@ -147,7 +144,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector("#my-section h2"),
                 (id) => id === "my-section"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasIdOutsideGlobal returns false for an id inside :global()", () => {
@@ -158,7 +155,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(":global(#my-section) h2"),
                 (id) => id === "my-section"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasAttribute returns true when an attribute matches the predicate", () => {
@@ -169,7 +166,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector("[data-theme='dark'] .nav"),
                 (attr) => attr.attribute === "data-theme"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasAttribute returns false when no attribute matches the predicate", () => {
@@ -180,7 +177,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".nav"),
                 (attr) => attr.attribute === "data-theme"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasAttributeOutsideGlobal returns true for an attribute outside :global()", () => {
@@ -191,7 +188,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector("[data-theme='dark'] .nav"),
                 (attr) => attr.attribute === "data-theme"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorHasAttributeOutsideGlobal returns false for an attribute inside :global()", () => {
@@ -202,21 +199,21 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(":global([data-theme='dark']) .nav"),
                 (attr) => attr.attribute === "data-theme"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("selectorHasNesting returns true for a selector with nesting (&)", () => {
         expect.hasAssertions();
 
-        expect(selectorHasNesting(getFirstSelector("& .child"))).toBe(true);
+        expect(selectorHasNesting(getFirstSelector("& .child"))).toBeTruthy();
     });
 
     it("selectorHasNesting returns false for a selector without nesting", () => {
         expect.hasAssertions();
 
-        expect(selectorHasNesting(getFirstSelector(".parent .child"))).toBe(
-            false
-        );
+        expect(
+            selectorHasNesting(getFirstSelector(".parent .child"))
+        ).toBeFalsy();
     });
 
     it("selectorTrailingCompoundHasClass returns true when the last compound has the class", () => {
@@ -227,7 +224,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".parent .DocSearch"),
                 (cls) => cls === "DocSearch"
             )
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("selectorTrailingCompoundHasClass returns false when the trailing compound lacks the class", () => {
@@ -238,7 +235,7 @@ describe("selector-parser-utils selectorHasClass / selectorHasId / selectorHasAt
                 getFirstSelector(".DocSearch .child"),
                 (cls) => cls === "DocSearch"
             )
-        ).toBe(false);
+        ).toBeFalsy();
     });
 });
 
@@ -277,11 +274,11 @@ describe("selector-parser-utils outside-global collection helpers", () => {
 
         expect(parsed).toBeDefined();
 
-        const typeNames = getTypeNamesOutsideGlobal(parsed!);
+        const elementNames = getTypeNamesOutsideGlobal(parsed!);
 
-        expect(typeNames).toContain("article");
-        expect(typeNames).toContain("div");
-        expect(typeNames).not.toContain("span");
+        expect(elementNames).toContain("article");
+        expect(elementNames).toContain("div");
+        expect(elementNames).not.toContain("span");
     });
 
     it("getAttributeNamesOutsideGlobal returns attribute names not wrapped in :global()", () => {

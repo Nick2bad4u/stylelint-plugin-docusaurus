@@ -1,25 +1,25 @@
-import postcss, { type Rule } from "postcss";
+import postcss from "postcss";
 import { describe, expect, it } from "vitest";
 
 import { isAllowedDocSearchRootScopeRule } from "../src/_internal/docsearch-root-scope.js";
 
 describe("docsearch-root-scope helpers", () => {
-    describe("isAllowedDocSearchRootScopeRule", () => {
+    describe(isAllowedDocSearchRootScopeRule, () => {
         it("returns false for an unparseable selector (defensive null-safety path)", () => {
             expect.hasAssertions();
 
             // ":::" is not a valid CSS selector; parseSelectorList returns undefined
-            const rule = postcss.rule({ selector: ":::" }) as Rule;
+            const rule = postcss.rule({ selector: ":::" });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(false);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeFalsy();
         });
 
         it("returns true when the selector ends with the .DocSearch class", () => {
             expect.hasAssertions();
 
-            const rule = postcss.rule({ selector: ".DocSearch" }) as Rule;
+            const rule = postcss.rule({ selector: ".DocSearch" });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(true);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeTruthy();
         });
 
         it("returns true when multiple selectors all end with .DocSearch", () => {
@@ -27,17 +27,17 @@ describe("docsearch-root-scope helpers", () => {
 
             const rule = postcss.rule({
                 selector: ".DocSearch, .navbar .DocSearch",
-            }) as Rule;
+            });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(true);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeTruthy();
         });
 
         it("returns false when the selector does not end with .DocSearch", () => {
             expect.hasAssertions();
 
-            const rule = postcss.rule({ selector: ".navbar" }) as Rule;
+            const rule = postcss.rule({ selector: ".navbar" });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(false);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeFalsy();
         });
 
         it("returns false when only some selectors end with .DocSearch", () => {
@@ -45,17 +45,17 @@ describe("docsearch-root-scope helpers", () => {
 
             const rule = postcss.rule({
                 selector: ".DocSearch, .navbar--dark",
-            }) as Rule;
+            });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(false);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeFalsy();
         });
 
         it("returns false for an empty selector (no selectors in list)", () => {
             expect.hasAssertions();
 
-            const rule = postcss.rule({ selector: "" }) as Rule;
+            const rule = postcss.rule({ selector: "" });
 
-            expect(isAllowedDocSearchRootScopeRule(rule)).toBe(false);
+            expect(isAllowedDocSearchRootScopeRule(rule)).toBeFalsy();
         });
     });
 });

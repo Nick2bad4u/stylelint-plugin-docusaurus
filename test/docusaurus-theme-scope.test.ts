@@ -1,17 +1,13 @@
-import { describe, expect, it } from "vitest";
-
-import {
-    getLeadingDocusaurusColorMode,
-    isAllowedThemeScopeSelector,
-} from "../src/_internal/docusaurus-theme-scope";
-
 import postcss, { type AtRule, type Rule } from "postcss";
+import { describe, expect, it } from "vitest";
 
 import {
     findLegacyThemeColorModeSelector,
     getContainingRule,
     getContainingRules,
+    getLeadingDocusaurusColorMode,
     isAllowedThemeScopeRule,
+    isAllowedThemeScopeSelector,
     isDocsearchThemeCustomPropertyName,
     isDocusaurusThemeCustomPropertyName,
     isIfmColorPrimaryScaleVariable,
@@ -70,7 +66,7 @@ describe("docusaurus theme-scope helpers", () => {
         expect(getLeadingDocusaurusColorMode(":root")).toBeUndefined();
     });
 
-    describe("findLegacyThemeColorModeSelector", () => {
+    describe(findLegacyThemeColorModeSelector, () => {
         it("returns the matched .theme-dark selector node text", () => {
             expect.hasAssertions();
 
@@ -106,7 +102,7 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("normalizeLegacyThemeColorModeSelectors", () => {
+    describe(normalizeLegacyThemeColorModeSelectors, () => {
         it("replaces .theme-dark with [data-theme='dark']", () => {
             expect.hasAssertions();
 
@@ -132,7 +128,7 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("normalizeSelectorList", () => {
+    describe(normalizeSelectorList, () => {
         it("splits a comma-separated selector list into trimmed parts", () => {
             expect.hasAssertions();
 
@@ -149,13 +145,13 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("isIfmColorPrimaryScaleVariable", () => {
+    describe(isIfmColorPrimaryScaleVariable, () => {
         it("returns true for --ifm-color-primary", () => {
             expect.hasAssertions();
 
-            expect(isIfmColorPrimaryScaleVariable("--ifm-color-primary")).toBe(
-                true
-            );
+            expect(
+                isIfmColorPrimaryScaleVariable("--ifm-color-primary")
+            ).toBeTruthy();
         });
 
         it("returns true for --ifm-color-primary-dark", () => {
@@ -163,7 +159,7 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isIfmColorPrimaryScaleVariable("--ifm-color-primary-dark")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("returns false for --ifm-navbar-background-color", () => {
@@ -171,25 +167,25 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isIfmColorPrimaryScaleVariable("--ifm-navbar-background-color")
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("returns false for a non-ifm custom property", () => {
             expect.hasAssertions();
 
-            expect(isIfmColorPrimaryScaleVariable("--my-primary-color")).toBe(
-                false
-            );
+            expect(
+                isIfmColorPrimaryScaleVariable("--my-primary-color")
+            ).toBeFalsy();
         });
     });
 
-    describe("isDocsearchThemeCustomPropertyName", () => {
+    describe(isDocsearchThemeCustomPropertyName, () => {
         it("returns true for --docsearch-* custom properties", () => {
             expect.hasAssertions();
 
             expect(
                 isDocsearchThemeCustomPropertyName("--docsearch-primary-color")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("returns false for --ifm-* custom properties", () => {
@@ -197,7 +193,7 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isDocsearchThemeCustomPropertyName("--ifm-color-primary")
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("returns false for arbitrary custom properties", () => {
@@ -205,17 +201,17 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isDocsearchThemeCustomPropertyName("--my-custom-color")
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
 
-    describe("isDocusaurusThemeCustomPropertyName", () => {
+    describe(isDocusaurusThemeCustomPropertyName, () => {
         it("returns true for --ifm-* custom properties", () => {
             expect.hasAssertions();
 
             expect(
                 isDocusaurusThemeCustomPropertyName("--ifm-color-primary")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("returns true for --docsearch-* custom properties", () => {
@@ -223,7 +219,7 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isDocusaurusThemeCustomPropertyName("--docsearch-primary-color")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("returns false for arbitrary custom properties", () => {
@@ -231,11 +227,11 @@ describe("docusaurus theme-scope helpers", () => {
 
             expect(
                 isDocusaurusThemeCustomPropertyName("--my-custom-color")
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
 
-    describe("getContainingRule", () => {
+    describe(getContainingRule, () => {
         it("returns the parent rule for a declaration inside a rule", () => {
             expect.hasAssertions();
 
@@ -258,7 +254,7 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("getContainingRules", () => {
+    describe(getContainingRules, () => {
         it("returns all containing rules from nearest to outermost", () => {
             expect.hasAssertions();
 
@@ -285,7 +281,7 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("walkThemeScopeDeclarations", () => {
+    describe(walkThemeScopeDeclarations, () => {
         it("visits declarations directly inside a rule", () => {
             expect.hasAssertions();
 
@@ -334,14 +330,14 @@ describe("docusaurus theme-scope helpers", () => {
         });
     });
 
-    describe("isAllowedThemeScopeRule", () => {
+    describe(isAllowedThemeScopeRule, () => {
         it("allows a rule whose selector is :root", () => {
             expect.hasAssertions();
 
             // :root is a standard Docusaurus theme scope selector
-            const rule = postcss.rule({ selector: ":root" }) as Rule;
+            const rule = postcss.rule({ selector: ":root" });
 
-            expect(isAllowedThemeScopeRule(rule)).toBe(true);
+            expect(isAllowedThemeScopeRule(rule)).toBeTruthy();
         });
 
         it("allows a rule with [data-theme='dark'] selector", () => {
@@ -349,17 +345,17 @@ describe("docusaurus theme-scope helpers", () => {
 
             const rule = postcss.rule({
                 selector: "[data-theme='dark']",
-            }) as Rule;
+            });
 
-            expect(isAllowedThemeScopeRule(rule)).toBe(true);
+            expect(isAllowedThemeScopeRule(rule)).toBeTruthy();
         });
 
         it("rejects a rule whose selector is not an allowed theme scope", () => {
             expect.hasAssertions();
 
-            const rule = postcss.rule({ selector: ".navbar" }) as Rule;
+            const rule = postcss.rule({ selector: ".navbar" });
 
-            expect(isAllowedThemeScopeRule(rule)).toBe(false);
+            expect(isAllowedThemeScopeRule(rule)).toBeFalsy();
         });
     });
 });

@@ -4,7 +4,7 @@ import { structuralTokenRecommendations } from "../src/_internal/docusaurus-sele
 import { findStructuralTokenRecommendationMatch } from "../src/_internal/structural-token-recommendations.js";
 
 describe("structural-token-recommendations helpers", () => {
-    describe("findStructuralTokenRecommendationMatch", () => {
+    describe(findStructuralTokenRecommendationMatch, () => {
         it("returns undefined for an unparseable selector (defensive null-safety path)", () => {
             expect.hasAssertions();
 

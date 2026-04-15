@@ -77,8 +77,8 @@ describe("docusaurus/no-docusaurus-layer-name-collisions", () => {
         expect.hasAssertions();
 
         const result = await lintWithConfig({
-            code: `
-                @layer docusaurus\\2e infima {
+            code: String.raw`
+                @layer docusaurus\2e infima {
                     .heroBanner {
                         color: white;
                     }
@@ -102,8 +102,8 @@ describe("docusaurus/no-docusaurus-layer-name-collisions", () => {
         expect.hasAssertions();
 
         const result = await lintWithConfig({
-            code: `
-                @import url('./theme.css') \\6c ayer(docusaurus\\2e widgets);
+            code: String.raw`
+                @import url('./theme.css') \6c ayer(docusaurus\2e widgets);
             `,
             codeFilename: "src/css/custom.css",
             config: {

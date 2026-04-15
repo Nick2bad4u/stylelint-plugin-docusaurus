@@ -9,7 +9,7 @@ import {
 } from "../src/_internal/source-file-context.js";
 
 describe("source-file-context helpers", () => {
-    describe("getSourceFilePath", () => {
+    describe(getSourceFilePath, () => {
         it("returns undefined when filePath is an empty string", () => {
             expect.hasAssertions();
 
@@ -17,9 +17,9 @@ describe("source-file-context helpers", () => {
             // To exercise the filePath.length === 0 branch we inject the empty string manually.
             const root = postcss.parse("a { color: red; }");
 
-            if (root.source) {
-                (root.source.input as unknown as { file: string }).file = "";
-            }
+            expect(root.source).toBeDefined();
+
+            (root.source!.input as unknown as { file: string }).file = "";
 
             expect(getSourceFilePath(root)).toBeUndefined();
         });
@@ -48,7 +48,7 @@ describe("source-file-context helpers", () => {
             expect(result).toBeDefined();
             expect(typeof result).toBe("string");
             expect(result).not.toContain("\\");
-            expect(result).toMatch(/src\/styles\/main\.css$/u);
+            expect(result).toMatch(/src\/styles\/main\.css$/v);
         });
 
         it("converts backslashes to forward slashes in the returned path", () => {
@@ -58,7 +58,7 @@ describe("source-file-context helpers", () => {
             // path (with OS-native separators), then normalizeSourceFilePath converts
             // all backslashes to forward slashes.
             const root = postcss.parse("a { color: red; }", {
-                from: "src\\styles\\main.css",
+                from: String.raw`src\styles\main.css`,
             });
 
             const result = getSourceFilePath(root);
@@ -69,33 +69,33 @@ describe("source-file-context helpers", () => {
         });
     });
 
-    describe("isCssModuleFilePath", () => {
+    describe(isCssModuleFilePath, () => {
         it("returns true for a .module.css path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/Button.module.css")).toBe(true);
+            expect(isCssModuleFilePath("src/Button.module.css")).toBeTruthy();
         });
 
         it("returns true for a .module.scss path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/Button.module.scss")).toBe(true);
+            expect(isCssModuleFilePath("src/Button.module.scss")).toBeTruthy();
         });
 
         it("returns false for a plain .css path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/global.css")).toBe(false);
+            expect(isCssModuleFilePath("src/global.css")).toBeFalsy();
         });
 
         it("returns false for undefined", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath(undefined)).toBe(false);
+            expect(isCssModuleFilePath(undefined)).toBeFalsy();
         });
     });
 
-    describe("isCssModuleRoot", () => {
+    describe(isCssModuleRoot, () => {
         it("returns true when the root was parsed from a .module.css file", () => {
             expect.hasAssertions();
 
@@ -103,7 +103,7 @@ describe("source-file-context helpers", () => {
                 from: "src/Button.module.css",
             });
 
-            expect(isCssModuleRoot(root)).toBe(true);
+            expect(isCssModuleRoot(root)).toBeTruthy();
         });
 
         it("returns false when the root was parsed from a plain .css file", () => {
@@ -113,16 +113,18 @@ describe("source-file-context helpers", () => {
                 from: "src/global.css",
             });
 
-            expect(isCssModuleRoot(root)).toBe(false);
+            expect(isCssModuleRoot(root)).toBeFalsy();
         });
     });
 
-    describe("normalizeSourceFilePath", () => {
+    describe(normalizeSourceFilePath, () => {
         it("converts backslashes to forward slashes", () => {
             expect.hasAssertions();
 
             expect(
-                normalizeSourceFilePath("src\\styles\\components\\Button.css")
+                normalizeSourceFilePath(
+                    String.raw`src\styles\components\Button.css`
+                )
             ).toBe("src/styles/components/Button.css");
         });
 
@@ -137,9 +139,9 @@ describe("source-file-context helpers", () => {
         it("handles mixed separators", () => {
             expect.hasAssertions();
 
-            expect(normalizeSourceFilePath("src\\styles/main.css")).toBe(
-                "src/styles/main.css"
-            );
+            expect(
+                normalizeSourceFilePath(String.raw`src\styles/main.css`)
+            ).toBe("src/styles/main.css");
         });
     });
 });
