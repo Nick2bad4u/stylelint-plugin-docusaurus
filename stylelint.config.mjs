@@ -299,34 +299,34 @@ const config = defineConfig({
                 // Dogfood the local plugin against the repository's own
                 // Docusaurus site styles.
                 ...localDocusaurusDogfoodRules,
+                // Re-enable four historically-disabled rules so they are
+                // active for docs and guarded only at file level where
+                // Docusaurus patterns intentionally diverge.
+                //
+                // "order/properties-order" and "scales/font-sizes" cannot be
+                // meaningfully re-enabled here with a bare boolean; they
+                // require the full options array from the root extends. Both
+                // rules still produce true violations in the docs CSS
+                // (non-scale rem values, Infima property ordering), so they
+                // remain null for the docs override.
+                "a11y/media-prefers-reduced-motion": true,
+                "defensive-css/require-named-grid-lines": true,
+                "no-descending-specificity": true,
+                "order/properties-order": null,
+                "plugin/no-low-performance-animation-properties": true,
+                "scales/font-sizes": null,
                 // Relax accessibility rules for documentation UI elements
                 "a11y/content-property-no-static-value": null,
                 "a11y/font-size-is-readable": null,
-                // The docs theme defines fast transitions/animations but provides
-                // explicit reduced-motion fallbacks already. The a11y rule can
-                // flag false positives due to the complex selector duplication.
-                // Disable it for docs to avoid noisy warnings.
-                "a11y/media-prefers-reduced-motion": null,
                 "csstools/use-nesting": null,
                 "declaration-block-no-redundant-longhand-properties": null,
                 "declaration-no-important": null,
-                // Docusaurus + Infima use patterns that do not benefit from (and
-                // sometimes regress under) our stricter app-level rules.
-                //
-                // In particular, named grid lines are a net-negative for docs
-                // because Prettier/formatting + upstream CSS assumptions can
-                // produce subtle layout regressions.
-                "defensive-css/require-named-grid-lines": null,
                 "keyframes-name-pattern": null,
                 "logical-css/require-logical-keywords": null,
                 "logical-css/require-logical-properties": null,
                 "logical-css/require-logical-units": null,
-                "no-descending-specificity": null,
                 "no-duplicate-selectors": null,
-                "order/properties-order": null,
-                "plugin/no-low-performance-animation-properties": null,
                 "plugin/stylelint-group-selectors": null,
-                "scales/font-sizes": null,
                 "scales/line-heights": null,
                 "scss/declaration-property-value-no-unknown": null,
                 "selector-max-specificity": null,

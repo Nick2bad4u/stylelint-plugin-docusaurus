@@ -36,4 +36,66 @@ describe("selector scope analysis", () => {
             })
         ).toBeTruthy();
     });
+
+    it("returns true immediately when ancestorHasScopeAnchor option is true", () => {
+        expect.hasAssertions();
+
+        // The shortcut on line ~88 exits early without scanning the selector
+        expect(
+            selectorListHasScopeAnchor("h2", { ancestorHasScopeAnchor: true })
+        ).toBe(true);
+    });
+
+    it("returns true immediately when ancestorHasScopeAnchor is true even for complex selectors", () => {
+        expect.hasAssertions();
+
+        expect(
+            selectorListHasScopeAnchor("div > span + p ~ ul", {
+                ancestorHasScopeAnchor: true,
+            })
+        ).toBe(true);
+    });
+
+    it("treats an id selector as a meaningful scope anchor", () => {
+        expect.hasAssertions();
+
+        // An id selector that is NOT in rootOnlyIgnoredIdNames should count as anchor
+        expect(selectorListHasScopeAnchor("#my-custom-section h2")).toBe(true);
+    });
+
+    it("does not treat an id inside :not() as a scope anchor", () => {
+        expect.hasAssertions();
+
+        expect(selectorListHasScopeAnchor(":not(#my-section) h2")).toBe(false);
+    });
+
+    it("treats an attribute selector as a meaningful scope anchor", () => {
+        expect.hasAssertions();
+
+        // [data-custom] is not in rootOnlyIgnoredAttributeNames → it IS a valid anchor
+        expect(selectorListHasScopeAnchor("[data-custom='foo'] h2")).toBe(true);
+    });
+
+    it("does not treat an attribute in additionalIgnoredAttributeNames as a scope anchor", () => {
+        expect.hasAssertions();
+
+        expect(
+            selectorListHasScopeAnchor("[data-color-mode] h2", {
+                additionalIgnoredAttributeNames: new Set(["data-color-mode"]),
+            })
+        ).toBe(false);
+    });
+
+    it("returns false for an unparseable selector", () => {
+        expect.hasAssertions();
+
+        // parseSelectorList returns undefined for ":::" → selectorListHasScopeAnchor returns false
+        expect(selectorListHasScopeAnchor(":::")).toBe(false);
+    });
+
+    it("returns false for a plain element selector with no anchor", () => {
+        expect.hasAssertions();
+
+        expect(selectorListHasScopeAnchor("h2")).toBe(false);
+    });
 });

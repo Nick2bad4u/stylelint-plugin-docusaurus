@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable defensive-css/require-named-grid-lines, scales/font-sizes -- Docusaurus CSS breaks these features */
+/* stylelint-disable defensive-css/require-named-grid-lines, plugin/no-low-performance-animation-properties -- Docs landing layout uses repeat/minmax responsive grids (no named grid lines needed for auto-fit patterns) and visual hover/focus transition polish that intentionally conflict with these strict heuristics. The `scales/font-sizes` rule is disabled at config level for all docs files because this stylesheet uses fluid clamp() values and precise intermediate rem sizes outside the standard design token scale. */
 
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules

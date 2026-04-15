@@ -34,6 +34,12 @@ const sidebars: SidebarsConfig = {
                     label: "🟣 all",
                     type: "doc",
                 },
+                {
+                    className: "sb-config-docusaurus-docs-safe",
+                    id: "configs/docusaurus-docs-safe",
+                    label: "🛡️ docusaurus-docs-safe",
+                    type: "doc",
+                },
             ],
             label: "Configs",
             link: {

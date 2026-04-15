@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable plugin/no-low-performance-animation-properties, order/properties-order, no-descending-specificity, a11y/media-prefers-reduced-motion -- Docusaurus CSS breaks these features */
+/* stylelint-disable a11y/media-prefers-reduced-motion, no-descending-specificity, plugin/no-low-performance-animation-properties -- Docusaurus sidebar/theme selector layering and transition patterns intentionally violate these heuristics in this global docs stylesheet. The `order/properties-order` and `scales/font-sizes` rules are disabled at config level for all docs files because they require the full options array and docs CSS uses Infima/Docusaurus font and property ordering conventions. */
 
 /**
  * Global CSS overrides for Docusaurus documentation site.

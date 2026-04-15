@@ -1,38 +1,44 @@
 ---
-title: recommended
-description: Default shareable config for stylelint-plugin-docusaurus.
+title: docusaurus-docs-safe
+description: Opinionated docs-surface preset that mirrors recommended plugin rules and documents Docusaurus docs CSS guardrail strategy.
 ---
 
-# recommended
+# docusaurus-docs-safe
 
-`configs.recommended` is the default shareable config for this package.
+`configs.docusaurus-docs-safe` is an opinionated preset intended for teams linting Docusaurus docs surfaces.
 
 ## Usage
 
 ```js
 import { configs } from "stylelint-plugin-docusaurus";
 
-export default configs.recommended;
+export default configs["docusaurus-docs-safe"];
 ```
 
 ## What it enables
 
-This config registers the local plugin pack and enables the rules marked as recommended.
+This preset currently mirrors `configs.recommended` for all public `docusaurus/*` plugin rules.
 
-This config currently enables eight lower-noise baseline rules:
+Its purpose is to provide a stable home for Docusaurus docs-surface guidance without forcing third-party rule dependencies into this package runtime.
 
-- `docusaurus/no-invalid-theme-custom-property-scope`
-- `docusaurus/no-mobile-navbar-backdrop-filter`
-- `docusaurus/no-subtree-data-theme-selectors`
-- `docusaurus/no-unwrapped-global-theme-selectors-in-css-modules`
-- `docusaurus/prefer-data-theme-color-mode`
-- `docusaurus/prefer-data-theme-over-prefers-color-scheme`
-- `docusaurus/require-html-prefix-for-docusaurus-data-attribute-selectors`
-- `docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules`
+## Docusaurus docs CSS guardrails (important)
 
-## Intended future role
+When linting real Docusaurus docs CSS (for example `custom.css` and `index.module.css`), some third-party rules are intentionally noisy and should be handled with targeted overrides plus justified inline `stylelint-disable ... -- reason` comments.
 
-As Docusaurus-specific rules are added, `recommended` should stay focused on low-noise, broadly applicable rules that are safe to enable in most Docusaurus codebases.
+Known trap-prone rules:
+
+- `a11y/media-prefers-reduced-motion`
+- `defensive-css/require-named-grid-lines`
+- `no-descending-specificity`
+- `plugin/no-low-performance-animation-properties`
+- `order/properties-order`
+- `scales/font-sizes`
+
+Suggested approach:
+
+1. Keep docs overrides explicit in your Stylelint config.
+2. Use narrow file-level disables with `-- reason` for intentional exceptions.
+3. Add a CI guardrail test that verifies both of the above.
 
 ## Rules in this config
 

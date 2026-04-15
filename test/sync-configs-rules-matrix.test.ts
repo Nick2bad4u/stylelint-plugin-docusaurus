@@ -129,6 +129,37 @@ describe("sync-configs-rules-matrix automation", () => {
         );
     });
 
+    it("escapes asterisks and opening brackets in config rule descriptions", () => {
+        expect.hasAssertions();
+
+        const generatedSection = generateRulesSectionFromConfig({
+            configName: "strict",
+            configs: {
+                strict: {
+                    rules: {
+                        "docusaurus/strict-rule": true,
+                    },
+                },
+            },
+            rules: {
+                "strict-rule": {
+                    docs: {
+                        description: "Disallow --ifm-* and [data-theme] usage.",
+                        recommended: false,
+                        url: "https://example.test/docs/rules/strict-rule",
+                    },
+                    meta: {
+                        fixable: false,
+                    },
+                },
+            },
+        });
+
+        expect(generatedSection).toContain(
+            "| [`strict-rule`](https://example.test/docs/rules/strict-rule) | — | Disallow --ifm-\\* and \\[data-theme] usage. |"
+        );
+    });
+
     it("parses write-mode CLI args and rejects unknown flags", () => {
         expect.hasAssertions();
 

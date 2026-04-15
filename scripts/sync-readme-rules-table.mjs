@@ -156,9 +156,43 @@ const parseCliArgs = (cliArgs) => {
 const getRuleFixIndicator = (ruleModule) =>
     ruleModule.meta?.fixable === true ? "🔧" : "—";
 
-/** @param {RuleModule} ruleModule */
-const getConfigIndicator = (ruleModule) =>
-    ruleModule.docs?.recommended === true ? "recommended, all" : "all";
+/**
+ * Returns the emoji preset-key badge(s) for a rule.
+ *
+ * Mapping:
+ *
+ * - 🟢 = `docusaurus.configs.recommended`
+ * - 🟣 = `docusaurus.configs.all`
+ * - 🛡️ = `docusaurus.configs["docusaurus-docs-safe"]` (mirrors recommended)
+ *
+ * Rules in `recommended` are also in `docusaurus-docs-safe`, so they show all
+ * three badges. Rules only in `all` show just 🟣.
+ *
+ * @param {RuleModule} ruleModule
+ *
+ * @returns {string}
+ */
+const getPresetKeyIndicator = (ruleModule) =>
+    ruleModule.docs?.recommended === true ? "🟢 🛡️ 🟣" : "🟣";
+
+/**
+ * Legend block prepended to the Rules section.
+ *
+ * Each line in this constant must use plain `\n` — line-ending normalisation is
+ * applied later by `generateReadmeRulesSectionFromRules`.
+ */
+const RULES_SECTION_LEGEND = [
+    "**Fix legend:**",
+    "",
+    "- 🔧 = autofixable",
+    "- — = report only",
+    "",
+    "**Preset key legend:**",
+    "",
+    "- 🟢 — `docusaurus.configs.recommended`",
+    "- 🟣 — `docusaurus.configs.all`",
+    '- 🛡️ — `docusaurus.configs["docusaurus-docs-safe"]`',
+].join("\n");
 
 /** @param {readonly [string, RuleModule]} entry */
 const toRuleTableRow = ([ruleName, ruleModule]) => {
@@ -168,7 +202,7 @@ const toRuleTableRow = ([ruleName, ruleModule]) => {
         throw new TypeError(`Rule '${ruleName}' is missing docs metadata.`);
     }
 
-    return `| [\`${ruleName}\`](${docs.url}) | ${getRuleFixIndicator(ruleModule)} | ${getConfigIndicator(ruleModule)} | ${escapeMarkdownTableCell(docs.description)} |`;
+    return `| [\`${ruleName}\`](${docs.url}) | ${getRuleFixIndicator(ruleModule)} | ${getPresetKeyIndicator(ruleModule)} | ${escapeMarkdownTableCell(docs.description)} |`;
 };
 
 /** @param {RulesMap} rules */
@@ -191,7 +225,9 @@ export const generateReadmeRulesSectionFromRules = (rules) => {
     return [
         "## Rules",
         "",
-        "| Rule | Fix | Configs | Description |",
+        RULES_SECTION_LEGEND,
+        "",
+        "| Rule | Fix | Preset key | Description |",
         "| --- | :-: | --- | --- |",
         ...ruleEntries.map(toRuleTableRow),
         "",

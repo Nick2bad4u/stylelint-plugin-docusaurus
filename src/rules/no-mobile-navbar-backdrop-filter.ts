@@ -19,8 +19,6 @@ import {
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
 
- 
-
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
 const ruleName = createRuleName("no-mobile-navbar-backdrop-filter");
@@ -90,8 +88,6 @@ function selectorTargetsDocusaurusNavbar(selectorList: string): boolean {
         selectorTrailingCompoundHasClass(selector, isNavbarTargetCssToken)
     );
 }
-
- 
 
 /**
  * Rule implementation for preventing mobile-breaking backdrop filters on the

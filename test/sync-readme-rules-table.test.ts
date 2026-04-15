@@ -110,10 +110,10 @@ describe("sync-readme-rules-table automation", () => {
         expect(writes).toHaveLength(1);
         expect(writes[0]?.encoding).toBe("utf8");
         expect(writes[0]?.contents).toContain(
-            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | recommended, all | Alpha rule. |"
+            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | 🟢 🛡️ 🟣 | Alpha rule. |"
         );
         expect(writes[0]?.contents).toContain(
-            "| [`zeta-rule`](https://example.test/docs/rules/zeta-rule) | — | all | Zeta rule. |"
+            "| [`zeta-rule`](https://example.test/docs/rules/zeta-rule) | — | 🟣 | Zeta rule. |"
         );
         expect(writes[0]?.contents).toContain("## Next");
     });
@@ -135,7 +135,28 @@ describe("sync-readme-rules-table automation", () => {
         });
 
         expect(generatedSection).toContain(
-            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | recommended, all | Alpha uses A \\| B\\\\C<br>and stays readable. |"
+            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | 🟢 🛡️ 🟣 | Alpha uses A \\| B\\\\C<br>and stays readable. |"
+        );
+    });
+
+    it("escapes asterisks and opening brackets in rule descriptions", () => {
+        expect.hasAssertions();
+
+        const generatedSection = generateReadmeRulesSectionFromRules({
+            "ifm-rule": {
+                docs: {
+                    description: "Disallow --ifm-* and [data-theme] usage.",
+                    recommended: false,
+                    url: "https://example.test/docs/rules/ifm-rule",
+                },
+                meta: {
+                    fixable: false,
+                },
+            },
+        });
+
+        expect(generatedSection).toContain(
+            "| [`ifm-rule`](https://example.test/docs/rules/ifm-rule) | — | 🟣 | Disallow --ifm-\\* and \\[data-theme] usage. |"
         );
     });
 

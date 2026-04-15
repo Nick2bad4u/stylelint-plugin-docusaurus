@@ -298,6 +298,8 @@ export const generateRulesSectionFromConfig = ({
     return [
         sectionHeading,
         "",
+        "**Fix legend:** 🔧 = autofixable · — = report only",
+        "",
         "| Rule | Fix | Description |",
         "| --- | :-: | --- |",
         ...ruleEntries.map(([ruleName, ruleModule]) => {

@@ -25,9 +25,7 @@ export function isDirectExecution(input: {
 export function loadBuiltRules(input?: {
     readonly builtPluginPath?: string | undefined;
     readonly importModule?:
-        | ((
-              modulePath: string
-          ) => Promise<
+        | ((modulePath: string) => Promise<
               Readonly<{
                   rules?:
                       | Readonly<Record<string, ReadmeRuleModule>>

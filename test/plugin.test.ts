@@ -59,8 +59,16 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
     it("exposes the expected shareable config names", () => {
         expect.hasAssertions();
 
-        expect(configNames).toStrictEqual(["recommended", "all"]);
-        expect(Object.keys(configs)).toStrictEqual(["all", "recommended"]);
+        expect(configNames).toStrictEqual([
+            "recommended",
+            "all",
+            "docusaurus-docs-safe",
+        ]);
+        expect(Object.keys(configs)).toStrictEqual([
+            "all",
+            "docusaurus-docs-safe",
+            "recommended",
+        ]);
     });
 
     it("exposes the first public rule ids in stable order", () => {
@@ -149,6 +157,9 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
 
         expect(configs.recommended.plugins).toStrictEqual([...plugins]);
         expect(configs.all.plugins).toStrictEqual([...plugins]);
+        expect(configs["docusaurus-docs-safe"].plugins).toStrictEqual([
+            ...plugins,
+        ]);
         expect(configs.recommended.rules).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
             "docusaurus/no-mobile-navbar-backdrop-filter": true,
@@ -187,5 +198,8 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "docusaurus/require-ifm-color-primary-scale-per-color-mode": true,
             "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules": true,
         });
+        expect(configs["docusaurus-docs-safe"].rules).toStrictEqual(
+            configs.recommended.rules
+        );
     });
 });
