@@ -1,7 +1,7 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
     "name": "stylelint-plugin-docusaurus",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": false,
     "description": "Stylelint rules and shareable configs for Docusaurus stylesheets.",
     "keywords": [
