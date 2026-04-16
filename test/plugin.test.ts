@@ -76,8 +76,12 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
 
         expect(ruleNames).toStrictEqual([
             "no-broad-all-resets-outside-isolation-subtrees",
+            "no-color-scheme-on-docusaurus-html-root",
+            "no-direct-project-token-consumption-in-css-modules",
             "no-direct-theme-token-consumption-in-css-modules",
             "no-docusaurus-layer-name-collisions",
+            "no-hardcoded-docusaurus-breakpoint-values",
+            "no-important-on-infima-or-docusaurus-selector-overrides",
             "no-invalid-theme-custom-property-scope",
             "no-mobile-navbar-backdrop-filter",
             "no-mobile-navbar-stacking-context-traps",
@@ -97,15 +101,22 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "prefer-stable-docusaurus-theme-class-names",
             "require-docsearch-color-mode-pairs",
             "require-docsearch-root-scope-for-docsearch-token-overrides",
+            "require-font-display-on-font-face",
+            "require-font-face-local-src-before-remote",
             "require-html-prefix-for-docusaurus-data-attribute-selectors",
             "require-ifm-color-primary-scale",
             "require-ifm-color-primary-scale-per-color-mode",
             "require-local-anchor-for-global-theme-overrides-in-css-modules",
+            "require-reduced-motion-override-for-interactive-transitions",
         ]);
         expect(ruleIds).toStrictEqual([
             "docusaurus/no-broad-all-resets-outside-isolation-subtrees",
+            "docusaurus/no-color-scheme-on-docusaurus-html-root",
+            "docusaurus/no-direct-project-token-consumption-in-css-modules",
             "docusaurus/no-direct-theme-token-consumption-in-css-modules",
             "docusaurus/no-docusaurus-layer-name-collisions",
+            "docusaurus/no-hardcoded-docusaurus-breakpoint-values",
+            "docusaurus/no-important-on-infima-or-docusaurus-selector-overrides",
             "docusaurus/no-invalid-theme-custom-property-scope",
             "docusaurus/no-mobile-navbar-backdrop-filter",
             "docusaurus/no-mobile-navbar-stacking-context-traps",
@@ -125,10 +136,13 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "docusaurus/prefer-stable-docusaurus-theme-class-names",
             "docusaurus/require-docsearch-color-mode-pairs",
             "docusaurus/require-docsearch-root-scope-for-docsearch-token-overrides",
+            "docusaurus/require-font-display-on-font-face",
+            "docusaurus/require-font-face-local-src-before-remote",
             "docusaurus/require-html-prefix-for-docusaurus-data-attribute-selectors",
             "docusaurus/require-ifm-color-primary-scale",
             "docusaurus/require-ifm-color-primary-scale-per-color-mode",
             "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules",
+            "docusaurus/require-reduced-motion-override-for-interactive-transitions",
         ]);
     });
 
@@ -184,8 +198,12 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         });
         expect(docusaurusPluginConfigs["docusaurus-all"].rules).toStrictEqual({
             "docusaurus/no-broad-all-resets-outside-isolation-subtrees": true,
+            "docusaurus/no-color-scheme-on-docusaurus-html-root": true,
+            "docusaurus/no-direct-project-token-consumption-in-css-modules": true,
             "docusaurus/no-direct-theme-token-consumption-in-css-modules": true,
             "docusaurus/no-docusaurus-layer-name-collisions": true,
+            "docusaurus/no-hardcoded-docusaurus-breakpoint-values": true,
+            "docusaurus/no-important-on-infima-or-docusaurus-selector-overrides": true,
             "docusaurus/no-invalid-theme-custom-property-scope": true,
             "docusaurus/no-mobile-navbar-backdrop-filter": true,
             "docusaurus/no-mobile-navbar-stacking-context-traps": true,
@@ -205,10 +223,13 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
             "docusaurus/require-docsearch-color-mode-pairs": true,
             "docusaurus/require-docsearch-root-scope-for-docsearch-token-overrides": true,
+            "docusaurus/require-font-display-on-font-face": true,
+            "docusaurus/require-font-face-local-src-before-remote": true,
             "docusaurus/require-html-prefix-for-docusaurus-data-attribute-selectors": true,
             "docusaurus/require-ifm-color-primary-scale": true,
             "docusaurus/require-ifm-color-primary-scale-per-color-mode": true,
             "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules": true,
+            "docusaurus/require-reduced-motion-override-for-interactive-transitions": true,
         });
         expect(
             docusaurusPluginConfigs["docusaurus-docs-safe"].rules

@@ -207,6 +207,41 @@ const sidebars: SidebarsConfig = {
                     label: "R026 require-docsearch-root-scope-for-docsearch-token-overrides",
                     type: "doc",
                 },
+                {
+                    id: "require-reduced-motion-override-for-interactive-transitions",
+                    label: "R027 require-reduced-motion-override-for-interactive-transitions",
+                    type: "doc",
+                },
+                {
+                    id: "no-hardcoded-docusaurus-breakpoint-values",
+                    label: "R028 no-hardcoded-docusaurus-breakpoint-values",
+                    type: "doc",
+                },
+                {
+                    id: "require-font-display-on-font-face",
+                    label: "R029 require-font-display-on-font-face",
+                    type: "doc",
+                },
+                {
+                    id: "require-font-face-local-src-before-remote",
+                    label: "R030 require-font-face-local-src-before-remote",
+                    type: "doc",
+                },
+                {
+                    id: "no-direct-project-token-consumption-in-css-modules",
+                    label: "R031 no-direct-project-token-consumption-in-css-modules",
+                    type: "doc",
+                },
+                {
+                    id: "no-color-scheme-on-docusaurus-html-root",
+                    label: "R032 no-color-scheme-on-docusaurus-html-root",
+                    type: "doc",
+                },
+                {
+                    id: "no-important-on-infima-or-docusaurus-selector-overrides",
+                    label: "R033 no-important-on-infima-or-docusaurus-selector-overrides",
+                    type: "doc",
+                },
             ],
             label: "Rules",
             link: {

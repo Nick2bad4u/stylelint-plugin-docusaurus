@@ -20,17 +20,20 @@ The repository was intentionally converted from a mature ESLint-plugin template 
 
 ## Current rule status
 
-The public rule catalog now includes **26** Docusaurus-specific rules.
+The public rule catalog now includes **33** Docusaurus-specific rules.
 
 The current families cover:
 
 - theme-token scope and Infima primary-scale guardrails
 - color-mode selector correctness, prefers-color-scheme guidance, and DocSearch color-mode/token/root-scope correctness
 - stable theme class usage and unsafe internal selector detection
-- CSS Modules boundaries for global theme selectors, hidden global overrides, and token consumption
-- mobile navbar/sidebar safety and breakpoint alignment
+- CSS Modules boundaries for global theme selectors, hidden global overrides, and token consumption (framework and project-scoped tokens)
+- mobile navbar/sidebar safety and breakpoint alignment (including hardcoded Docusaurus breakpoint detection)
 - cascade-layer, `revert-layer`, and broad `all` reset safety
 - HTML data-attribute and content-wrapper selector hygiene
+- interactive-transition reduced-motion accessibility guardrails
+- `@font-face` font-display and local-src ordering correctness
+- Infima/Docusaurus selector override quality (`!important` escalation, `color-scheme` interference)
 
 ## What comes next
 
