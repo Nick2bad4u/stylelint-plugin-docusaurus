@@ -32,13 +32,42 @@ const scriptsDirectoryPath = dirname(fileURLToPath(import.meta.url));
 const repositoryRootPath = resolve(scriptsDirectoryPath, "..");
 const builtPluginModulePath = resolve(repositoryRootPath, "dist", "plugin.js");
 
+/** @param {string} value */
+const isWindowsAbsolutePath = (value) => /^[A-Za-z]:[\\/]/u.test(value);
+
+/**
+ * @param {string} repositoryRoot
+ * @param {readonly string[]} pathSegments
+ *
+ * @returns {string}
+ */
+const resolveFromRepositoryRoot = (repositoryRoot, pathSegments) =>
+    isWindowsAbsolutePath(repositoryRoot)
+        ? repositoryRoot.replaceAll("/", "\\") + `\\${pathSegments.join("\\")}`
+        : resolve(repositoryRoot, ...pathSegments);
+
+/**
+ * @param {string} filePath
+ *
+ * @returns {string}
+ */
+const toFileHref = (filePath) => {
+    if (isWindowsAbsolutePath(filePath)) {
+        const normalized = filePath.replaceAll("\\", "/");
+
+        return new URL(`file:///${normalized}`).href;
+    }
+
+    return pathToFileURL(resolve(filePath)).href;
+};
+
 /**
  * @param {string} [repositoryRoot]
  *
  * @returns {string}
  */
 export const getReadmePath = (repositoryRoot = repositoryRootPath) =>
-    resolve(repositoryRoot, "README.md");
+    resolveFromRepositoryRoot(repositoryRoot, ["README.md"]);
 
 /**
  * @param {Readonly<{
@@ -49,8 +78,7 @@ export const getReadmePath = (repositoryRoot = repositoryRootPath) =>
  * @returns {boolean}
  */
 export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
-    typeof argvEntry === "string" &&
-    pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+    typeof argvEntry === "string" && toFileHref(argvEntry) === currentImportUrl;
 
 /**
  * @param {Readonly<{

@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, relative, resolve, win32 } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -25,6 +25,31 @@ const temporaryDriveLetters = [
     "S",
     "R",
 ];
+
+/** @param {string} value */
+const isWindowsAbsolutePath = (value) => /^[A-Za-z]:[\\/]/u.test(value);
+
+/**
+ * @param {string} repositoryRoot
+ * @param {readonly string[]} pathSegments
+ *
+ * @returns {string}
+ */
+const resolveFromRepositoryRoot = (repositoryRoot, pathSegments) =>
+    isWindowsAbsolutePath(repositoryRoot)
+        ? win32.resolve(repositoryRoot, ...pathSegments)
+        : resolve(repositoryRoot, ...pathSegments);
+
+/**
+ * @param {string} fromPath
+ * @param {string} toPath
+ *
+ * @returns {string}
+ */
+const relativeFromRepositoryRoot = (fromPath, toPath) =>
+    isWindowsAbsolutePath(fromPath) || isWindowsAbsolutePath(toPath)
+        ? win32.relative(fromPath, toPath)
+        : relative(fromPath, toPath);
 
 /**
  * Parse a `--config FILE`, `--config=FILE`, `--options FILE`, or
@@ -419,12 +444,15 @@ export function createTypedocExecutionPlan({
     cliArgs = process.argv.slice(2),
     platform = process.platform,
     repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), ".."),
-    docsWorkspaceDirectory = resolve(repositoryRoot, "docs", "docusaurus"),
+    docsWorkspaceDirectory = resolveFromRepositoryRoot(repositoryRoot, [
+        "docs",
+        "docusaurus",
+    ]),
 } = {}) {
     return {
         configFile: getConfigFileName(cliArgs),
         docsWorkspaceDirectory,
-        docsWorkspaceRelativePath: relative(
+        docsWorkspaceRelativePath: relativeFromRepositoryRoot(
             repositoryRoot,
             docsWorkspaceDirectory
         ),

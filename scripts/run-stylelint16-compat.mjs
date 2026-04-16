@@ -23,6 +23,24 @@ const stylelintCompatSmokeScriptPath = join(
     "stylelint-compat-smoke.mjs"
 );
 
+/** @param {string} value */
+const isWindowsAbsolutePath = (value) => /^[A-Za-z]:[\\/]/u.test(value);
+
+/**
+ * @param {string} filePath
+ *
+ * @returns {string}
+ */
+const toFileHref = (filePath) => {
+    if (isWindowsAbsolutePath(filePath)) {
+        const normalized = filePath.replaceAll("\\", "/");
+
+        return new URL(`file:///${normalized}`).href;
+    }
+
+    return pathToFileURL(resolve(filePath)).href;
+};
+
 /**
  * Normalize unknown thrown values to Error instances.
  *
@@ -89,8 +107,7 @@ export const getWindowsCommandShell = (environment = process.env) =>
  * @returns {boolean}
  */
 export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
-    typeof argvEntry === "string" &&
-    pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+    typeof argvEntry === "string" && toFileHref(argvEntry) === currentImportUrl;
 
 /**
  * @param {Readonly<{

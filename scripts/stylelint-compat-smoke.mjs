@@ -27,6 +27,24 @@ const builtPluginCjsPath = fileURLToPath(
     new URL("../dist/plugin.cjs", import.meta.url)
 );
 
+/** @param {string} value */
+const isWindowsAbsolutePath = (value) => /^[A-Za-z]:[\\/]/u.test(value);
+
+/**
+ * @param {string} filePath
+ *
+ * @returns {string}
+ */
+const toFileHref = (filePath) => {
+    if (isWindowsAbsolutePath(filePath)) {
+        const normalized = filePath.replaceAll("\\", "/");
+
+        return new URL(`file:///${normalized}`).href;
+    }
+
+    return pathToFileURL(resolve(filePath)).href;
+};
+
 /**
  * @typedef {(string | import("stylelint").Plugin)[]} StylelintConfigPluginArray
  */
@@ -152,8 +170,7 @@ export function parseExpectedStylelintMajor(argv) {
  * @returns {boolean}
  */
 export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
-    typeof argvEntry === "string" &&
-    pathToFileURL(resolve(argvEntry)).href === currentImportUrl;
+    typeof argvEntry === "string" && toFileHref(argvEntry) === currentImportUrl;
 
 /**
  * @param {unknown} value
