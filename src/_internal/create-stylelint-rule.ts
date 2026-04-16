@@ -33,7 +33,7 @@ export type StylelintPluginRule<
 > = Readonly<{
     docs: StylelintRuleDocs;
     messages: M;
-    meta: RuleMeta;
+    meta: Readonly<{ docs: StylelintRuleDocs }> & RuleMeta;
     rule: Rule<P, S, M>;
     ruleName: string;
 }> &
@@ -43,7 +43,7 @@ export type StylelintPluginRule<
 export type StylelintPluginRuleContract = Readonly<{
     docs: StylelintRuleDocs;
     messages: RuleMessages;
-    meta: RuleMeta;
+    meta: Readonly<{ docs: StylelintRuleDocs }> & RuleMeta;
     rule: Rule;
     ruleName: string;
 }> &
@@ -68,9 +68,13 @@ export const createStylelintRule = <
     options: CreateStylelintRuleOptions<P, S, M>
 ): StylelintPluginRule<P, S, M> => {
     const { docs, messages, rule, ruleName } = options;
-    const meta: RuleMeta = {
+    const baseMeta: RuleMeta = {
         ...options.meta,
         url: options.meta?.url ?? docs.url,
+    };
+    const meta: Readonly<{ docs: StylelintRuleDocs }> & RuleMeta = {
+        ...baseMeta,
+        docs,
     };
     const typedRule = rule as Rule<P, S, M>;
 
