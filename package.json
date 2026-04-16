@@ -48,21 +48,52 @@
             "default": "./dist/plugin.js"
         },
         "./configs/docusaurus-all": {
-            "types": "./dist/configs/docusaurus-all.d.ts",
-            "default": "./dist/configs/docusaurus-all.js"
+            "import": {
+                "types": "./dist/configs/docusaurus-all.d.ts",
+                "default": "./dist/configs/docusaurus-all.js"
+            },
+            "require": {
+                "types": "./dist/configs/docusaurus-all.d.cts",
+                "default": "./dist/configs/docusaurus-all.cjs"
+            }
         },
         "./configs/docusaurus-docs-safe": {
-            "types": "./dist/configs/docusaurus-docs-safe.d.ts",
-            "default": "./dist/configs/docusaurus-docs-safe.js"
+            "import": {
+                "types": "./dist/configs/docusaurus-docs-safe.d.ts",
+                "default": "./dist/configs/docusaurus-docs-safe.js"
+            },
+            "require": {
+                "types": "./dist/configs/docusaurus-docs-safe.d.cts",
+                "default": "./dist/configs/docusaurus-docs-safe.cjs"
+            }
         },
         "./configs/docusaurus-recommended": {
-            "types": "./dist/configs/docusaurus-recommended.d.ts",
-            "default": "./dist/configs/docusaurus-recommended.js"
+            "import": {
+                "types": "./dist/configs/docusaurus-recommended.d.ts",
+                "default": "./dist/configs/docusaurus-recommended.js"
+            },
+            "require": {
+                "types": "./dist/configs/docusaurus-recommended.d.cts",
+                "default": "./dist/configs/docusaurus-recommended.cjs"
+            }
         },
         "./package.json": "./package.json"
     },
     "main": "./dist/plugin.cjs",
     "types": "./dist/plugin.d.ts",
+    "typesVersions": {
+        "*": {
+            "configs/docusaurus-all": [
+                "./dist/configs/docusaurus-all.d.ts"
+            ],
+            "configs/docusaurus-docs-safe": [
+                "./dist/configs/docusaurus-docs-safe.d.ts"
+            ],
+            "configs/docusaurus-recommended": [
+                "./dist/configs/docusaurus-recommended.d.ts"
+            ]
+        }
+    },
     "files": [
         "dist",
         "docs/rules/**",
@@ -86,9 +117,10 @@
         "bench:ui": "vitest bench --ui",
         "prebench:watch": "npm run build",
         "bench:watch": "vitest bench",
-        "build": "tsc -b tsconfig.build.json --force && npm run build:types:cjs && npm run build:cjs",
+        "build": "tsc -b tsconfig.build.json --force && npm run build:types:cjs && npm run build:cjs && npm run build:configs:cjs",
         "build:cjs": "esbuild dist/plugin.js --bundle --format=cjs --platform=node --packages=external --sourcemap --outfile=dist/plugin.cjs --footer:js=\"module.exports = Object.assign(module.exports.default, module.exports);\"",
         "build:clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+        "build:configs:cjs": "node -e \"const fs=require('node:fs');['docusaurus-all','docusaurus-docs-safe','docusaurus-recommended'].forEach(n=>{fs.writeFileSync('dist/configs/'+n+'.cjs','\\\"use strict\\\";\\nconst{docusaurusPluginConfigs}=require(\\\"../plugin.cjs\\\");\\nmodule.exports=docusaurusPluginConfigs[\\\"'+n+'\\\"];\\n','utf8');fs.writeFileSync('dist/configs/'+n+'.d.cts','import type{DocusaurusShareableConfig}from\\\"../plugin.cjs\\\";\\ndeclare const config:DocusaurusShareableConfig;\\nexport=config;\\n','utf8');})\"",
         "build:eslint-inspector": "npx -y @eslint/config-inspector@1.4.2 build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/stylelint-plugin-docusaurus/eslint-inspector/\"",
         "build:eslint-inspector:local": "npx @eslint/config-inspector",
         "build:stylelint-inspector": "npx -y stylelint-config-inspector@latest build --outDir \"docs/docusaurus/static/stylelint-inspector\" --base \"/stylelint-plugin-docusaurus/stylelint-inspector/\"",
