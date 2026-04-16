@@ -67,12 +67,12 @@ When a token already exists, using it keeps the styling contract in one predicta
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.all,
+ ...docusaurusPluginConfigs["docusaurus-all"],
  rules: {
-  ...configs.all.rules,
+  ...docusaurusPluginConfigs["docusaurus-all"].rules,
   "docusaurus/prefer-infima-theme-tokens-over-structural-overrides": true,
  },
 };

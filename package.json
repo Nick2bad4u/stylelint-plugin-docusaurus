@@ -47,6 +47,18 @@
             },
             "default": "./dist/plugin.js"
         },
+        "./configs/docusaurus-all": {
+            "types": "./dist/configs/docusaurus-all.d.ts",
+            "default": "./dist/configs/docusaurus-all.js"
+        },
+        "./configs/docusaurus-docs-safe": {
+            "types": "./dist/configs/docusaurus-docs-safe.d.ts",
+            "default": "./dist/configs/docusaurus-docs-safe.js"
+        },
+        "./configs/docusaurus-recommended": {
+            "types": "./dist/configs/docusaurus-recommended.d.ts",
+            "default": "./dist/configs/docusaurus-recommended.js"
+        },
         "./package.json": "./package.json"
     },
     "main": "./dist/plugin.cjs",

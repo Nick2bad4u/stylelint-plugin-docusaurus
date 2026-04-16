@@ -189,19 +189,21 @@ const getRuleFixIndicator = (ruleModule) =>
  *
  * Mapping:
  *
- * - 🟢 = `docusaurus.configs.recommended`
- * - 🟣 = `docusaurus.configs.all`
- * - 🛡️ = `docusaurus.configs["docusaurus-docs-safe"]` (mirrors recommended)
+ * - 🟢 = `docusaurusPluginConfigs["docusaurus-recommended"]`
+ * - 🟣 = `docusaurusPluginConfigs["docusaurus-all"]`
+ * - 🛡️ = `docusaurusPluginConfigs["docusaurus-docs-safe"]`
  *
- * Rules in `recommended` are also in `docusaurus-docs-safe`, so they show all
- * three badges. Rules only in `all` show just 🟣.
+ * Rules in `docusaurus-recommended` are also in `docusaurus-docs-safe`, so they
+ * show all three badges. Rules only in `docusaurus-all` show just 🟣.
  *
  * @param {RuleModule} ruleModule
  *
  * @returns {string}
  */
 const getPresetKeyIndicator = (ruleModule) =>
-    ruleModule.docs?.recommended === true ? "🟢 🛡️ 🟣" : "🟣";
+    ruleModule.docs?.recommended === true
+        ? "[🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md)"
+        : "[🟣](./docs/rules/configs/docusaurus-all.md)";
 
 /**
  * Legend block prepended to the Rules section.
@@ -217,9 +219,9 @@ const RULES_SECTION_LEGEND = [
     "",
     "**Preset key legend:**",
     "",
-    "- 🟢 — `docusaurus.configs.recommended`",
-    "- 🟣 — `docusaurus.configs.all`",
-    '- 🛡️ — `docusaurus.configs["docusaurus-docs-safe"]`',
+    '- [🟢](./docs/rules/configs/docusaurus-recommended.md) — `docusaurusPluginConfigs["docusaurus-recommended"]`',
+    '- [🟣](./docs/rules/configs/docusaurus-all.md) — `docusaurusPluginConfigs["docusaurus-all"]`',
+    '- [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) — `docusaurusPluginConfigs["docusaurus-docs-safe"]`',
 ].join("\n");
 
 /** @param {readonly [string, RuleModule]} entry */

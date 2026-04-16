@@ -74,12 +74,12 @@ Attribute selectors that target CSS-module implementation details are sometimes 
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.all,
+ ...docusaurusPluginConfigs["docusaurus-all"],
  rules: {
-  ...configs.all.rules,
+  ...docusaurusPluginConfigs["docusaurus-all"].rules,
   "docusaurus/prefer-stable-docusaurus-theme-class-names": true,
  },
 };

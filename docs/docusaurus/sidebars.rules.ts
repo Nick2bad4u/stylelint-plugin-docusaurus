@@ -23,15 +23,15 @@ const sidebars: SidebarsConfig = {
             },
             items: [
                 {
-                    className: "sb-config-recommended",
-                    id: "configs/recommended",
-                    label: "🟡 recommended",
+                    className: "sb-config-docusaurus-recommended",
+                    id: "configs/docusaurus-recommended",
+                    label: "🟡 docusaurus-recommended",
                     type: "doc",
                 },
                 {
-                    className: "sb-config-all",
-                    id: "configs/all",
-                    label: "🟣 all",
+                    className: "sb-config-docusaurus-all",
+                    id: "configs/docusaurus-all",
+                    label: "🟣 docusaurus-all",
                     type: "doc",
                 },
                 {

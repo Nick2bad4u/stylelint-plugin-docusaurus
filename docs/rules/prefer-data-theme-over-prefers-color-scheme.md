@@ -78,12 +78,12 @@ This rule intentionally leaves this pattern alone because it is not directly ove
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.recommended,
+ ...docusaurusPluginConfigs["docusaurus-recommended"],
  rules: {
-  ...configs.recommended.rules,
+  ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
   "docusaurus/prefer-data-theme-over-prefers-color-scheme": true,
  },
 };

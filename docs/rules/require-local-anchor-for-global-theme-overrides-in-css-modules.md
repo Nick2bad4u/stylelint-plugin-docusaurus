@@ -86,12 +86,12 @@ Sometimes you really do need to reach out to a Docusaurus runtime class or root 
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.recommended,
+ ...docusaurusPluginConfigs["docusaurus-recommended"],
  rules: {
-  ...configs.recommended.rules,
+  ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
   "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules": true,
  },
 };

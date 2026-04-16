@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import plugins, {
     configNames,
-    configs,
+    docusaurusPluginConfigs,
     meta,
     ruleIds,
     ruleNames,
@@ -13,7 +13,7 @@ import { lintWithConfig } from "./_internal/stylelint-test-helpers";
 
 const require = createRequire(import.meta.url);
 type BuiltCjsPluginModule = Readonly<{
-    configs: typeof configs;
+    docusaurusPluginConfigs: typeof docusaurusPluginConfigs;
     meta: typeof meta;
     ruleIds: typeof ruleIds;
     ruleNames: typeof ruleNames;
@@ -48,7 +48,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             require("../dist/plugin.cjs") as BuiltCjsPluginModule;
 
         expect(Array.isArray(builtCjsPlugin)).toBeTruthy();
-        expect(builtCjsPlugin.configs).toBeDefined();
+        expect(builtCjsPlugin.docusaurusPluginConfigs).toBeDefined();
         expect(builtCjsPlugin.meta).toBeDefined();
         expect(builtCjsPlugin.rules).toBeDefined();
         expect(builtCjsPlugin.ruleIds).toStrictEqual(ruleIds);
@@ -60,14 +60,14 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect.hasAssertions();
 
         expect(configNames).toStrictEqual([
-            "recommended",
-            "all",
+            "docusaurus-recommended",
+            "docusaurus-all",
             "docusaurus-docs-safe",
         ]);
-        expect(Object.keys(configs)).toStrictEqual([
-            "all",
+        expect(Object.keys(docusaurusPluginConfigs)).toStrictEqual([
+            "docusaurus-all",
             "docusaurus-docs-safe",
-            "recommended",
+            "docusaurus-recommended",
         ]);
     });
 
@@ -135,6 +135,10 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
     it("lets the recommended config lint baseline CSS without parse errors", async () => {
         expect.hasAssertions();
 
+        const recommendedConfig =
+            docusaurusPluginConfigs["docusaurus-recommended"];
+        const pluginEntries = recommendedConfig.plugins;
+
         const result = await lintWithConfig({
             code: `
                 .heroBanner {
@@ -142,9 +146,11 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
                 }
             `,
             config: {
-                ...configs.recommended,
-                // eslint-disable-next-line @typescript-eslint/no-misused-spread -- This is a plugin array copy, not text decomposition.
-                plugins: [...configs.recommended.plugins],
+                ...recommendedConfig,
+                plugins: Array.isArray(pluginEntries)
+                    ? // eslint-disable-next-line @typescript-eslint/no-misused-spread -- pluginEntries is narrowed to an array and copied intentionally.
+                      [...pluginEntries]
+                    : [pluginEntries],
             },
         });
 
@@ -155,12 +161,18 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
     it("keeps `recommended` and `all` aligned with the shipped public rule catalog", () => {
         expect.hasAssertions();
 
-        expect(configs.recommended.plugins).toStrictEqual([...plugins]);
-        expect(configs.all.plugins).toStrictEqual([...plugins]);
-        expect(configs["docusaurus-docs-safe"].plugins).toStrictEqual([
-            ...plugins,
-        ]);
-        expect(configs.recommended.rules).toStrictEqual({
+        expect(
+            docusaurusPluginConfigs["docusaurus-recommended"].plugins
+        ).toStrictEqual([...plugins]);
+        expect(docusaurusPluginConfigs["docusaurus-all"].plugins).toStrictEqual(
+            [...plugins]
+        );
+        expect(
+            docusaurusPluginConfigs["docusaurus-docs-safe"].plugins
+        ).toStrictEqual([...plugins]);
+        expect(
+            docusaurusPluginConfigs["docusaurus-recommended"].rules
+        ).toStrictEqual({
             "docusaurus/no-invalid-theme-custom-property-scope": true,
             "docusaurus/no-mobile-navbar-backdrop-filter": true,
             "docusaurus/no-subtree-data-theme-selectors": true,
@@ -170,7 +182,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "docusaurus/require-html-prefix-for-docusaurus-data-attribute-selectors": true,
             "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules": true,
         });
-        expect(configs.all.rules).toStrictEqual({
+        expect(docusaurusPluginConfigs["docusaurus-all"].rules).toStrictEqual({
             "docusaurus/no-broad-all-resets-outside-isolation-subtrees": true,
             "docusaurus/no-direct-theme-token-consumption-in-css-modules": true,
             "docusaurus/no-docusaurus-layer-name-collisions": true,
@@ -198,8 +210,10 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
             "docusaurus/require-ifm-color-primary-scale-per-color-mode": true,
             "docusaurus/require-local-anchor-for-global-theme-overrides-in-css-modules": true,
         });
-        expect(configs["docusaurus-docs-safe"].rules).toStrictEqual(
-            configs.recommended.rules
+        expect(
+            docusaurusPluginConfigs["docusaurus-docs-safe"].rules
+        ).toStrictEqual(
+            docusaurusPluginConfigs["docusaurus-recommended"].rules
         );
     });
 });

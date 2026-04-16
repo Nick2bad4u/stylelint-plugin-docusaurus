@@ -10,8 +10,8 @@ Stylelint plugin scaffold for Docusaurus-focused CSS rules, shareable configs, a
 2. [Quick start](#quick-start)
 3. [Exports](#exports)
 4. [Configs](#configs)
-5. [Docusaurus docs CSS guardrails](#docusaurus-docs-css-guardrails)
-6. [Rules](#rules)
+5. [Rules](#rules)
+6. [Docusaurus docs CSS guardrails](#docusaurus-docs-css-guardrails)
 7. [Documentation](#documentation)
 8. [Contributors ✨](#contributors-)
 
@@ -29,23 +29,40 @@ npm install --save-dev stylelint stylelint-plugin-docusaurus
 
 ## Quick start
 
-Use the recommended shareable config:
+Use the plugin-scoped recommended shareable config:
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
-export default configs.recommended;
+export default docusaurusPluginConfigs["docusaurus-recommended"];
 ```
 
-If you want to compose the config yourself, register the plugin pack directly:
+Or consume the config from `extends` (recommended when composing multiple presets):
+
+```js
+export default {
+ extends: [
+  "stylelint-config-standard",
+  "stylelint-config-recess-order",
+  "stylelint-config-idiomatic-order",
+  "stylelint-config-standard-scss",
+  "stylelint-config-tailwindcss",
+  "stylelint-plugin-docusaurus/configs/docusaurus-recommended",
+ ],
+};
+```
+
+If you prefer manual plugin registration, use the package name string (or the plugin-pack import form):
 
 ```js
 import docusaurusPlugin from "stylelint-plugin-docusaurus";
 
 export default {
- plugins: [...docusaurusPlugin],
+ plugins: ["stylelint-plugin-docusaurus"],
+ // Alternative explicit pack form:
+ // plugins: [...docusaurusPlugin],
  rules: {
-  // Future docusaurus/* rules go here.
+  "docusaurus/no-mobile-navbar-backdrop-filter": true,
  },
 };
 ```
@@ -54,42 +71,23 @@ export default {
 
 The package currently exports:
 
-- the default Stylelint plugin pack
-- `configs.recommended`
-- `configs.all`
-- `configs["docusaurus-docs-safe"]`
-- typed runtime metadata and rule-registry exports for future rule authoring
+- default Stylelint plugin pack (`default`)
+- `docusaurusPluginConfigs`
+- `configNames`, `ruleNames`, `ruleIds`, `rules`, and `meta`
+- extends-ready subpath configs:
+  - `stylelint-plugin-docusaurus/configs/docusaurus-recommended`
+  - `stylelint-plugin-docusaurus/configs/docusaurus-all`
+  - `stylelint-plugin-docusaurus/configs/docusaurus-docs-safe`
 
 ## Configs
 
-This package intentionally exports these configs from the start:
+| Config key                                          | Purpose                                                            |
+| --------------------------------------------------- | ------------------------------------------------------------------ |
+| `docusaurusPluginConfigs["docusaurus-recommended"]` | Default low-noise config for broadly applicable Docusaurus rules.  |
+| `docusaurusPluginConfigs["docusaurus-all"]`         | Exhaustive stable config for every public `docusaurus/*` rule.     |
+| `docusaurusPluginConfigs["docusaurus-docs-safe"]`   | Opinionated docs-surface preset for Docusaurus docs CSS workflows. |
 
-| Config                            | Purpose                                                                     |
-| --------------------------------- | --------------------------------------------------------------------------- |
-| `configs.recommended`             | Default low-noise config for broadly applicable Docusaurus rules.           |
-| `configs.all`                     | Exhaustive stable config for every public `docusaurus/*` rule.              |
-| `configs["docusaurus-docs-safe"]` | Opinionated docs-surface preset home for Docusaurus CSS guardrail guidance. |
-
-`configs.recommended` currently enables eight lower-noise baseline rules, while `configs.all` adds stricter opt-in rules for CSS Modules boundaries, explicit local anchoring for global CSS Module theme escapes, content-scope hygiene, selector stability, paired color-mode overrides, curated token guidance, and reset/cascade-layer safety.
-
-## Docusaurus docs CSS guardrails
-
-When linting real Docusaurus docs surfaces (for example `docs/docusaurus/src/css/custom.css` and `docs/docusaurus/src/pages/index.module.css`), some third-party rules are intentionally noisy and should be handled with explicit docs overrides plus narrow, justified inline disable comments.
-
-Common trap-prone rules:
-
-- `a11y/media-prefers-reduced-motion`
-- `defensive-css/require-named-grid-lines`
-- `no-descending-specificity`
-- `plugin/no-low-performance-animation-properties`
-- `order/properties-order`
-- `scales/font-sizes`
-
-Recommended pattern:
-
-1. Keep docs override behavior explicit in config.
-2. Use file-level `/* stylelint-disable ... -- reason */` only where intentional.
-3. Add CI guardrails (`test/stylelint-docs-guardrails.test.ts`) to prevent silent regressions.
+`docusaurus-recommended` enables the baseline rule set; `docusaurus-all` enables the full stable public catalog.
 
 ## Rules
 
@@ -100,38 +98,45 @@ Recommended pattern:
 
 **Preset key legend:**
 
-- 🟢 — `docusaurus.configs.recommended`
-- 🟣 — `docusaurus.configs.all`
-- 🛡️ — `docusaurus.configs["docusaurus-docs-safe"]`
+- [🟢](./docs/rules/configs/docusaurus-recommended.md) — `docusaurusPluginConfigs["docusaurus-recommended"]`
+- [🟣](./docs/rules/configs/docusaurus-all.md) — `docusaurusPluginConfigs["docusaurus-all"]`
+- [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) — `docusaurusPluginConfigs["docusaurus-docs-safe"]`
 
-| Rule | Fix | Preset key | Description |
-| --- | :-: | --- | --- |
-| [`no-broad-all-resets-outside-isolation-subtrees`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-broad-all-resets-outside-isolation-subtrees) | — | 🟣 | Disallow broad all: initial\|revert\|unset resets outside explicitly isolated local subtrees. |
-| [`no-direct-theme-token-consumption-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-direct-theme-token-consumption-in-css-modules) | — | 🟣 | Disallow direct --ifm-\* and --docsearch-\* token consumption in CSS Modules declarations. |
-| [`no-docusaurus-layer-name-collisions`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-docusaurus-layer-name-collisions) | — | 🟣 | Disallow author-defined cascade layer names that collide with reserved Docusaurus-managed layer prefixes. |
-| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope) | — | 🟢 🛡️ 🟣 | Disallow declaring Docusaurus theme custom properties outside global theme scopes, except for DocSearch variables scoped to the DocSearch UI. |
-| [`no-mobile-navbar-backdrop-filter`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-backdrop-filter) | — | 🟢 🛡️ 🟣 | Disallow backdrop-filter on Docusaurus navbar selectors unless it is guarded behind the desktop breakpoint. |
-| [`no-mobile-navbar-stacking-context-traps`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-stacking-context-traps) | — | 🟣 | Disallow containing-block and stacking-context properties on Docusaurus navbar selectors unless they are guarded behind the desktop breakpoint. |
-| [`no-navbar-breakpoint-desync`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-navbar-breakpoint-desync) | — | 🟣 | Disallow custom CSS breakpoints for Docusaurus mobile navbar/sidebar surfaces that can desync from the built-in JS breakpoint. |
-| [`no-revert-layer-outside-isolation-subtrees`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-revert-layer-outside-isolation-subtrees) | — | 🟣 | Disallow revert-layer usage outside explicitly isolated local subtrees. |
-| [`no-subtree-data-theme-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-subtree-data-theme-selectors) | — | 🟢 🛡️ 🟣 | Disallow subtree-scoped data-theme selectors that do not start from the Docusaurus root color-mode attribute. |
-| [`no-unanchored-infima-subcomponent-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unanchored-infima-subcomponent-selectors) | — | 🟣 | Disallow unanchored Infima subcomponent selectors in global Docusaurus stylesheets. |
-| [`no-unsafe-theme-internal-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unsafe-theme-internal-selectors) | — | 🟣 | Disallow curated unsafe Docusaurus internal selector fallbacks that have no documented stable CSS contract. |
-| [`no-unscoped-content-element-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unscoped-content-element-overrides) | — | 🟣 | Disallow unscoped content-element overrides that leak across the whole Docusaurus site. |
-| [`no-unstable-docusaurus-generated-class-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unstable-docusaurus-generated-class-selectors) | — | 🟣 | Disallow exact selectors that target Docusaurus theme CSS-module class names with unstable hash suffixes. |
-| [`no-unwrapped-global-theme-selectors-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unwrapped-global-theme-selectors-in-css-modules) | — | 🟢 🛡️ 🟣 | Disallow unwrapped Docusaurus and Infima global theme selectors inside CSS Modules. |
-| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode) | 🔧 | 🟢 🛡️ 🟣 | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes. |
-| [`prefer-data-theme-docsearch-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-docsearch-overrides) | — | 🟣 | Prefer \[data-theme] selectors over .navbar--dark when overriding DocSearch styles. |
-| [`prefer-data-theme-over-prefers-color-scheme`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-over-prefers-color-scheme) | — | 🟢 🛡️ 🟣 | Prefer Docusaurus data-theme selector scopes over prefers-color-scheme media queries when styling Docusaurus theme tokens or global theme surfaces. |
-| [`prefer-docsearch-theme-tokens-over-structural-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-docsearch-theme-tokens-over-structural-overrides) | — | 🟣 | Prefer curated DocSearch theme tokens over hard-coded structural overrides on common DocSearch UI surfaces. |
-| [`prefer-infima-theme-tokens-over-structural-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-infima-theme-tokens-over-structural-overrides) | — | 🟣 | Prefer curated Infima theme tokens over hard-coded structural overrides on common Docusaurus theme surfaces. |
-| [`prefer-stable-docusaurus-theme-class-names`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-stable-docusaurus-theme-class-names) | — | 🟣 | Prefer documented stable Docusaurus theme class names over attribute-selector fallbacks for known theme components. |
-| [`require-docsearch-color-mode-pairs`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-docsearch-color-mode-pairs) | — | 🟣 | Require paired light/dark DocSearch token override blocks when customizing DocSearch by color mode. |
-| [`require-docsearch-root-scope-for-docsearch-token-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-docsearch-root-scope-for-docsearch-token-overrides) | — | 🟣 | Require DocSearch token overrides to live on the .DocSearch root scope instead of descendant or non-DocSearch selectors. |
-| [`require-html-prefix-for-docusaurus-data-attribute-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-html-prefix-for-docusaurus-data-attribute-selectors) | — | 🟢 🛡️ 🟣 | Require an html prefix for bare Docusaurus root data-attribute selectors that target global theme surfaces. |
-| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale) | — | 🟣 | Require the full recommended Infima primary color scale when overriding --ifm-color-primary. |
-| [`require-ifm-color-primary-scale-per-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale-per-color-mode) | — | 🟣 | Require matching Infima primary color-scale overrides for each Docusaurus color mode you customize. |
-| [`require-local-anchor-for-global-theme-overrides-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-local-anchor-for-global-theme-overrides-in-css-modules) | — | 🟢 🛡️ 🟣 | Require a local selector anchor when overriding Docusaurus global theme surfaces inside CSS Modules. |
+| Rule                                                                                                                                                                                                   | Fix | Preset key                                                                                                                                            | Description                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-: | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`no-broad-all-resets-outside-isolation-subtrees`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-broad-all-resets-outside-isolation-subtrees)                                 |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow broad all: initial\|revert\|unset resets outside explicitly isolated local subtrees.                                                       |
+| [`no-direct-theme-token-consumption-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-direct-theme-token-consumption-in-css-modules)                             |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow direct --ifm-\* and --docsearch-\* token consumption in CSS Modules declarations.                                                          |
+| [`no-docusaurus-layer-name-collisions`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-docusaurus-layer-name-collisions)                                                       |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow author-defined cascade layer names that collide with reserved Docusaurus-managed layer prefixes.                                           |
+| [`no-invalid-theme-custom-property-scope`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-invalid-theme-custom-property-scope)                                                 |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Disallow declaring Docusaurus theme custom properties outside global theme scopes, except for DocSearch variables scoped to the DocSearch UI.       |
+| [`no-mobile-navbar-backdrop-filter`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-backdrop-filter)                                                             |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Disallow backdrop-filter on Docusaurus navbar selectors unless it is guarded behind the desktop breakpoint.                                         |
+| [`no-mobile-navbar-stacking-context-traps`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-mobile-navbar-stacking-context-traps)                                               |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow containing-block and stacking-context properties on Docusaurus navbar selectors unless they are guarded behind the desktop breakpoint.     |
+| [`no-navbar-breakpoint-desync`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-navbar-breakpoint-desync)                                                                       |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow custom CSS breakpoints for Docusaurus mobile navbar/sidebar surfaces that can desync from the built-in JS breakpoint.                      |
+| [`no-revert-layer-outside-isolation-subtrees`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-revert-layer-outside-isolation-subtrees)                                         |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow revert-layer usage outside explicitly isolated local subtrees.                                                                             |
+| [`no-subtree-data-theme-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-subtree-data-theme-selectors)                                                               |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Disallow subtree-scoped data-theme selectors that do not start from the Docusaurus root color-mode attribute.                                       |
+| [`no-unanchored-infima-subcomponent-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unanchored-infima-subcomponent-selectors)                                       |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow unanchored Infima subcomponent selectors in global Docusaurus stylesheets.                                                                 |
+| [`no-unsafe-theme-internal-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unsafe-theme-internal-selectors)                                                         |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow curated unsafe Docusaurus internal selector fallbacks that have no documented stable CSS contract.                                         |
+| [`no-unscoped-content-element-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unscoped-content-element-overrides)                                                   |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow unscoped content-element overrides that leak across the whole Docusaurus site.                                                             |
+| [`no-unstable-docusaurus-generated-class-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unstable-docusaurus-generated-class-selectors)                             |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Disallow exact selectors that target Docusaurus theme CSS-module class names with unstable hash suffixes.                                           |
+| [`no-unwrapped-global-theme-selectors-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/no-unwrapped-global-theme-selectors-in-css-modules)                         |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Disallow unwrapped Docusaurus and Infima global theme selectors inside CSS Modules.                                                                 |
+| [`prefer-data-theme-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-color-mode)                                                                     |  🔧 | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Prefer Docusaurus data-theme selectors over legacy theme-dark/theme-light classes.                                                                  |
+| [`prefer-data-theme-docsearch-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-docsearch-overrides)                                                   |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Prefer \[data-theme] selectors over .navbar--dark when overriding DocSearch styles.                                                                 |
+| [`prefer-data-theme-over-prefers-color-scheme`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-data-theme-over-prefers-color-scheme)                                       |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Prefer Docusaurus data-theme selector scopes over prefers-color-scheme media queries when styling Docusaurus theme tokens or global theme surfaces. |
+| [`prefer-docsearch-theme-tokens-over-structural-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-docsearch-theme-tokens-over-structural-overrides)               |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Prefer curated DocSearch theme tokens over hard-coded structural overrides on common DocSearch UI surfaces.                                         |
+| [`prefer-infima-theme-tokens-over-structural-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-infima-theme-tokens-over-structural-overrides)                     |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Prefer curated Infima theme tokens over hard-coded structural overrides on common Docusaurus theme surfaces.                                        |
+| [`prefer-stable-docusaurus-theme-class-names`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/prefer-stable-docusaurus-theme-class-names)                                         |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Prefer documented stable Docusaurus theme class names over attribute-selector fallbacks for known theme components.                                 |
+| [`require-docsearch-color-mode-pairs`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-docsearch-color-mode-pairs)                                                         |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Require paired light/dark DocSearch token override blocks when customizing DocSearch by color mode.                                                 |
+| [`require-docsearch-root-scope-for-docsearch-token-overrides`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-docsearch-root-scope-for-docsearch-token-overrides)         |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Require DocSearch token overrides to live on the .DocSearch root scope instead of descendant or non-DocSearch selectors.                            |
+| [`require-html-prefix-for-docusaurus-data-attribute-selectors`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-html-prefix-for-docusaurus-data-attribute-selectors)       |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Require an html prefix for bare Docusaurus root data-attribute selectors that target global theme surfaces.                                         |
+| [`require-ifm-color-primary-scale`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale)                                                               |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Require the full recommended Infima primary color scale when overriding --ifm-color-primary.                                                        |
+| [`require-ifm-color-primary-scale-per-color-mode`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-ifm-color-primary-scale-per-color-mode)                                 |  —  | [🟣](./docs/rules/configs/docusaurus-all.md)                                                                                                          | Require matching Infima primary color-scale overrides for each Docusaurus color mode you customize.                                                 |
+| [`require-local-anchor-for-global-theme-overrides-in-css-modules`](https://nick2bad4u.github.io/stylelint-plugin-docusaurus/docs/rules/require-local-anchor-for-global-theme-overrides-in-css-modules) |  —  | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Require a local selector anchor when overriding Docusaurus global theme surfaces inside CSS Modules.                                                |
+
+## Docusaurus docs CSS guardrails
+
+For real Docusaurus docs CSS surfaces, these third-party rules are commonly noisy:
+`a11y/media-prefers-reduced-motion`, `defensive-css/require-named-grid-lines`, `no-descending-specificity`, `plugin/no-low-performance-animation-properties`, `order/properties-order`, `scales/font-sizes`.
+
+Recommended pattern: keep explicit docs overrides + narrow inline disable comments with a reason, and enforce both with `test/stylelint-docs-guardrails.test.ts`.
 
 ## Documentation
 

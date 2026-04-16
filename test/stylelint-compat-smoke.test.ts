@@ -14,7 +14,7 @@ import {
 
 function createMockBuiltPluginSurface(): BuiltPluginSurface {
     const plugin = ["mock-plugin-pack"];
-    const configNames = ["recommended", "all"] as const;
+    const configNames = ["docusaurus-recommended", "docusaurus-all"] as const;
     const ruleIds = ["mock-rule", "mock-rule-strict"] as const;
     const ruleNames = [
         "docusaurus/mock-rule",
@@ -41,11 +41,11 @@ function createMockBuiltPluginSurface(): BuiltPluginSurface {
     } as const;
     const builtPluginCjs = Object.assign([...plugin], {
         configNames,
-        configs: {
-            all: {
+        docusaurusPluginConfigs: {
+            "docusaurus-all": {
                 rules: allRules,
             },
-            recommended: {
+            "docusaurus-recommended": {
                 rules: recommendedRules,
             },
         },
@@ -55,7 +55,7 @@ function createMockBuiltPluginSurface(): BuiltPluginSurface {
         rules,
     });
 
-    return {
+    const surface = {
         builtPluginCjs,
         configNames,
         configs: {
@@ -68,12 +68,24 @@ function createMockBuiltPluginSurface(): BuiltPluginSurface {
                 rules: recommendedRules,
             },
         },
+        docusaurusPluginConfigs: {
+            "docusaurus-all": {
+                plugins: plugin,
+                rules: allRules,
+            },
+            "docusaurus-recommended": {
+                plugins: plugin,
+                rules: recommendedRules,
+            },
+        },
         meta,
         plugin,
         ruleIds,
         ruleNames,
         rules,
     };
+
+    return surface as unknown as BuiltPluginSurface;
 }
 
 describe("stylelint compatibility smoke script", () => {

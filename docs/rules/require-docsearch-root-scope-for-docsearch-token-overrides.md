@@ -73,12 +73,12 @@ Keeping those variables on the root DocSearch surface makes the override contrac
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.all,
+ ...docusaurusPluginConfigs["docusaurus-all"],
  rules: {
-  ...configs.all.rules,
+  ...docusaurusPluginConfigs["docusaurus-all"].rules,
   "docusaurus/require-docsearch-root-scope-for-docsearch-token-overrides": true,
  },
 };

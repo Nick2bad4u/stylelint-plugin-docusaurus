@@ -84,12 +84,12 @@ const toFileHref = (filePath) => {
 
 /**
  * @typedef {Readonly<{
- *     all: import("stylelint").Config &
+ *     "docusaurus-all": import("stylelint").Config &
  *         Readonly<{
  *             plugins: StylelintConfigPluginArray;
  *             rules: Readonly<Record<string, unknown>>;
  *         }>;
- *     recommended: import("stylelint").Config &
+ *     "docusaurus-recommended": import("stylelint").Config &
  *         Readonly<{
  *             plugins: StylelintConfigPluginArray;
  *             rules: Readonly<Record<string, unknown>>;
@@ -101,7 +101,7 @@ const toFileHref = (filePath) => {
  * @typedef {Readonly<{
  *     builtPluginCjs: unknown;
  *     configNames: readonly string[];
- *     configs: BuiltPluginConfigs;
+ *     docusaurusPluginConfigs: BuiltPluginConfigs;
  *     meta: Readonly<{
  *         name: string;
  *         namespace: string;
@@ -365,9 +365,13 @@ export function assertStylelintMajor(
  */
 function createSurfaceSnapshot(candidate) {
     const candidateRecord = toRecord(candidate);
-    const configsRecord = toRecord(candidateRecord["configs"]);
-    const allConfigRecord = toRecord(configsRecord["all"]);
-    const recommendedConfigRecord = toRecord(configsRecord["recommended"]);
+    const pluginConfigsRecord = toRecord(
+        candidateRecord["docusaurusPluginConfigs"]
+    );
+    const allConfigRecord = toRecord(pluginConfigsRecord["docusaurus-all"]);
+    const recommendedConfigRecord = toRecord(
+        pluginConfigsRecord["docusaurus-recommended"]
+    );
 
     return {
         allRuleKeys: Object.keys(toRecord(allConfigRecord["rules"])),
@@ -413,8 +417,8 @@ async function loadBuiltPluginSurface({
             configNames: /** @type {readonly string[]} */ (
                 builtPluginModule["configNames"]
             ),
-            configs: /** @type {BuiltPluginConfigs} */ (
-                builtPluginModule["configs"]
+            docusaurusPluginConfigs: /** @type {BuiltPluginConfigs} */ (
+                builtPluginModule["docusaurusPluginConfigs"]
             ),
             meta: /** @type {BuiltPluginSurface["meta"]} */ (
                 builtPluginModule["meta"]
@@ -449,7 +453,7 @@ export function assertPluginSurface(surface, { logger = console } = {}) {
     const {
         builtPluginCjs,
         configNames,
-        configs,
+        docusaurusPluginConfigs,
         meta,
         plugin,
         ruleIds,
@@ -476,8 +480,10 @@ export function assertPluginSurface(surface, { logger = console } = {}) {
     if (
         !Array.isArray(configNames) ||
         configNames.length === 0 ||
-        !Array.isArray(configs.recommended.plugins) ||
-        !Array.isArray(configs.all.plugins)
+        !Array.isArray(
+            docusaurusPluginConfigs["docusaurus-recommended"].plugins
+        ) ||
+        !Array.isArray(docusaurusPluginConfigs["docusaurus-all"].plugins)
     ) {
         throw new TypeError("Config names export is unavailable.");
     }
@@ -504,7 +510,7 @@ export function assertPluginSurface(surface, { logger = console } = {}) {
         !isDeepStrictEqual(
             createSurfaceSnapshot({
                 configNames,
-                configs,
+                docusaurusPluginConfigs,
                 meta,
                 ruleIds,
                 ruleNames,
@@ -573,11 +579,11 @@ export async function runConfigScenario(
 }
 
 /**
- * @param {Pick<BuiltPluginSurface, "configs" | "plugin">} input
+ * @param {Pick<BuiltPluginSurface, "docusaurusPluginConfigs" | "plugin">} input
  *
  * @returns {readonly ConfigScenario[]}
  */
-export function createScenarios({ configs, plugin }) {
+export function createScenarios({ docusaurusPluginConfigs, plugin }) {
     const baselineCssModule = `
 .heroBanner {
     --hero-banner-color: var(--ifm-color-primary);
@@ -641,10 +647,12 @@ html[data-theme='dark'] .DocSearch {
             code: baselineCssModule,
             codeFilename: "Component.module.css",
             config: {
-                ...configs.recommended,
-                plugins: Array.from(configs.recommended.plugins),
+                ...docusaurusPluginConfigs["docusaurus-recommended"],
+                plugins: Array.from(
+                    docusaurusPluginConfigs["docusaurus-recommended"].plugins
+                ),
                 rules: {
-                    ...configs.recommended.rules,
+                    ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
                 },
             },
             name: "recommended-config-modules",
@@ -653,10 +661,12 @@ html[data-theme='dark'] .DocSearch {
             code: baselineCssModule,
             codeFilename: "Component.module.css",
             config: {
-                ...configs.all,
-                plugins: Array.from(configs.all.plugins),
+                ...docusaurusPluginConfigs["docusaurus-all"],
+                plugins: Array.from(
+                    docusaurusPluginConfigs["docusaurus-all"].plugins
+                ),
                 rules: {
-                    ...configs.all.rules,
+                    ...docusaurusPluginConfigs["docusaurus-all"].rules,
                 },
             },
             name: "all-config-modules",
@@ -665,10 +675,12 @@ html[data-theme='dark'] .DocSearch {
             code: baselineGlobalCss,
             codeFilename: "src/css/custom.css",
             config: {
-                ...configs.recommended,
-                plugins: Array.from(configs.recommended.plugins),
+                ...docusaurusPluginConfigs["docusaurus-recommended"],
+                plugins: Array.from(
+                    docusaurusPluginConfigs["docusaurus-recommended"].plugins
+                ),
                 rules: {
-                    ...configs.recommended.rules,
+                    ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
                 },
             },
             name: "recommended-config-global",
@@ -677,10 +689,12 @@ html[data-theme='dark'] .DocSearch {
             code: baselineGlobalCss,
             codeFilename: "src/css/custom.css",
             config: {
-                ...configs.all,
-                plugins: Array.from(configs.all.plugins),
+                ...docusaurusPluginConfigs["docusaurus-all"],
+                plugins: Array.from(
+                    docusaurusPluginConfigs["docusaurus-all"].plugins
+                ),
                 rules: {
-                    ...configs.all.rules,
+                    ...docusaurusPluginConfigs["docusaurus-all"].rules,
                 },
             },
             name: "all-config-global",
@@ -735,7 +749,7 @@ export async function runStylelintCompatSmoke({
     assertPluginSurface(builtPluginSurface, { logger });
 
     for (const scenario of createScenarios({
-        configs: builtPluginSurface.configs,
+        docusaurusPluginConfigs: builtPluginSurface.docusaurusPluginConfigs,
         plugin: builtPluginSurface.plugin,
     })) {
         await runConfigScenario(scenario, {

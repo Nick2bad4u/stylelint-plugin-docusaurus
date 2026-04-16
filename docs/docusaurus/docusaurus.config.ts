@@ -546,11 +546,11 @@ const config = {
                         },
                         {
                             label: "🟡 recommended",
-                            to: "/docs/rules/configs/recommended",
+                            to: "/docs/rules/configs/docusaurus-recommended",
                         },
                         {
                             label: "🟣 all",
-                            to: "/docs/rules/configs/all",
+                            to: "/docs/rules/configs/docusaurus-all",
                         },
                     ],
                 },

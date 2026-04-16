@@ -69,12 +69,12 @@ Using `.navbar--dark` for DocSearch dark-mode overrides can make the search UI d
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.all,
+ ...docusaurusPluginConfigs["docusaurus-all"],
  rules: {
-  ...configs.all.rules,
+  ...docusaurusPluginConfigs["docusaurus-all"].rules,
   "docusaurus/prefer-data-theme-docsearch-overrides": true,
  },
 };

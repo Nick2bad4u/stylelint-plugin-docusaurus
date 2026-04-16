@@ -71,12 +71,12 @@ When there is no stable theme class name available, Docusaurus recommends using 
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.all,
+ ...docusaurusPluginConfigs["docusaurus-all"],
  rules: {
-  ...configs.all.rules,
+  ...docusaurusPluginConfigs["docusaurus-all"].rules,
   "docusaurus/no-unstable-docusaurus-generated-class-selectors": true,
  },
 };

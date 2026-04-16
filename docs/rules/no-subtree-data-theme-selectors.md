@@ -64,12 +64,12 @@ html[data-theme="light"] .footer {
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.recommended,
+ ...docusaurusPluginConfigs["docusaurus-recommended"],
  rules: {
-  ...configs.recommended.rules,
+  ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
   "docusaurus/no-subtree-data-theme-selectors": true,
  },
 };

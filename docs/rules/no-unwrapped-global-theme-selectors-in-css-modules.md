@@ -63,12 +63,12 @@ Authors often move a working selector from `src/css/custom.css` into a CSS Modul
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.recommended,
+ ...docusaurusPluginConfigs["docusaurus-recommended"],
  rules: {
-  ...configs.recommended.rules,
+  ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
   "docusaurus/no-unwrapped-global-theme-selectors-in-css-modules": true,
  },
 };

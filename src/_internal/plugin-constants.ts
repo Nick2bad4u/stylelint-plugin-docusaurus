@@ -18,8 +18,8 @@ export const DOCS_SITE_URL =
 export const DOCS_RULES_BASE_URL: `${string}/docs/rules` = `${DOCS_SITE_URL}/docs/rules`;
 /** Supported shareable config names exported by this template. */
 export const CONFIG_NAMES = [
-    "recommended",
-    "all",
+    "docusaurus-recommended",
+    "docusaurus-all",
     "docusaurus-docs-safe",
 ] as const;
 

@@ -12,9 +12,10 @@ The repository was intentionally converted from a mature ESLint-plugin template 
 ## What the package currently exports
 
 - A default Stylelint plugin pack export.
-- Two shareable configs:
-  - `configs.recommended`
-  - `configs.all`
+- A plugin-scoped shareable config map: `docusaurusPluginConfigs`
+  - `docusaurus-recommended`
+  - `docusaurus-all`
+  - `docusaurus-docs-safe`
 - Static runtime metadata and typed helper infrastructure for future rule authoring.
 
 ## Current rule status

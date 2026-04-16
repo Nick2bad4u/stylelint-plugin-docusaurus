@@ -67,12 +67,12 @@ Declaring them inside component selectors makes theme behavior harder to reason 
 ## Stylelint config example
 
 ```js
-import { configs } from "stylelint-plugin-docusaurus";
+import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
- ...configs.recommended,
+ ...docusaurusPluginConfigs["docusaurus-recommended"],
  rules: {
-  ...configs.recommended.rules,
+  ...docusaurusPluginConfigs["docusaurus-recommended"].rules,
   "docusaurus/no-invalid-theme-custom-property-scope": true,
  },
 };

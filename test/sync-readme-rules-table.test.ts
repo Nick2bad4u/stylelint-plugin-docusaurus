@@ -110,10 +110,10 @@ describe("sync-readme-rules-table automation", () => {
         expect(writes).toHaveLength(1);
         expect(writes[0]?.encoding).toBe("utf8");
         expect(writes[0]?.contents).toContain(
-            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | 🟢 🛡️ 🟣 | Alpha rule. |"
+            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Alpha rule. |"
         );
         expect(writes[0]?.contents).toContain(
-            "| [`zeta-rule`](https://example.test/docs/rules/zeta-rule) | — | 🟣 | Zeta rule. |"
+            "| [`zeta-rule`](https://example.test/docs/rules/zeta-rule) | — | [🟣](./docs/rules/configs/docusaurus-all.md) | Zeta rule. |"
         );
         expect(writes[0]?.contents).toContain("## Next");
     });
@@ -135,7 +135,7 @@ describe("sync-readme-rules-table automation", () => {
         });
 
         expect(generatedSection).toContain(
-            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | 🟢 🛡️ 🟣 | Alpha uses A \\| B\\\\C<br>and stays readable. |"
+            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Alpha uses A \\| B\\\\C<br>and stays readable. |"
         );
     });
 
@@ -156,7 +156,7 @@ describe("sync-readme-rules-table automation", () => {
         });
 
         expect(generatedSection).toContain(
-            "| [`ifm-rule`](https://example.test/docs/rules/ifm-rule) | — | 🟣 | Disallow --ifm-\\* and \\[data-theme] usage. |"
+            "| [`ifm-rule`](https://example.test/docs/rules/ifm-rule) | — | [🟣](./docs/rules/configs/docusaurus-all.md) | Disallow --ifm-\\* and \\[data-theme] usage. |"
         );
     });
 

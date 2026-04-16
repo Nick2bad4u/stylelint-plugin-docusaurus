@@ -180,7 +180,7 @@ describe("sync-configs-rules-matrix automation", () => {
                 importModule: () =>
                     Promise.resolve({
                         configNames: ["strict"],
-                        configs: {
+                        docusaurusPluginConfigs: {
                             strict: {
                                 rules: {
                                     "docusaurus/strict-rule": true,

@@ -130,10 +130,10 @@ function createConfig(
 }
 
 /** Shareable config exports exposed by the package. */
-export const configs: DocusaurusConfigMap = {
-    all: createConfig(ruleIds),
+export const docusaurusPluginConfigs: DocusaurusConfigMap = {
+    "docusaurus-all": createConfig(ruleIds),
     "docusaurus-docs-safe": createConfig(recommendedRuleIds),
-    recommended: createConfig(recommendedRuleIds),
+    "docusaurus-recommended": createConfig(recommendedRuleIds),
 };
 
 /** Stable ordered shareable config names. */
