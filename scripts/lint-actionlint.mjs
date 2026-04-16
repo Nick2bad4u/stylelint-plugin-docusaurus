@@ -347,6 +347,27 @@ export function runCli({
     );
 
     if (result.error) {
+        const errorCode =
+            typeof result.error === "object" &&
+            result.error !== null &&
+            "code" in result.error
+                ? /** @type {{ code?: unknown }} */ (result.error).code
+                : undefined;
+
+        if (errorCode === "ENOENT") {
+            logger.log(
+                pc.yellow(
+                    "actionlint binary not found in PATH; skipping workflow lint step."
+                )
+            );
+            logger.log(
+                pc.dim(
+                    "Install actionlint or ensure it is available in PATH to enable workflow lint enforcement."
+                )
+            );
+            return 0;
+        }
+
         logger.error(pc.red("Failed to run actionlint:"), result.error);
         process.exitCode = 1;
         return 1;

@@ -9,6 +9,7 @@ import {
     isActionlintPassThroughMode,
     isDirectExecution,
     parseActionlintCliArgs,
+    runCli,
 } from "../scripts/lint-actionlint.mjs";
 
 describe("lint-actionlint wrapper", () => {
@@ -170,5 +171,67 @@ describe("lint-actionlint wrapper", () => {
         } finally {
             cwdSpy.mockRestore();
         }
+    });
+
+    it("skips with success when actionlint binary is missing (ENOENT)", () => {
+        expect.hasAssertions();
+
+        const logs: string[] = [];
+        const errors: string[] = [];
+
+        const exitCode = runCli({
+            logger: {
+                error: (...args) => {
+                    errors.push(args.map(String).join(" "));
+                },
+                log: (...args) => {
+                    logs.push(args.map(String).join(" "));
+                },
+            },
+            rawArgs: ["-help"],
+            spawnActionlint: () => ({
+                error: {
+                    code: "ENOENT",
+                    message: "spawnSync actionlint ENOENT",
+                },
+                signal: null,
+                status: null,
+            }),
+        });
+
+        expect(exitCode).toBe(0);
+        expect(errors).toStrictEqual([]);
+        expect(logs.join("\n")).toContain("actionlint binary not found");
+    });
+
+    it("fails when actionlint returns a non-ENOENT spawn error", () => {
+        expect.hasAssertions();
+
+        const logs: string[] = [];
+        const errors: string[] = [];
+
+        const exitCode = runCli({
+            logger: {
+                error: (...args) => {
+                    errors.push(args.map(String).join(" "));
+                },
+                log: (...args) => {
+                    logs.push(args.map(String).join(" "));
+                },
+            },
+            rawArgs: ["-help"],
+            spawnActionlint: () => ({
+                error: {
+                    code: "EACCES",
+                    message: "spawnSync actionlint EACCES",
+                },
+                signal: null,
+                status: null,
+            }),
+        });
+
+        expect(exitCode).toBe(1);
+        expect(errors.join("\n")).toContain("Failed to run actionlint");
+        expect(logs).toStrictEqual([]);
     });
 });
