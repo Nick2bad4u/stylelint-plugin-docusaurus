@@ -122,7 +122,7 @@ const detectLineEnding = (markdown) =>
  * @param {"\n" | "\r\n"} lineEnding
  */
 const normalizeMarkdownLineEndings = (markdown, lineEnding) =>
-    markdown.replace(/\r?\n/gv, lineEnding);
+    markdown.replaceAll(/\r?\n/gv, lineEnding);
 
 /** @param {string} markdown */
 const getReadmeRulesSectionBounds = (markdown) => {

@@ -398,7 +398,7 @@ const getHeadingsByDepth = (tree, depth) =>
 export default function remarkLintRuleDocHeadings(options = {}) {
     const headingToggles = {
         ...defaultHeadingToggles,
-        ...(options.headings ?? {}),
+        ...options.headings,
     };
     const helperDocPathPattern =
         options.helperDocPathPattern ?? defaultHelperDocPathPattern;
@@ -487,7 +487,7 @@ export default function remarkLintRuleDocHeadings(options = {}) {
 
             if (!expectedH1Titles.includes(actualTitle)) {
                 file.message(
-                    `H1 heading must match one of: ${expectedH1Titles.map((title) => `\`${title}\``).join(", ")}.`,
+                    `H1 heading must match one of: ${expectedH1Titles.map((title) => "`" + title + "`").join(", ")}.`,
                     h1Headings[0],
                     "remark-lint:rule-doc-headings:h1-title"
                 );
@@ -722,7 +722,7 @@ export default function remarkLintRuleDocHeadings(options = {}) {
             );
 
             if (
-                !/\[[^\]]+\]\([^\)]+\)/u.test(
+                !/\[[^\]]+\]\([^)]+\)/u.test(
                     stripMarkdownCode(deprecatedSectionContent)
                 )
             ) {

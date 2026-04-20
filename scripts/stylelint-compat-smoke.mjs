@@ -238,8 +238,8 @@ function isMissingBuildArtifactsIssue(error) {
     return [
         "dist/plugin.js",
         "dist/plugin.cjs",
-        "dist\\plugin.js",
-        "dist\\plugin.cjs",
+        String.raw`dist\plugin.js`,
+        String.raw`dist\plugin.cjs`,
     ].some((artifactPath) => error.message.includes(artifactPath));
 }
 
@@ -332,7 +332,7 @@ export function assertStylelintMajor(
     const runtimeMajor = Number.parseInt(runtimeMajorText, 10);
 
     if (Number.isNaN(runtimeMajor)) {
-        throw new Error(
+        throw new TypeError(
             `Unable to parse Stylelint runtime version: ${runtimeVersion}`
         );
     }

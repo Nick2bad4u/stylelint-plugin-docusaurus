@@ -51,10 +51,10 @@ function computeSelectorHasScopeAnchor(
         node: Readonly<Node>,
         pseudoNames: ReadonlySet<string>
     ): boolean {
-        let currentNode: Node | undefined = node.parent as Node | undefined;
+        let currentNode: Node | undefined = node.parent;
 
         while (isDefined(currentNode)) {
-            const parentNode = currentNode.parent as Node | undefined;
+            const parentNode = currentNode.parent;
 
             if (
                 currentNode.type === "pseudo" &&

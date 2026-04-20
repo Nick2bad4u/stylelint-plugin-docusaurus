@@ -36,7 +36,7 @@ const excludedPathSegments = [
  * @returns {string} Escaped regular-expression fragment.
  */
 export function escapeRegExp(value) {
-    return value.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+    return value.replaceAll(/[.*+?^${}()|[\]\\]/gu, String.raw`\$&`);
 }
 
 /**

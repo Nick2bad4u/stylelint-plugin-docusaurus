@@ -17,8 +17,8 @@
 export function escapeMarkdownTableCell(value) {
     return value
         .replaceAll("\\", "\\\\")
-        .replaceAll("|", "\\|")
-        .replaceAll("*", "\\*")
-        .replaceAll("[", "\\[")
-        .replace(/\r?\n/gu, "<br>");
+        .replaceAll("|", String.raw`\|`)
+        .replaceAll("*", String.raw`\*`)
+        .replaceAll("[", String.raw`\[`)
+        .replaceAll(/\r?\n/gu, "<br>");
 }

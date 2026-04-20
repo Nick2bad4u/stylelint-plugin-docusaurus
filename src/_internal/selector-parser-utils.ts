@@ -124,7 +124,7 @@ export function classifyLeadingRootAttributeNode(
             return undefined;
         }
 
-        const parentNode = containingSelector.parent as Node | undefined;
+        const parentNode = containingSelector.parent;
 
         if (!isDefined(parentNode) || parentNode.type !== "pseudo") {
             return hasHtmlPrefix ? "html-prefixed" : "bare";
@@ -575,14 +575,14 @@ function cssClassAttributeMatchesFragment(
 function getContainingSelectorNode(
     node: Readonly<Node>
 ): ParsedSelector | undefined {
-    let currentNode: Node | undefined = node.parent as Node | undefined;
+    let currentNode: Node | undefined = node.parent;
 
     while (isDefined(currentNode)) {
         if (currentNode.type === "selector") {
             return safeCastTo<ParsedSelector>(currentNode);
         }
 
-        currentNode = currentNode.parent as Node | undefined;
+        currentNode = currentNode.parent;
     }
 
     return undefined;
@@ -593,12 +593,12 @@ function getDirectChildUnderSelector(
     node: Readonly<Node>,
     selector: Readonly<ParsedSelector>
 ): Node | undefined {
-    let currentNode: Node = safeCastTo<Node>(node);
-    let parentNode: Node | undefined = currentNode.parent as Node | undefined;
+    let currentNode: Node = node;
+    let parentNode: Node | undefined = currentNode.parent;
 
     while (isDefined(parentNode) && parentNode !== selector) {
         currentNode = parentNode;
-        parentNode = currentNode.parent as Node | undefined;
+        parentNode = currentNode.parent;
     }
 
     return parentNode === selector ? currentNode : undefined;
@@ -609,10 +609,10 @@ function hasNamedAncestorPseudo(
     node: Readonly<Node>,
     pseudoName: string
 ): boolean {
-    let currentNode: Node | undefined = node.parent as Node | undefined;
+    let currentNode: Node | undefined = node.parent;
 
     while (isDefined(currentNode)) {
-        const parentNode = currentNode.parent as Node | undefined;
+        const parentNode = currentNode.parent;
 
         if (currentNode.type === "pseudo" && currentNode.value === pseudoName) {
             return true;
@@ -629,10 +629,10 @@ function hasNamedAncestorPseudoInSet(
     node: Readonly<Node>,
     pseudoNames: ReadonlySet<string>
 ): boolean {
-    let currentNode: Node | undefined = node.parent as Node | undefined;
+    let currentNode: Node | undefined = node.parent;
 
     while (isDefined(currentNode)) {
-        const parentNode = currentNode.parent as Node | undefined;
+        const parentNode = currentNode.parent;
 
         if (
             currentNode.type === "pseudo" &&

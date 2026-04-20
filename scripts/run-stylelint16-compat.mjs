@@ -305,6 +305,8 @@ export async function runStylelint16Compat({
 
     /** @type {Error | undefined} */
     let primaryError;
+    /** @type {Error[]} */
+    const cleanupErrors = [];
 
     try {
         for (const command of createCompatibilityCheckCommands({
@@ -324,74 +326,70 @@ export async function runStylelint16Compat({
             error,
             "Stylelint 16 compatibility check failed."
         );
-    } finally {
-        /** @type {Error[]} */
-        const cleanupErrors = [];
+    }
 
-        await runCleanupStep(
-            cleanupErrors,
-            "Failed to restore package.json after the Stylelint 16 compatibility check.",
-            async () => {
-                await cpFn(packageJsonBackupPath, targetPackageJsonPath, {
-                    force: true,
-                });
-            }
-        );
-        await runCleanupStep(
-            cleanupErrors,
-            "Failed to restore package-lock.json after the Stylelint 16 compatibility check.",
-            async () => {
-                await cpFn(packageLockBackupPath, targetPackageLockJsonPath, {
-                    force: true,
-                });
-            }
-        );
-        await runCleanupStep(
-            cleanupErrors,
-            "Failed to restore dependencies after the Stylelint 16 compatibility check.",
-            () => {
-                runCommandFn({
-                    ...createRestoreDependenciesCommand({
-                        npmCommand,
-                        platform,
-                    }),
-                    repositoryRootPath: targetRepositoryRootPath,
-                    windowsCommandShell,
-                });
-            }
-        );
-        await runCleanupStep(
-            cleanupErrors,
-            `Failed to remove temporary backup directory: ${tempBackupDirectory}`,
-            async () => {
-                await rmFn(tempBackupDirectory, {
-                    force: true,
-                    recursive: true,
-                });
-            }
-        );
-
-        if (primaryError !== undefined && cleanupErrors.length > 0) {
-            throw new AggregateError(
-                [primaryError, ...cleanupErrors],
-                "Stylelint 16 compatibility check failed and cleanup encountered additional errors."
-            );
+    await runCleanupStep(
+        cleanupErrors,
+        "Failed to restore package.json after the Stylelint 16 compatibility check.",
+        async () => {
+            await cpFn(packageJsonBackupPath, targetPackageJsonPath, {
+                force: true,
+            });
         }
-
-        if (primaryError !== undefined) {
-            throw primaryError;
+    );
+    await runCleanupStep(
+        cleanupErrors,
+        "Failed to restore package-lock.json after the Stylelint 16 compatibility check.",
+        async () => {
+            await cpFn(packageLockBackupPath, targetPackageLockJsonPath, {
+                force: true,
+            });
         }
-
-        if (cleanupErrors.length === 1) {
-            throw cleanupErrors[0];
+    );
+    await runCleanupStep(
+        cleanupErrors,
+        "Failed to restore dependencies after the Stylelint 16 compatibility check.",
+        () => {
+            runCommandFn({
+                ...createRestoreDependenciesCommand({
+                    npmCommand,
+                    platform,
+                }),
+                repositoryRootPath: targetRepositoryRootPath,
+                windowsCommandShell,
+            });
         }
-
-        if (cleanupErrors.length > 1) {
-            throw new AggregateError(
-                cleanupErrors,
-                "Stylelint 16 compatibility cleanup failed."
-            );
+    );
+    await runCleanupStep(
+        cleanupErrors,
+        `Failed to remove temporary backup directory: ${tempBackupDirectory}`,
+        async () => {
+            await rmFn(tempBackupDirectory, {
+                force: true,
+                recursive: true,
+            });
         }
+    );
+    if (primaryError !== undefined && cleanupErrors.length > 0) {
+        throw new AggregateError(
+            [primaryError, ...cleanupErrors],
+            "Stylelint 16 compatibility check failed and cleanup encountered additional errors."
+        );
+    }
+
+    if (primaryError !== undefined) {
+        throw primaryError;
+    }
+
+    if (cleanupErrors.length === 1) {
+        throw cleanupErrors[0];
+    }
+
+    if (cleanupErrors.length > 1) {
+        throw new AggregateError(
+            cleanupErrors,
+            "Stylelint 16 compatibility cleanup failed."
+        );
     }
 }
 

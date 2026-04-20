@@ -345,7 +345,9 @@ export function runCli({
         const message =
             error instanceof Error
                 ? error.message
-                : String(error ?? "Unknown error");
+                : typeof error === "string"
+                  ? error
+                  : "Unknown error";
 
         logger.error(message);
         process.exitCode = 1;

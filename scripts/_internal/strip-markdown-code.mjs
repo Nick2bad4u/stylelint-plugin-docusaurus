@@ -59,7 +59,7 @@ function isClosingFence(line, fencedCodeBlockState) {
     }
 
     return (
-        fence[0] === fencedCodeBlockState.fenceCharacter &&
+        fence.startsWith(fencedCodeBlockState.fenceCharacter) &&
         fence.length >= fencedCodeBlockState.minimumFenceLength
     );
 }

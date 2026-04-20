@@ -333,10 +333,11 @@ export function runCli({
         const scopeText = plan.overrideExcluded
             ? "including" + ` ${pc.magenta([...excludedFiles].join(", "))}`
             : "excluding" + ` ${pc.magenta([...excludedFiles].join(", "))}`;
+        const workflowFilesMsg = pc.cyan(`workflow file(s), ${scopeText}.`);
         logger.log(
             `${pc.bold(pc.cyan("Running actionlint on"))} ${pc.magenta(
                 String(plan.targetFiles.length)
-            )} ${pc.cyan(`workflow file(s), ${scopeText}.`)}`
+            )} ${workflowFilesMsg}`
         );
     }
 
@@ -348,9 +349,7 @@ export function runCli({
 
     if (result.error) {
         const errorCode =
-            typeof result.error === "object" &&
-            result.error !== null &&
-            "code" in result.error
+            typeof result.error === "object" && "code" in result.error
                 ? /** @type {{ code?: unknown }} */ (result.error).code
                 : undefined;
 

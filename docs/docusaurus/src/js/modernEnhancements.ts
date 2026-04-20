@@ -21,11 +21,9 @@ export const initializeAdvancedFeatures: InitializeAdvancedFeatures = () => {
     // Intentionally minimal for the Stylelint template bootstrap phase.
 };
 
-if (typeof window !== "undefined") {
-    window.initializeAdvancedFeatures = initializeAdvancedFeatures;
+if (typeof globalThis.window !== "undefined") {
+    globalThis.window.initializeAdvancedFeatures = initializeAdvancedFeatures;
     queueMicrotask(() => {
         initializeAdvancedFeatures();
     });
 }
-
-export {};
