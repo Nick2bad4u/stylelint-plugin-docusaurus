@@ -222,7 +222,7 @@ function getSubstMappings() {
             continue;
         }
 
-        const driveLetterCode = driveLetter.codePointAt(0);
+        const driveLetterCode = driveLetter.charCodeAt(0);
 
         if (driveLetterCode < 65 || driveLetterCode > 90) {
             continue;

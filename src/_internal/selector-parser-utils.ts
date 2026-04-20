@@ -15,6 +15,8 @@ export type ParsedSelector = Selector;
 /** Parsed selector-list root used by multiple Docusaurus selector helpers. */
 export type ParsedSelectorList = Root;
 
+type ParentContainerNode = NonNullable<Node["parent"]>;
+type SelectorAstNode = Extract<Node, ParentContainerNode>;
 /** Supported selector containers that expose the standard traversal helpers. */
 type SelectorContainer = Root | Selector;
 
@@ -126,7 +128,7 @@ export function classifyLeadingRootAttributeNode(
 
         const parentNode = containingSelector.parent;
 
-        if (!isDefined(parentNode) || parentNode.type !== "pseudo") {
+        if (!isSelectorParserNode(parentNode) || parentNode.type !== "pseudo") {
             return hasHtmlPrefix ? "html-prefixed" : "bare";
         }
 
@@ -575,11 +577,14 @@ function cssClassAttributeMatchesFragment(
 function getContainingSelectorNode(
     node: Readonly<Node>
 ): ParsedSelector | undefined {
-    let currentNode: Node | undefined = node.parent;
+    let currentNode: Node["parent"] = node.parent;
 
     while (isDefined(currentNode)) {
-        if (currentNode.type === "selector") {
-            return safeCastTo<ParsedSelector>(currentNode);
+        if (
+            isSelectorParserNode(currentNode) &&
+            currentNode.type === "selector"
+        ) {
+            return currentNode;
         }
 
         currentNode = currentNode.parent;
@@ -594,9 +599,13 @@ function getDirectChildUnderSelector(
     selector: Readonly<ParsedSelector>
 ): Node | undefined {
     let currentNode: Node = node;
-    let parentNode: Node | undefined = currentNode.parent;
+    let parentNode: Node["parent"] = currentNode.parent;
 
     while (isDefined(parentNode) && parentNode !== selector) {
+        if (!isSelectorParserNode(parentNode)) {
+            return undefined;
+        }
+
         currentNode = parentNode;
         parentNode = currentNode.parent;
     }
@@ -609,12 +618,16 @@ function hasNamedAncestorPseudo(
     node: Readonly<Node>,
     pseudoName: string
 ): boolean {
-    let currentNode: Node | undefined = node.parent;
+    let currentNode: Node["parent"] = node.parent;
 
     while (isDefined(currentNode)) {
         const parentNode = currentNode.parent;
 
-        if (currentNode.type === "pseudo" && currentNode.value === pseudoName) {
+        if (
+            isSelectorParserNode(currentNode) &&
+            currentNode.type === "pseudo" &&
+            currentNode.value === pseudoName
+        ) {
             return true;
         }
 
@@ -629,12 +642,13 @@ function hasNamedAncestorPseudoInSet(
     node: Readonly<Node>,
     pseudoNames: ReadonlySet<string>
 ): boolean {
-    let currentNode: Node | undefined = node.parent;
+    let currentNode: Node["parent"] = node.parent;
 
     while (isDefined(currentNode)) {
         const parentNode = currentNode.parent;
 
         if (
+            isSelectorParserNode(currentNode) &&
             currentNode.type === "pseudo" &&
             setHas(pseudoNames, currentNode.value)
         ) {
@@ -645,6 +659,26 @@ function hasNamedAncestorPseudoInSet(
     }
 
     return false;
+}
+
+/** Check whether one selector-parser parent container is also a concrete node. */
+function isSelectorParserNode(
+    node: Readonly<Node["parent"]> | undefined
+): node is SelectorAstNode {
+    return (
+        isDefined(node) &&
+        (node.type === "attribute" ||
+            node.type === "class" ||
+            node.type === "combinator" ||
+            node.type === "comment" ||
+            node.type === "id" ||
+            node.type === "nesting" ||
+            node.type === "pseudo" ||
+            node.type === "selector" ||
+            node.type === "string" ||
+            node.type === "tag" ||
+            node.type === "universal")
+    );
 }
 
 /** Normalize one attribute value for fragment comparisons. */

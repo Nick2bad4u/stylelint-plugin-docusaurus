@@ -51,12 +51,35 @@ function computeSelectorHasScopeAnchor(
         node: Readonly<Node>,
         pseudoNames: ReadonlySet<string>
     ): boolean {
-        let currentNode: Node | undefined = node.parent;
+        type ParentContainerNode = NonNullable<Node["parent"]>;
+        type SelectorAstNode = Extract<Node, ParentContainerNode>;
+
+        function isSelectorParserNode(
+            maybeNode: Readonly<Node["parent"]> | undefined
+        ): maybeNode is SelectorAstNode {
+            return (
+                isDefined(maybeNode) &&
+                (maybeNode.type === "attribute" ||
+                    maybeNode.type === "class" ||
+                    maybeNode.type === "combinator" ||
+                    maybeNode.type === "comment" ||
+                    maybeNode.type === "id" ||
+                    maybeNode.type === "nesting" ||
+                    maybeNode.type === "pseudo" ||
+                    maybeNode.type === "selector" ||
+                    maybeNode.type === "string" ||
+                    maybeNode.type === "tag" ||
+                    maybeNode.type === "universal")
+            );
+        }
+
+        let currentNode: Node["parent"] = node.parent;
 
         while (isDefined(currentNode)) {
             const parentNode = currentNode.parent;
 
             if (
+                isSelectorParserNode(currentNode) &&
                 currentNode.type === "pseudo" &&
                 setHas(pseudoNames, currentNode.value)
             ) {

@@ -98,8 +98,8 @@ const INTERACTIVE_PSEUDO_STRIP_REGEX =
  */
 interface ReducedMotionCoverage {
     /**
-     * Normalized selectors that appear anywhere inside a `@media
-     * (prefers-reduced-motion)` block.
+     * Normalized selectors that appear anywhere inside a prefers-reduced-motion
+     * media-query block.
      */
     readonly coveredSelectors: ReadonlySet<string>;
 
@@ -116,16 +116,18 @@ interface ReducedMotionCoverage {
  * Walk the root once and collect all reduced-motion companion data needed by
  * the second pass.
  */
-function collectReducedMotionCoverage(root: Root): ReducedMotionCoverage {
+function collectReducedMotionCoverage(
+    root: Readonly<Root>
+): ReducedMotionCoverage {
     const coveredSelectors = new Set<string>();
     let hasGlobalMotionReset = false;
 
-    root.walkAtRules("media", (atRule: AtRule) => {
+    root.walkAtRules("media", (atRule: Readonly<AtRule>) => {
         if (!isReducedMotionMediaParams(atRule.params)) {
             return;
         }
 
-        atRule.walkRules((ruleNode: Rule) => {
+        atRule.walkRules((ruleNode: Readonly<Rule>) => {
             // Split comma-separated selector lists so each individual selector
             // is recorded independently, enabling exact and base-selector
             // matching regardless of how the companion was authored.
@@ -161,7 +163,7 @@ function collectReducedMotionCoverage(root: Root): ReducedMotionCoverage {
                 return;
             }
 
-            ruleNode.walkDecls((decl: Declaration) => {
+            ruleNode.walkDecls((decl: Readonly<Declaration>) => {
                 if (hasGlobalMotionReset) {
                     return;
                 }
@@ -236,7 +238,7 @@ function isSafeMotionValue(value: string): boolean {
  */
 function isSelectorCovered(
     selector: string,
-    coverage: ReducedMotionCoverage
+    coverage: Readonly<ReducedMotionCoverage>
 ): boolean {
     if (coverage.hasGlobalMotionReset) {
         return true;
@@ -276,7 +278,7 @@ function selectorHasInteractivePseudo(selector: string): boolean {
 
     let found = false;
 
-    parsed.walkPseudos((pseudo: Pseudo): false | undefined => {
+    parsed.walkPseudos((pseudo: Readonly<Pseudo>): false | undefined => {
         if (found) {
             return false;
         }
@@ -314,7 +316,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
         const coverage = collectReducedMotionCoverage(root);
 
         // Pass 2 — walk rules, flag uncovered interactive motion declarations.
-        root.walkRules((ruleNode: Rule) => {
+        root.walkRules((ruleNode: Readonly<Rule>) => {
             // If this rule is already inside a @media (prefers-reduced-motion)
             // block it is explicitly part of the reduced-motion handling path.
             const containingMediaQueries = getContainingMediaQueries(ruleNode);
@@ -335,7 +337,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
                 return;
             }
 
-            ruleNode.walkDecls((decl: Declaration) => {
+            ruleNode.walkDecls((decl: Readonly<Declaration>) => {
                 const prop = decl.prop.toLowerCase();
 
                 if (!setHas(motionProperties, prop)) {
@@ -351,7 +353,7 @@ const ruleFunction: RuleBase<boolean, undefined> =
                         ruleNode.selector,
                         decl.prop
                     ),
-                    node: decl,
+                    node: decl as Declaration,
                     result,
                     ruleName,
                 });

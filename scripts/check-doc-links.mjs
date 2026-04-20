@@ -135,8 +135,6 @@ const EXTERNAL_PROTOCOLS = [
     "file:",
 ];
 
-const LEADING_BANG = /^!/;
-
 /**
  * Truncate safely keeping last `max` codepoints
  *
