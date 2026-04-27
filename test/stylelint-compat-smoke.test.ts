@@ -85,7 +85,8 @@ function createMockBuiltPluginSurface(): BuiltPluginSurface {
         rules,
     };
 
-    return surface as unknown as BuiltPluginSurface;
+    // eslint-disable-next-line nitpick/no-redundant-vars -- Explicitly verify the surface shape is decoupled from the built plugin shape.
+    return surface;
 }
 
 describe("stylelint compatibility smoke script", () => {

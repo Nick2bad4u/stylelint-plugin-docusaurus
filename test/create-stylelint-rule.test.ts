@@ -19,9 +19,7 @@ describe("createStylelintRule helper", () => {
                 testMessage: "Test message",
             },
             primaryOptionArray: true,
-            rule: minimalRule as Parameters<
-                typeof createStylelintRule
-            >[0]["rule"],
+            rule: minimalRule,
             ruleName: "test/primary-option-array",
         });
 
@@ -42,9 +40,7 @@ describe("createStylelintRule helper", () => {
             messages: {
                 testMessage: "Test message",
             },
-            rule: minimalRule as Parameters<
-                typeof createStylelintRule
-            >[0]["rule"],
+            rule: minimalRule,
             ruleName: "test/no-primary-option-array",
         });
 
@@ -65,9 +61,7 @@ describe("createStylelintRule helper", () => {
                 url: "https://example.com/docs/rules/test-meta",
             },
             messages,
-            rule: minimalRule as Parameters<
-                typeof createStylelintRule
-            >[0]["rule"],
+            rule: minimalRule,
             ruleName: "test/meta-stamp",
         });
 
@@ -91,9 +85,7 @@ describe("createStylelintRule helper", () => {
             },
             messages: {},
             meta: { url: "https://example.com/docs/rules/override" },
-            rule: minimalRule as Parameters<
-                typeof createStylelintRule
-            >[0]["rule"],
+            rule: minimalRule,
             ruleName: "test/meta-url-override",
         });
 

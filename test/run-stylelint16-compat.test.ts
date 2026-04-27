@@ -56,7 +56,7 @@ describe("run-stylelint16-compat wrapper", () => {
         expect(
             getWindowsCommandShell({
                 COMSPEC: "custom-cmd.exe",
-            } as NodeJS.ProcessEnv)
+            })
         ).toBe("custom-cmd.exe");
         expect(
             createRestoreDependenciesCommand({
