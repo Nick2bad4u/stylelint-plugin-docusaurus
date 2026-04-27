@@ -65,6 +65,7 @@ import pluginRedos from "eslint-plugin-redos";
 import pluginRegexp from "eslint-plugin-regexp";
 import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
 import sdl from "eslint-plugin-sdl-2";
+import repoPlugin from "eslint-plugin-repo";
 import pluginSecurity from "eslint-plugin-security";
 import sonarjs, { configs as sonarjsConfigs } from "eslint-plugin-sonarjs";
 import stylelint2 from "eslint-plugin-stylelint-2";
@@ -306,6 +307,8 @@ export default defineConfig([
     githubActions.configs.all,
     vite.configs.all,
     stylelint2.configs.all,
+    repoPlugin.configs.recommended,
+    repoPlugin.configs.github,
     {
         ...typedocPlugin.configs.recommended,
         name: "TypeDoc recommended (repo tuned)",
