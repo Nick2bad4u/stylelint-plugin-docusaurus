@@ -4,6 +4,10 @@
     "categorizeByGroup": false,
     "cleanOutputDir": true,
     "commentStyle": "all",
+    "coverageLabel": "TypeDoc Coverage",
+    "coverageOutputPath": "static/img/coverage",
+    "coverageOutputType": "all",
+    "coverageSvgWidth": 104,
     "emit": "docs",
     "entryPointStrategy": "expand",
     "entryPoints": [
