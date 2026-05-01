@@ -229,7 +229,7 @@ describe("sync-readme-rules-table automation", () => {
         };
 
         expect(packageJson.scripts?.["precommit"]).toBe(
-            "npm run build && npm run sync:readme-rules-table:write && npm run sync:configs-rules-matrix:write"
+            "npm run sync:rules:write"
         );
         expect(packageJson.scripts?.["sync:configs-rules-matrix:write"]).toBe(
             "node scripts/sync-configs-rules-matrix.mjs --write"
