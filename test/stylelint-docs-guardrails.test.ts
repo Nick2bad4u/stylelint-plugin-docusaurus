@@ -60,7 +60,7 @@ describe("docs stylelint guardrails", () => {
         expect(packageJsonContents).toContain("npm run test:docs-guardrails");
     });
 
-    it("keeps docs override rule strategy explicit and intentional", () => {
+    it("keeps stylelint config delegated to shared config", () => {
         expect.hasAssertions();
 
         const configFileContents = nodeFs.readFileSync(
@@ -68,30 +68,17 @@ describe("docs stylelint guardrails", () => {
             "utf8"
         );
 
-        // Ensure the docs override block exists.
-        expect(configFileContents).toContain("docs/docusaurus/**/*.{css,scss}");
-
-        // Rules that are re-enabled globally in docs and then locally guarded where needed.
         expect(configFileContents).toContain(
-            '"a11y/media-prefers-reduced-motion": true,'
+            'import sharedConfig from "stylelint-config-nick2bad4u";'
         );
-        expect(configFileContents).toContain(
-            '"defensive-css/require-named-grid-lines": true,'
+        expect(configFileContents).toContain("const stylelintConfig = {");
+        expect(configFileContents).toContain("...sharedConfig,");
+        expect(configFileContents).not.toContain(
+            "docs/docusaurus/**/*.{css,scss}"
         );
-        expect(configFileContents).toContain(
-            '"no-descending-specificity": true,'
-        );
-        expect(configFileContents).toContain(
-            '"plugin/no-low-performance-animation-properties": true,'
-        );
-
-        // Rules that remain disabled for docs because they require full config options
-        // and/or conflict with Docusaurus/Infima conventions.
-        expect(configFileContents).toContain('"order/properties-order": null,');
-        expect(configFileContents).toContain('"scales/font-sizes": null,');
     });
 
-    it("keeps custom.css file-level guards for rules that intentionally conflict there", () => {
+    it("does not keep stale file-level stylelint disables in custom.css", () => {
         expect.hasAssertions();
 
         const disabledRules = getDisabledStylelintRulesFromFile(
@@ -101,28 +88,11 @@ describe("docs stylelint guardrails", () => {
             "docs/docusaurus/src/css/custom.css"
         );
 
-        expect(disableLines.length).toBeGreaterThan(0);
-
-        for (const disableLine of disableLines) {
-            // Keep every disable comment justified with an inline reason.
-            expect(disableLine).toContain(" -- ");
-        }
-
-        expect(disabledRules).toStrictEqual(
-            expect.arrayContaining([
-                "a11y/media-prefers-reduced-motion",
-                "no-descending-specificity",
-                "plugin/no-low-performance-animation-properties",
-            ])
-        );
-        expect(disabledRules).toStrictEqual([
-            "a11y/media-prefers-reduced-motion",
-            "no-descending-specificity",
-            "plugin/no-low-performance-animation-properties",
-        ]);
+        expect(disableLines).toStrictEqual([]);
+        expect(disabledRules).toStrictEqual([]);
     });
 
-    it("keeps index.module.css file-level guards for rules that intentionally conflict there", () => {
+    it("does not keep stale file-level stylelint disables in index.module.css", () => {
         expect.hasAssertions();
 
         const disabledRules = getDisabledStylelintRulesFromFile(
@@ -132,22 +102,7 @@ describe("docs stylelint guardrails", () => {
             "docs/docusaurus/src/pages/index.module.css"
         );
 
-        expect(disableLines.length).toBeGreaterThan(0);
-
-        for (const disableLine of disableLines) {
-            // Keep every disable comment justified with an inline reason.
-            expect(disableLine).toContain(" -- ");
-        }
-
-        expect(disabledRules).toStrictEqual(
-            expect.arrayContaining([
-                "defensive-css/require-named-grid-lines",
-                "plugin/no-low-performance-animation-properties",
-            ])
-        );
-        expect(disabledRules).toStrictEqual([
-            "defensive-css/require-named-grid-lines",
-            "plugin/no-low-performance-animation-properties",
-        ]);
+        expect(disableLines).toStrictEqual([]);
+        expect(disabledRules).toStrictEqual([]);
     });
 });
