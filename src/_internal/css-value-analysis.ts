@@ -70,7 +70,7 @@ export function findFirstCssVarCustomPropertyReference(
 ): string | undefined {
     const sanitizedValue = stripCssStringsAndComments(value);
     const customPropertyReferencePattern =
-        /(?<![\w-])var\(\s*(?<propertyName>--[\w-]+)/giu;
+        /(?<![\w\-])var\(\s*(?<propertyName>--[\w\-]+)/giv;
 
     for (const match of sanitizedValue.matchAll(
         customPropertyReferencePattern
@@ -89,7 +89,7 @@ export function findFirstCssVarCustomPropertyReference(
 
 /** Check whether one character can participate in a CSS identifier. */
 function isIdentifierCharacter(character: string | undefined): boolean {
-    return typeof character === "string" && /[\w-]/u.test(character);
+    return typeof character === "string" && /[\w\-]/v.test(character);
 }
 
 /** Skip one balanced parenthesized function body, including nested groups. */

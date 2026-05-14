@@ -20,9 +20,9 @@ const messages: {
     remoteBeforeLocal: () => string;
 } = ruleMessages(ruleName, {
     missingLocalSrc: (): string =>
-        `@font-face \`src\` has no \`local()\` fallback. Add \`local("Font Name")\` before the \`url()\` source so that browsers use a locally installed font before fetching a remote one.`,
+        '@font-face `src` has no `local()` fallback. Add `local("Font Name")` before the `url()` source so that browsers use a locally installed font before fetching a remote one.',
     remoteBeforeLocal: (): string =>
-        `In @font-face \`src\`, \`url()\` sources appear before \`local()\` sources. Move all \`local()\` declarations before the first \`url()\` so that locally installed fonts are preferred.`,
+        "In @font-face `src`, `url()` sources appear before `local()` sources. Move all `local()` declarations before the first `url()` so that locally installed fonts are preferred.",
 });
 
 const docs = {
@@ -36,10 +36,10 @@ const docs = {
  * Regex that matches the opening of a `local(...)` function token in a CSS
  * value.
  */
-const localFunctionPattern = /(?<![\w'-])local\s*\(/giu;
+const localFunctionPattern = /(?<![\w'\-])local\s*\(/giv;
 
 /** Regex that matches the opening of a `url(...)` function token in a CSS value. */
-const urlFunctionPattern = /(?<![\w'-])url\s*\(/giu;
+const urlFunctionPattern = /(?<![\w'\-])url\s*\(/giv;
 
 /** Classify occurrence positions of `local()` and `url()` in a CSS src value. */
 type SrcAnalysis = Readonly<{
@@ -72,7 +72,7 @@ function validateFontFaceSrc(
     let violation: "missingLocal" | "remoteBeforeLocal" | undefined = undefined;
 
     // eslint-disable-next-line sonarjs/no-invariant-returns -- all paths intentionally return false to stop postcss walkDecls after the first src declaration
-    fontFaceAtRule.walkDecls(/^src$/iu, (decl) => {
+    fontFaceAtRule.walkDecls(/^src$/iv, (decl) => {
         const { firstLocalIndex, firstUrlIndex } = analyzeSrcValue(decl.value);
 
         if (!isDefined(firstUrlIndex)) {

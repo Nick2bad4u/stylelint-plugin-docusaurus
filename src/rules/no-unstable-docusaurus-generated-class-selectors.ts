@@ -123,7 +123,7 @@ function isGeneratedHashSuffix(suffix: string): boolean {
     let containsUppercaseLetterOrDigit = false;
 
     for (const character of suffix) {
-        if (!/^[\w-]$/u.test(character)) {
+        if (!/^[\w\-]$/v.test(character)) {
             return false;
         }
 

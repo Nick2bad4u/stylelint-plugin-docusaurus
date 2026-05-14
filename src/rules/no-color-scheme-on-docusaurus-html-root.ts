@@ -50,7 +50,7 @@ const managedRootSelectors: ReadonlySet<string> = new Set([
 
 /** Normalize a CSS selector for stable comparison. */
 function normalizeSelector(selector: string): string {
-    return selector.trim().replaceAll(/\s+/gu, " ");
+    return selector.trim().replaceAll(/\s+/gv, " ");
 }
 
 /**

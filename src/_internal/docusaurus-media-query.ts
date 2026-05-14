@@ -38,7 +38,7 @@ export function extractWidthBreakpointConstraints(
     const widthConstraints: WidthBreakpointConstraint[] = [];
 
     for (const match of mediaQuery.matchAll(
-        /(?<kind>max|min)-width\s*:\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giu
+        /(?<kind>max|min)-width\s*:\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giv
     )) {
         const kind = match.groups?.["kind"];
         const parsedLength = parseLengthMatch(
@@ -58,7 +58,7 @@ export function extractWidthBreakpointConstraints(
     }
 
     for (const match of mediaQuery.matchAll(
-        /width\s*(?<operatorText><=|<|>=|>)\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giu
+        /width\s*(?<operatorText><=|<|>=|>)\s*(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)/giv
     )) {
         const operatorText = match.groups?.["operatorText"];
         const parsedLength = parseLengthMatch(
@@ -83,7 +83,7 @@ export function extractWidthBreakpointConstraints(
     }
 
     for (const match of mediaQuery.matchAll(
-        /(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)\s*(?<operatorText><=|<|>=|>)\s*width/giu
+        /(?<numericText>\d+(?:\.\d+)?)\s*(?<unitText>em|px|rem)\s*(?<operatorText><=|<|>=|>)\s*width/giv
     )) {
         const operatorText = match.groups?.["operatorText"];
         const parsedLength = parseLengthMatch(
@@ -268,7 +268,7 @@ function createTrailingWidthConstraint(
 
 /** Check whether one top-level media-query branch is explicitly negated. */
 function isNegatedMediaQueryBranch(mediaQueryBranch: string): boolean {
-    return /^\s*not\b/iu.test(mediaQueryBranch);
+    return /^\s*not\b/iv.test(mediaQueryBranch);
 }
 
 /**
@@ -311,7 +311,7 @@ function mediaQueryBranchUsesScreenCompatibleMediaType(
         mediaTypeToken.length
     );
 
-    if (mediaTypeSuffix.length > 0 && !/^\s+and\b/iu.test(mediaTypeSuffix)) {
+    if (mediaTypeSuffix.length > 0 && !/^\s+and\b/iv.test(mediaTypeSuffix)) {
         return true;
     }
 

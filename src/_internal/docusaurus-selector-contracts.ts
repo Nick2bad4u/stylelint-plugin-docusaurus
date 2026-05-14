@@ -92,13 +92,13 @@ const exactGlobalThemeClassNames: ReadonlySet<string> = new Set([
 
 /** Prefixes for global Docusaurus/Infima class names exposed at runtime. */
 const globalThemeClassPrefixes: readonly string[] = [
-    "DocSearch-",
     "breadcrumbs__",
+    "DocSearch-",
     "dropdown__",
     "footer__",
     "menu__",
-    "navbar__",
     "navbar-",
+    "navbar__",
     "pagination-nav__",
     "table-of-contents__",
     "tabs__",

@@ -91,7 +91,7 @@ const safeMotionValues: ReadonlySet<string> = new Set([
  * (with or without arguments — e.g. `:is(:hover)`).
  */
 const INTERACTIVE_PSEUDO_STRIP_REGEX =
-    /::?(?:active|focus(?:-visible|-within)?|hover)(?:\([^)]*\))?/giu;
+    /::?(?:active|focus(?:-visible|-within)?|hover)(?:\([^\)]*\))?/giv;
 
 /**
  * Reduced-motion companion data collected from the root in one forward pass.
@@ -155,7 +155,7 @@ function collectReducedMotionCoverage(
                 trimmedSelector === "*::before" ||
                 trimmedSelector === "*::after" ||
                 // Handles comma-separated universal list, e.g. "*, *::before, *::after"
-                /^\*(?:\s*,\s*\*::(?:after|before))*\s*$/u.test(
+                /^\*(?:\s*,\s*\*::(?:after|before))*\s*$/v.test(
                     trimmedSelector
                 );
 
@@ -202,7 +202,7 @@ function deriveBaseSelector(selector: string): string {
  * (either `reduce` or `no-preference` variant).
  */
 function isReducedMotionMediaParams(params: string): boolean {
-    return /prefers-reduced-motion/iu.test(params);
+    return /prefers-reduced-motion/iv.test(params);
 }
 
 /**
@@ -214,14 +214,14 @@ function isSafeMotionValue(value: string): boolean {
     const normalized = value
         .trim()
         .toLowerCase()
-        .replace(/\s*!important\s*$/u, "")
+        .replace(/\s*!important\s*$/v, "")
         .trim();
 
     return (
         setHas(safeMotionValues, normalized) ||
         // Zero-duration: digit zero, optional all-zero decimal, optional unit.
         // Requires the decimal part to consist only of zeros to reject "0.3s".
-        /^0+(?:\.0+)?(?:ms|s)?$/u.test(normalized)
+        /^0+(?:\.0+)?(?:ms|s)?$/v.test(normalized)
     );
 }
 
@@ -261,7 +261,7 @@ function isSelectorCovered(
  * outer whitespace and collapses internal whitespace runs to a single space.
  */
 function normalizeSelector(selector: string): string {
-    return selector.trim().replaceAll(/\s+/gu, " ");
+    return selector.trim().replaceAll(/\s+/gv, " ");
 }
 
 /**
@@ -283,7 +283,7 @@ function selectorHasInteractivePseudo(selector: string): boolean {
             return false;
         }
 
-        const pseudoName = pseudo.value.replace(/^::?/u, "").toLowerCase();
+        const pseudoName = pseudo.value.replace(/^::?/v, "").toLowerCase();
 
         if (setHas(interactivePseudoNames, pseudoName)) {
             found = true;

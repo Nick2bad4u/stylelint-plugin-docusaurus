@@ -20,7 +20,7 @@ const messages: {
     rejectedFontDisplayValue: (value: string, allowed: string) => string;
 } = ruleMessages(ruleName, {
     missingFontDisplay: (): string =>
-        `Missing \`font-display\` declaration in @font-face. Add \`font-display: swap\` (or your preferred value) to control font-loading behavior and prevent CLS/FOIT.`,
+        "Missing `font-display` declaration in @font-face. Add `font-display: swap` (or your preferred value) to control font-loading behavior and prevent CLS/FOIT.",
     rejectedFontDisplayValue: (value: string, allowed: string): string =>
         `The \`font-display\` value "${value}" is not in the allowed list: ${allowed}. Use one of the configured allowed values to ensure consistent font-loading behavior.`,
 });

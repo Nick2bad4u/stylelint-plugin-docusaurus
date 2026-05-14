@@ -14,7 +14,7 @@ import {
 
 function createMockBuiltPluginSurface(): BuiltPluginSurface {
     const plugin = ["mock-plugin-pack"];
-    const configNames = ["docusaurus-recommended", "docusaurus-all"] as const;
+    const configNames = ["docusaurus-all", "docusaurus-recommended"] as const;
     const ruleIds = ["mock-rule", "mock-rule-strict"] as const;
     const ruleNames = [
         "docusaurus/mock-rule",

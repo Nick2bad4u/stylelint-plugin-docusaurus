@@ -46,7 +46,7 @@ describe("source-file-context helpers", () => {
             const result = getSourceFilePath(root);
 
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
             expect(result).not.toContain("\\");
             expect(result).toMatch(/src\/styles\/main\.css$/v);
         });

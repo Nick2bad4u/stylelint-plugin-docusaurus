@@ -21,7 +21,7 @@ import {
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
 const prefersColorSchemeMediaFeaturePattern =
-    /\(\s*prefers-color-scheme\s*:\s*(?<mode>dark|light)\s*\)/giu;
+    /\(\s*prefers-color-scheme\s*:\s*(?<mode>dark|light)\s*\)/giv;
 
 type DocusaurusPrefersColorSchemeMode = "dark" | "light";
 type DocusaurusThemeOverrideContext =
@@ -98,7 +98,7 @@ function findRelevantThemeSurfaceSelector(
 function getExplicitPrefersColorSchemeModes(
     mediaQuery: string
 ): readonly DocusaurusPrefersColorSchemeMode[] {
-    if (/\bnot\b/iu.test(mediaQuery)) {
+    if (/\bnot\b/iv.test(mediaQuery)) {
         return [];
     }
 

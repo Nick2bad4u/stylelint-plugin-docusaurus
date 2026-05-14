@@ -1,7 +1,7 @@
 import type { Root } from "postcss";
 
 /** CSS Modules file-name pattern recognized by the plugin's stylesheet rules. */
-const cssModuleFileNamePattern = /\.module\.(?:css|less|sass|scss)$/iu;
+const cssModuleFileNamePattern = /\.module\.(?:css|less|sass|scss)$/iv;
 
 /** Resolve the normalized source file path for one PostCSS root. */
 export function getSourceFilePath(root: Readonly<Root>): string | undefined {

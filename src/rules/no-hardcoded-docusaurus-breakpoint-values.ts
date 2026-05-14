@@ -51,7 +51,7 @@ type SecondaryOptions = Readonly<{
 function extractMediaQueryPxValues(params: string): string[] {
     const pxValues: string[] = [];
 
-    for (const match of params.matchAll(/\b(?<px>\d+(?:\.\d+)?)px\b/giu)) {
+    for (const match of params.matchAll(/\b(?<px>\d+(?:\.\d+)?)px\b/giv)) {
         const numericPart = match.groups?.["px"];
 
         if (isDefined(numericPart)) {

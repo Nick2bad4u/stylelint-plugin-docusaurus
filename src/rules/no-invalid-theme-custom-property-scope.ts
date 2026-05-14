@@ -40,7 +40,7 @@ const docs = {
 } as const;
 
 /** Boundary-aware fallback for exact `.DocSearch` root class detection. */
-const docSearchRootClassPattern = /(?:^|[^\w-])\.DocSearch(?![\w-])/u;
+const docSearchRootClassPattern = /(?:^|[^\w\-])\.DocSearch(?![\w\-])/v;
 
 /**
  * Check whether every selector in a rule scopes DocSearch variables to the

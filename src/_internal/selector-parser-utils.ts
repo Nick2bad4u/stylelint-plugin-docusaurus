@@ -322,6 +322,9 @@ export function parseSelectorList(
     selectorList: string
 ): ParsedSelectorList | undefined {
     try {
+        // Postcss-selector-parser currently exposes sync AST parsing via astSync.
+        // This helper is intentionally synchronous for rule hot-path usage.
+        // eslint-disable-next-line n/no-sync
         return selectorParser().astSync(selectorList);
     } catch {
         return undefined;
@@ -336,13 +339,15 @@ export function selectorHasAttribute(
     let hasMatchingAttribute = false;
 
     selectorContainer.walkAttributes((attributeNode) => {
+        if (hasMatchingAttribute) {
+            return;
+        }
+
         if (!predicate(attributeNode)) {
             return;
         }
 
         hasMatchingAttribute = true;
-
-        return false;
     });
 
     return hasMatchingAttribute;
@@ -357,6 +362,10 @@ export function selectorHasAttributeInPositiveScope(
     let hasMatchingAttribute = false;
 
     selectorContainer.walkAttributes((attributeNode) => {
+        if (hasMatchingAttribute) {
+            return;
+        }
+
         if (
             shouldIgnorePositiveSelectorMatchNode(attributeNode, includeGlobal)
         ) {
@@ -368,8 +377,6 @@ export function selectorHasAttributeInPositiveScope(
         }
 
         hasMatchingAttribute = true;
-
-        return false;
     });
 
     return hasMatchingAttribute;
@@ -383,6 +390,10 @@ export function selectorHasAttributeOutsideGlobal(
     let hasMatchingAttribute = false;
 
     selectorContainer.walkAttributes((attributeNode) => {
+        if (hasMatchingAttribute) {
+            return;
+        }
+
         if (isInsideGlobalPseudo(attributeNode)) {
             return;
         }
@@ -392,8 +403,6 @@ export function selectorHasAttributeOutsideGlobal(
         }
 
         hasMatchingAttribute = true;
-
-        return false;
     });
 
     return hasMatchingAttribute;
@@ -407,13 +416,15 @@ export function selectorHasClass(
     let hasMatchingClass = false;
 
     selectorContainer.walkClasses((cssClassNode) => {
+        if (hasMatchingClass) {
+            return;
+        }
+
         if (!predicate(cssClassNode.value)) {
             return;
         }
 
         hasMatchingClass = true;
-
-        return false;
     });
 
     return hasMatchingClass;
@@ -428,6 +439,10 @@ export function selectorHasClassInPositiveScope(
     let hasMatchingClass = false;
 
     selectorContainer.walkClasses((cssClassNode) => {
+        if (hasMatchingClass) {
+            return;
+        }
+
         if (
             shouldIgnorePositiveSelectorMatchNode(cssClassNode, includeGlobal)
         ) {
@@ -439,8 +454,6 @@ export function selectorHasClassInPositiveScope(
         }
 
         hasMatchingClass = true;
-
-        return false;
     });
 
     return hasMatchingClass;
@@ -454,6 +467,10 @@ export function selectorHasClassOutsideGlobal(
     let hasMatchingClass = false;
 
     selectorContainer.walkClasses((cssClassNode) => {
+        if (hasMatchingClass) {
+            return;
+        }
+
         if (isInsideGlobalPseudo(cssClassNode)) {
             return;
         }
@@ -463,8 +480,6 @@ export function selectorHasClassOutsideGlobal(
         }
 
         hasMatchingClass = true;
-
-        return false;
     });
 
     return hasMatchingClass;
@@ -478,13 +493,15 @@ export function selectorHasId(
     let hasMatchingId = false;
 
     selectorContainer.walkIds((idNode) => {
+        if (hasMatchingId) {
+            return;
+        }
+
         if (!predicate(idNode.value)) {
             return;
         }
 
         hasMatchingId = true;
-
-        return false;
     });
 
     return hasMatchingId;
@@ -498,6 +515,10 @@ export function selectorHasIdOutsideGlobal(
     let hasMatchingId = false;
 
     selectorContainer.walkIds((idNode) => {
+        if (hasMatchingId) {
+            return;
+        }
+
         if (isInsideGlobalPseudo(idNode)) {
             return;
         }
@@ -507,8 +528,6 @@ export function selectorHasIdOutsideGlobal(
         }
 
         hasMatchingId = true;
-
-        return false;
     });
 
     return hasMatchingId;
@@ -521,13 +540,15 @@ export function selectorHasNesting(
     let hasNesting = false;
 
     selectorContainer.walk((node) => {
+        if (hasNesting) {
+            return;
+        }
+
         if (node.type !== "nesting") {
             return;
         }
 
         hasNesting = true;
-
-        return false;
     });
 
     return hasNesting;

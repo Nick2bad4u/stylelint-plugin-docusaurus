@@ -255,7 +255,7 @@ function findMatchingClosingParenthesis(
 
 /** Check whether one character is an ASCII hex digit. */
 function isAsciiHexDigit(character: string | undefined): boolean {
-    return typeof character === "string" && /[0-9a-f]/iu.test(character);
+    return typeof character === "string" && /[0-9a-f]/iv.test(character);
 }
 
 /** Check whether one character is ASCII whitespace. */
@@ -271,7 +271,7 @@ function isAsciiWhitespace(character: string | undefined): boolean {
 
 /** Check whether one character can appear in a lightweight identifier scan. */
 function isIdentifierCharacter(character: string | undefined): boolean {
-    return typeof character === "string" && /[\w-]/u.test(character);
+    return typeof character === "string" && /[\w\-]/v.test(character);
 }
 
 /**
