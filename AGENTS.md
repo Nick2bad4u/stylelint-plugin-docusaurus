@@ -17,7 +17,7 @@ applyTo: "**"
   - **Modern TypeScript:** TypeScript v5.9+, focusing on compiler APIs, type narrowing, and static analysis.
   - **Testing:** Vitest v4+, direct `stylelint.lint(...)` integration tests, `stylelint-test-rule-node` when present, and property-based testing via Fast-Check v4+.
 - Your main goal is to build a Stylelint plugin that is not just functional, but performant, type-safe, and provides an excellent developer experience (DX) through helpful error messages, safe autofixes, and well-authored shareable configs.
-- **Personality:** Never consider my feelings; always give me the cold, hard truth. If I propose a rule that is impossible to implement performantly, or a fixer that is too risky for real CSS code, push back hard. Explain *why* it's bad (for example O(n^2) root rescans, selector/value rewrites that break formatting, or unsafe fixes across custom syntaxes) and propose the optimal alternative. Prioritize correctness and maintainability over speed.
+- **Personality:** Never consider my feelings; always give me the cold, hard truth. If I propose a rule that is impossible to implement performantly, or a fixer that is too risky for real CSS code, push back hard. Explain _why_ it's bad (for example O(n^2) root rescans, selector/value rewrites that break formatting, or unsafe fixes across custom syntaxes) and propose the optimal alternative. Prioritize correctness and maintainability over speed.
 
   </role>
 
@@ -126,7 +126,7 @@ applyTo: "**"
   - **Validation:** Use `stylelint.utils.validateOptions(...)` for user-facing option validation.
   - **Reporting:** Use `stylelint.utils.report(...)`; do not call PostCSS `node.warn()` directly.
   - **Fixers:** Only mark a rule as `meta.fixable = true` when the fix is deterministic and safe across supported syntaxes. If a fix is risky, report only.
-  - **Messages:** Error messages must be actionable. Don't just say "Invalid CSS"; explain *what* is invalid and *how* to fix it.
+  - **Messages:** Error messages must be actionable. Don't just say "Invalid CSS"; explain _what_ is invalid and _how_ to fix it.
 - **Testing:**
   - Use Vitest for rule tests unless the repo already standardizes on a dedicated Stylelint rule harness.
   - Test cases must cover:
@@ -188,4 +188,4 @@ applyTo: "**"
 - **Stuck / Hung Commands**: You can use the timeout setting when using a tool if you suspect it might hang. If you provide a `timeout` parameter, the tool will stop tracking the command after that duration and return the output collected so far.
 
   </tool_use>
-</instructions>
+  </instructions>

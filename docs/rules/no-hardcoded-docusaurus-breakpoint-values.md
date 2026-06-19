@@ -33,27 +33,27 @@ Centralizing breakpoints in a SCSS variable, custom property, or a shared design
 ```css
 /* 996px is the Docusaurus JS mobile-toggle boundary — hardcoded here */
 @media (max-width: 996px) {
-  .custom-nav {
-    display: none;
-  }
+ .custom-nav {
+  display: none;
+ }
 }
 ```
 
 ```css
 /* 768px matches the Infima medium breakpoint — fragile hardcode */
 @media screen and (min-width: 768px) {
-  .sidebar {
-    width: 300px;
-  }
+ .sidebar {
+  width: 300px;
+ }
 }
 ```
 
 ```css
 /* Dangerous: 992px is NOT the Docusaurus breakpoint (996px is) */
 @media (max-width: 992px) {
-  .navbar__toggle {
-    display: block;
-  }
+ .navbar__toggle {
+  display: block;
+ }
 }
 ```
 
@@ -64,27 +64,27 @@ Centralizing breakpoints in a SCSS variable, custom property, or a shared design
 $breakpoint-mobile: 996px;
 
 @media (max-width: #{$breakpoint-mobile}) {
-  .custom-nav {
-    display: none;
-  }
+ .custom-nav {
+  display: none;
+ }
 }
 ```
 
 ```css
 /* Container query — not a Docusaurus breakpoint */
 @media (min-width: 600px) {
-  .widget {
-    flex-direction: row;
-  }
+ .widget {
+  flex-direction: row;
+ }
 }
 ```
 
 ```css
 /* @media that does not reference a known breakpoint value */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none;
-  }
+ * {
+  transition: none;
+ }
 }
 ```
 
@@ -103,12 +103,12 @@ An array of breakpoint strings to exempt from reporting. Useful when you intenti
 ```js
 // stylelint.config.mjs
 export default {
-  rules: {
-    "docusaurus/no-hardcoded-docusaurus-breakpoint-values": [
-      true,
-      { ignoreBreakpoints: ["768px"] }
-    ]
-  }
+ rules: {
+  "docusaurus/no-hardcoded-docusaurus-breakpoint-values": [
+   true,
+   { ignoreBreakpoints: ["768px"] },
+  ],
+ },
 };
 ```
 
@@ -116,9 +116,9 @@ export default {
 
 ```css
 @media (width <= 600px) {
-  .widget {
-    flex-direction: column;
-  }
+ .widget {
+  flex-direction: column;
+ }
 }
 ```
 
@@ -126,9 +126,9 @@ export default {
 
 ```css
 @media (width <= 996px) {
-  .mobile-panel {
-    display: block;
-  }
+ .mobile-panel {
+  display: block;
+ }
 }
 ```
 
@@ -138,10 +138,10 @@ export default {
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/no-hardcoded-docusaurus-breakpoint-values": true
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/no-hardcoded-docusaurus-breakpoint-values": true,
+ },
 };
 ```
 

@@ -102,7 +102,7 @@ describe("cascade-layer-analysis helpers", () => {
         // CSS escape: \0 (null codepoint) → U+FFFD replacement char (lines ~195-210)
         // "\\0 abc" in JS = backslash + "0" + " " + "abc"
         expect(getDeclaredCascadeLayerNames(String.raw`\0 abc`)).toStrictEqual([
-            "\uFFFDabc",
+            "\u{FFFD}abc",
         ]);
     });
 

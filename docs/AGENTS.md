@@ -9,7 +9,7 @@ applyTo: "docs/**"
 
 ## Your Goal for Stylelint Rule Documentation
 
-- Your goal is to make every Stylelint rule documentation file (commonly `docs/rules/<rule-id>.md`) totally self-contained, allowing a developer to understand *why* the rule exists, *what* it flags, and *how* to fix it without looking at the source code.
+- Your goal is to make every Stylelint rule documentation file (commonly `docs/rules/<rule-id>.md`) totally self-contained, allowing a developer to understand _why_ the rule exists, _what_ it flags, and _how_ to fix it without looking at the source code.
 - For adjacent rule-docs pages such as guides, config pages, `overview.md`, or `getting-started.md`, keep the same tone and accuracy standards, but do not force rule-only sections where they do not fit.
 - You adhere strictly to Stylelint's documentation conventions and modern CSS tooling expectations.
 
@@ -41,7 +41,7 @@ Rule documentation files in the repository's rule-docs location (commonly `docs/
 4. **Rule Details:** An explanation of the problem the rule solves. Why is this pattern bad?
 5. **Examples:**
    - Use `❌ Incorrect` and `✅ Correct` headers.
-   - Always include code blocks with specific comments explaining *why* a line is incorrect when the reason is not obvious.
+   - Always include code blocks with specific comments explaining _why_ a line is incorrect when the reason is not obvious.
    - If the rule is configurable, show examples for different configurations.
 6. **Options (if applicable):**
    - A TypeScript type or JSON-like shape definition of the options object.
@@ -86,7 +86,7 @@ Rule documentation files in the repository's rule-docs location (commonly `docs/
 
 ## Example Doc
 
-```markdown
+````markdown
 # no-theme-token-leaks
 
 Disallow leaking Docusaurus theme custom properties into non-theme selectors.
@@ -117,16 +117,17 @@ Unscoped theme-token usage makes large Docusaurus stylesheets harder to refactor
 
 ```css
 .my-component {
-  color: var(--ifm-color-primary);
+ color: var(--ifm-color-primary);
 }
 ```
+````
 
 ## ✅ Correct
 
 ```css
 .my-component {
-  --component-link-color: var(--ifm-color-primary);
-  color: var(--component-link-color);
+ --component-link-color: var(--ifm-color-primary);
+ color: var(--component-link-color);
 }
 ```
 
@@ -136,7 +137,7 @@ Unscoped theme-token usage makes large Docusaurus stylesheets harder to refactor
 
 ```css
 [data-theme="dark"] .navbar {
-  --navbar-border-color: var(--ifm-color-primary);
+ --navbar-border-color: var(--ifm-color-primary);
 }
 ```
 
@@ -146,8 +147,8 @@ Unscoped theme-token usage makes large Docusaurus stylesheets harder to refactor
 import docusaurusPlugin, { configs } from "stylelint-plugin-docusaurus";
 
 export default {
-  ...configs.recommended,
-  plugins: [...docusaurusPlugin],
+ ...configs.recommended,
+ plugins: [...docusaurusPlugin],
 };
 ```
 

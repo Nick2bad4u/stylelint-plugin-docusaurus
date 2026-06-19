@@ -48,8 +48,7 @@ describe("isolation-subtree-analysis helpers", () => {
         it("returns the bare element even when it follows a plain class selector", () => {
             expect.hasAssertions();
 
-            // A plain class like .DocSearch is NOT an isolation anchor with default options;
-            // only classes from the anchor class lists count.
+            // A plain .DocSearch class is not an isolation anchor here; only configured anchor classes count.
             // The function should return the first selector string because there is no anchor.
             expect(findFirstSelectorWithoutIsolationAnchor("h2", false)).toBe(
                 "h2"

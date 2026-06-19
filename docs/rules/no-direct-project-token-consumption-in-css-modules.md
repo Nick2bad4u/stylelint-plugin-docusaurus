@@ -31,16 +31,16 @@ This rule enforces that aliasing discipline for any token namespace you define.
 ```css
 /* button.module.css — consumes --sb- token directly */
 .button {
-  background-color: var(--sb-brand-primary);
-  color: var(--sb-text-inverse);
+ background-color: var(--sb-brand-primary);
+ color: var(--sb-text-inverse);
 }
 ```
 
 ```css
 /* card.module.css — consumes --my-app- token directly */
 .card {
-  border: 1px solid var(--my-app-border-color);
-  padding: var(--my-app-spacing-md);
+ border: 1px solid var(--my-app-border-color);
+ padding: var(--my-app-spacing-md);
 }
 ```
 
@@ -49,22 +49,22 @@ This rule enforces that aliasing discipline for any token namespace you define.
 ```css
 /* button.module.css — alias first, then consume the alias */
 .button {
-  --button-background: var(--sb-brand-primary);
-  --button-color: var(--sb-text-inverse);
+ --button-background: var(--sb-brand-primary);
+ --button-color: var(--sb-text-inverse);
 
-  background-color: var(--button-background);
-  color: var(--button-color);
+ background-color: var(--button-background);
+ color: var(--button-color);
 }
 ```
 
 ```css
 /* card.module.css — component-scoped aliases */
 .card {
-  --card-border-color: var(--my-app-border-color);
-  --card-padding: var(--my-app-spacing-md);
+ --card-border-color: var(--my-app-border-color);
+ --card-padding: var(--my-app-spacing-md);
 
-  border: 1px solid var(--card-border-color);
-  padding: var(--card-padding);
+ border: 1px solid var(--card-border-color);
+ padding: var(--card-padding);
 }
 ```
 
@@ -83,11 +83,11 @@ This rule enforces that aliasing discipline for any token namespace you define.
 ```css
 /* theme.module.css */
 .hero {
-  --hero-bg: var(--sb-hero-background);
-  --hero-text: var(--sb-hero-foreground);
+ --hero-bg: var(--sb-hero-background);
+ --hero-text: var(--sb-hero-foreground);
 
-  background: var(--hero-bg);
-  color: var(--hero-text);
+ background: var(--hero-bg);
+ color: var(--hero-text);
 }
 ```
 
@@ -96,20 +96,20 @@ This rule enforces that aliasing discipline for any token namespace you define.
 ```css
 /* layout.module.css */
 .sidebar {
-  width: var(--ds-sidebar-width);
-  background: var(--brand-surface-secondary);
+ width: var(--ds-sidebar-width);
+ background: var(--brand-surface-secondary);
 }
 ```
 
 ```js
 // stylelint.config.mjs — catching both namespaces
 export default {
-  rules: {
-    "docusaurus/no-direct-project-token-consumption-in-css-modules": [
-      true,
-      { tokenPrefixes: ["--ds-", "--brand-"] }
-    ]
-  }
+ rules: {
+  "docusaurus/no-direct-project-token-consumption-in-css-modules": [
+   true,
+   { tokenPrefixes: ["--ds-", "--brand-"] },
+  ],
+ },
 };
 ```
 
@@ -119,13 +119,13 @@ export default {
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/no-direct-project-token-consumption-in-css-modules": [
-      true,
-      { tokenPrefixes: ["--sb-"] }
-    ]
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/no-direct-project-token-consumption-in-css-modules": [
+   true,
+   { tokenPrefixes: ["--sb-"] },
+  ],
+ },
 };
 ```
 

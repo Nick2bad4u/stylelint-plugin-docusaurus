@@ -30,20 +30,20 @@ Docusaurus sites commonly add `@font-face` blocks for icon fonts (Nerd Fonts, Ma
 ```css
 /* No local() fallback — always downloads from CDN */
 @font-face {
-  font-family: "NerdFont";
-  font-display: swap;
-  src: url("/fonts/nerdfont.woff2") format("woff2");
+ font-family: "NerdFont";
+ font-display: swap;
+ src: url("/fonts/nerdfont.woff2") format("woff2");
 }
 ```
 
 ```css
 /* url() appears before local() — browser downloads before checking locally */
 @font-face {
-  font-family: "MyFont";
-  font-display: swap;
-  src:
-    url("/fonts/myfont.woff2") format("woff2"),
-    local("MyFont");
+ font-family: "MyFont";
+ font-display: swap;
+ src:
+  url("/fonts/myfont.woff2") format("woff2"),
+  local("MyFont");
 }
 ```
 
@@ -52,20 +52,20 @@ Docusaurus sites commonly add `@font-face` blocks for icon fonts (Nerd Fonts, Ma
 ```css
 /* Correct: local() before url() */
 @font-face {
-  font-family: "MyFont";
-  font-display: swap;
-  src:
-    local("MyFont"),
-    local("MyFont-Regular"),
-    url("/fonts/myfont.woff2") format("woff2");
+ font-family: "MyFont";
+ font-display: swap;
+ src:
+  local("MyFont"),
+  local("MyFont-Regular"),
+  url("/fonts/myfont.woff2") format("woff2");
 }
 ```
 
 ```css
 /* Correct: only local() sources — no url() present */
 @font-face {
-  font-family: "SystemFallback";
-  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+ font-family: "SystemFallback";
+ src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
 }
 ```
 
@@ -82,13 +82,13 @@ Docusaurus sites commonly add `@font-face` blocks for icon fonts (Nerd Fonts, Ma
 
 ```css
 @font-face {
-  font-family: "OpenSans";
-  font-display: swap;
-  src:
-    local("Open Sans"),
-    local("OpenSans"),
-    url("/fonts/open-sans.woff2") format("woff2"),
-    url("/fonts/open-sans.woff") format("woff");
+ font-family: "OpenSans";
+ font-display: swap;
+ src:
+  local("Open Sans"),
+  local("OpenSans"),
+  url("/fonts/open-sans.woff2") format("woff2"),
+  url("/fonts/open-sans.woff") format("woff");
 }
 ```
 
@@ -96,11 +96,11 @@ Docusaurus sites commonly add `@font-face` blocks for icon fonts (Nerd Fonts, Ma
 
 ```css
 @font-face {
-  font-family: "OpenSans";
-  font-display: swap;
-  src:
-    url("/fonts/open-sans.woff2") format("woff2"),
-    local("Open Sans");
+ font-family: "OpenSans";
+ font-display: swap;
+ src:
+  url("/fonts/open-sans.woff2") format("woff2"),
+  local("Open Sans");
 }
 ```
 
@@ -110,10 +110,10 @@ Docusaurus sites commonly add `@font-face` blocks for icon fonts (Nerd Fonts, Ma
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/require-font-face-local-src-before-remote": true
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/require-font-face-local-src-before-remote": true,
+ },
 };
 ```
 

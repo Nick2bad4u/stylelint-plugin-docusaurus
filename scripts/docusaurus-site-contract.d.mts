@@ -5,8 +5,7 @@
  */
 
 /**
- * String or regular-expression matcher accepted by site-contract
- * expectations.
+ * String or regular-expression matcher accepted by site-contract expectations.
  */
 export type PatternLike = string | RegExp;
 

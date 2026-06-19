@@ -71,7 +71,6 @@ function validateFontFaceSrc(
 ): "missingLocal" | "remoteBeforeLocal" | undefined {
     let violation: "missingLocal" | "remoteBeforeLocal" | undefined = undefined;
 
-    // eslint-disable-next-line sonarjs/no-invariant-returns -- all paths intentionally return false to stop postcss walkDecls after the first src declaration
     fontFaceAtRule.walkDecls(/^src$/iv, (decl) => {
         const { firstLocalIndex, firstUrlIndex } = analyzeSrcValue(decl.value);
 

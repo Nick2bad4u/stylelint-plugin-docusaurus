@@ -172,25 +172,22 @@ describe("remark-lint-rule-doc-headings", () => {
     it("allows the stylelint config example heading to be disabled with the typed option key", async () => {
         expect.hasAssertions();
 
-        const ruleIds = await lintRuleDoc(
-            createRuleDocMarkdown().replace(
-                "## Further reading\nSee the package documentation.",
-                [
-                    "## Further reading",
-                    "See the package documentation.",
-                    "",
-                    "## Stylelint config example",
-                    "```js",
-                    "export default {};",
-                    "```",
-                ].join("\n")
-            ),
-            {
-                headings: {
-                    stylelintConfigExample: false,
-                },
-            }
+        const markdownWithConfigExample = createRuleDocMarkdown().replace(
+            "## Further reading\nSee the package documentation.",
+            `## Further reading
+See the package documentation.
+
+## Stylelint config example
+\`\`\`js
+export default {};
+\`\`\``
         );
+
+        const ruleIds = await lintRuleDoc(markdownWithConfigExample, {
+            headings: {
+                stylelintConfigExample: false,
+            },
+        });
 
         expect(ruleIds).not.toContain("remark-lint:rule-doc-headings:order");
         expect(ruleIds).not.toContain(

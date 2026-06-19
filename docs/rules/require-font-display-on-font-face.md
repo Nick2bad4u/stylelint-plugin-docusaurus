@@ -27,17 +27,19 @@ Docusaurus sites frequently load fonts from CDN sources such as Google Fonts or 
 ```css
 /* Missing font-display */
 @font-face {
-  font-family: "MyFont";
-  src: local("MyFont"), url("/fonts/myfont.woff2") format("woff2");
+ font-family: "MyFont";
+ src:
+  local("MyFont"),
+  url("/fonts/myfont.woff2") format("woff2");
 }
 ```
 
 ```css
 /* font-display: auto is not in the default allowed list */
 @font-face {
-  font-family: "NerdFont";
-  font-display: auto;
-  src: url("/fonts/nerdfont.woff2") format("woff2");
+ font-family: "NerdFont";
+ font-display: auto;
+ src: url("/fonts/nerdfont.woff2") format("woff2");
 }
 ```
 
@@ -46,18 +48,20 @@ Docusaurus sites frequently load fonts from CDN sources such as Google Fonts or 
 ```css
 /* Correct: font-display: swap declared */
 @font-face {
-  font-family: "MyFont";
-  font-display: swap;
-  src: local("MyFont"), url("/fonts/myfont.woff2") format("woff2");
+ font-family: "MyFont";
+ font-display: swap;
+ src:
+  local("MyFont"),
+  url("/fonts/myfont.woff2") format("woff2");
 }
 ```
 
 ```css
 /* Correct: font-display: optional for a non-critical decorative font */
 @font-face {
-  font-family: "DecorativeFont";
-  font-display: optional;
-  src: url("/fonts/decorative.woff2") format("woff2");
+ font-family: "DecorativeFont";
+ font-display: optional;
+ src: url("/fonts/decorative.woff2") format("woff2");
 }
 ```
 
@@ -75,12 +79,12 @@ Docusaurus sites frequently load fonts from CDN sources such as Google Fonts or 
 ```js
 // stylelint.config.mjs
 export default {
-  rules: {
-    "docusaurus/require-font-display-on-font-face": [
-      true,
-      { allowedValues: ["swap", "optional"] }
-    ]
-  }
+ rules: {
+  "docusaurus/require-font-display-on-font-face": [
+   true,
+   { allowedValues: ["swap", "optional"] },
+  ],
+ },
 };
 ```
 
@@ -88,9 +92,11 @@ export default {
 
 ```css
 @font-face {
-  font-family: "SystemFont";
-  font-display: fallback;
-  src: local("Arial"), url("/fonts/arial.woff2") format("woff2");
+ font-family: "SystemFont";
+ font-display: fallback;
+ src:
+  local("Arial"),
+  url("/fonts/arial.woff2") format("woff2");
 }
 ```
 
@@ -100,10 +106,10 @@ export default {
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/require-font-display-on-font-face": true
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/require-font-display-on-font-face": true,
+ },
 };
 ```
 

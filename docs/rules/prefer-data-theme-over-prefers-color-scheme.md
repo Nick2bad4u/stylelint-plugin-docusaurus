@@ -15,7 +15,7 @@ It does **not** report unrelated local component media queries such as `.card` o
 
 ## What this rule reports
 
-This rule reports Docusaurus theme overrides that rely on `prefers-color-scheme` instead of the site’s real color-mode contract.
+This rule reports Docusaurus theme overrides that rely on `prefers-color-scheme` instead of the site's real color-mode contract.
 
 ## Why this rule exists
 

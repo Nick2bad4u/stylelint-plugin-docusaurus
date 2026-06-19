@@ -48,39 +48,43 @@ applyTo: "test/**, tests/**"
 ## Writing Tests
 
 ### 1. Structure
+
 - Every rule test file should follow a shared, repository-approved pattern. For example, if the repo exposes shared test helpers, structure tests like this:
+
   ```ts
-  import { describe, expect, it } from 'vitest';
+  import { describe, expect, it } from "vitest";
 
-  import { lintWithConfig } from './_internal/stylelint-test-helpers';
-  import { configs } from '../src/plugin';
+  import { lintWithConfig } from "./_internal/stylelint-test-helpers";
+  import { configs } from "../src/plugin";
 
-  describe('my-rule', () => {
-    it('reports invalid code', async () => {
-      const result = await lintWithConfig({
-        code: '.bad-selector {}',
-        config: {
-          ...configs.recommended,
-          rules: {
-            ...configs.recommended.rules,
-            'docusaurus/my-rule': true,
-          },
-        },
-      });
-
-      expect(result.parseErrors).toHaveLength(0);
-      expect(result.warnings).toHaveLength(1);
+  describe("my-rule", () => {
+   it("reports invalid code", async () => {
+    const result = await lintWithConfig({
+     code: ".bad-selector {}",
+     config: {
+      ...configs.recommended,
+      rules: {
+       ...configs.recommended.rules,
+       "docusaurus/my-rule": true,
+      },
+     },
     });
+
+    expect(result.parseErrors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1);
+   });
   });
   ```
 
 ### 2. Valid Cases
-- Include code that *should not* trigger the rule.
-- **False Positive Prevention:** purposefully include code that looks *similar* to the target pattern but is technically correct/safe.
+
+- Include code that _should not_ trigger the rule.
+- **False Positive Prevention:** purposefully include code that looks _similar_ to the target pattern but is technically correct/safe.
 - **Syntax Awareness:** Test across supported syntaxes so the rule doesn't crash or report incorrectly when the syntax changes.
 
 ### 3. Invalid Cases
-- Include code that *must* trigger the rule.
+
+- Include code that _must_ trigger the rule.
 - **Errors:** Verify the exact message text or message helper output.
 - **Path-aware tests:** Include a realistic `codeFilename` or file extension through the repository helper you use so syntax resolution mirrors real file resolution.
 - **Output (Autofix):**
@@ -90,6 +94,7 @@ applyTo: "test/**, tests/**"
 - **Options:** If the rule has options, add test cases explicitly setting them.
 
 ### 4. Property-Based Testing (`fast-check`)
+
 - Use `fast-check` to generate random selectors, declarations, values, or CSS snippets when the rule logic is complex.
 - **Example Strategy:**
   - Generate random strings to test regex-based rules.
@@ -105,7 +110,7 @@ applyTo: "test/**, tests/**"
 - **Strict Typing:** Type helper inputs/outputs precisely so config fragments and warning assertions stay accurate.
 - **Multiline Code:** Use template literals (backticks) for code readability.
   - Avoid excessive indentation in the template literal; use `.trim()` or a utility helper if needed to normalize whitespace.
-- **Comments:** Put a comment above complex test cases explaining *what* specific edge case is being tested.
+- **Comments:** Put a comment above complex test cases explaining _what_ specific edge case is being tested.
 - **Plugin Wiring:** Keep tests coupled to public plugin wiring by using the repository's shared plugin/config helpers when available instead of bypassing the package entrypoint everywhere.
 - **Performance:**
   - If a test hangs, check for infinite loops in the rule's traversal or fixer.
@@ -119,43 +124,43 @@ applyTo: "test/**, tests/**"
 ## Example: Stylelint Rule Test
 
 ```ts
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import plugin, { configs } from '../src/plugin';
-import { lintWithConfig } from './_internal/stylelint-test-helpers';
+import plugin, { configs } from "../src/plugin";
+import { lintWithConfig } from "./_internal/stylelint-test-helpers";
 
-describe('docusaurus/my-rule', () => {
-  it('reports invalid CSS', async () => {
-    const result = await lintWithConfig({
-      code: '.DocSearch-Button { color: red; }',
-      config: {
-        ...configs.recommended,
-        plugins: [...plugin],
-        rules: {
-          ...configs.recommended.rules,
-          'docusaurus/my-rule': true,
-        },
-      },
-    });
-
-    expect(result.parseErrors).toHaveLength(0);
-    expect(result.warnings).toHaveLength(1);
+describe("docusaurus/my-rule", () => {
+ it("reports invalid CSS", async () => {
+  const result = await lintWithConfig({
+   code: ".DocSearch-Button { color: red; }",
+   config: {
+    ...configs.recommended,
+    plugins: [...plugin],
+    rules: {
+     ...configs.recommended.rules,
+     "docusaurus/my-rule": true,
+    },
+   },
   });
+
+  expect(result.parseErrors).toHaveLength(0);
+  expect(result.warnings).toHaveLength(1);
+ });
 });
 ```
 
 ## Example: Property-Based Test (Fast-Check)
 
 ```ts
-import * as fc from 'fast-check';
+import * as fc from "fast-check";
 
-test('selector helper handles arbitrary inputs', () => {
-  fc.assert(
-    fc.property(fc.string(), (selectorText) => {
-      const result = normalizeSelectorText(selectorText);
-      return typeof result === 'string';
-    }),
-  );
+test("selector helper handles arbitrary inputs", () => {
+ fc.assert(
+  fc.property(fc.string(), (selectorText) => {
+   const result = normalizeSelectorText(selectorText);
+   return typeof result === "string";
+  })
+ );
 });
 ```
 

@@ -1,7 +1,6 @@
 import { isDefined } from "ts-extras";
 
 /* eslint-disable @typescript-eslint/no-use-before-define -- parsing helpers are intentionally declared below exports for readability */
-/* eslint-disable sonarjs/updated-loop-counter -- index-jump scanning is intentional for lexer-style parser loops */
 
 /** Extract declared cascade layer names from one `@layer` parameter list. */
 export function getDeclaredCascadeLayerNames(
@@ -427,5 +426,4 @@ function splitTopLevelCommaSeparatedValues(value: string): readonly string[] {
         .filter((segment) => segment.length > 0);
 }
 
-/* eslint-enable sonarjs/updated-loop-counter -- restore default loop-counter checks outside this parser module */
 /* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this parser module */

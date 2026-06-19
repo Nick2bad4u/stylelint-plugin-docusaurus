@@ -34,21 +34,22 @@ The correct approach is to let Docusaurus manage `color-scheme` entirely, and us
 ```css
 /* Overrides the color-scheme Docusaurus manages */
 :root {
-  color-scheme: dark light;
+ color-scheme: dark light;
 }
 ```
 
 ```css
 /* Fights the theme-toggle mechanism */
 html[data-theme="dark"] {
-  color-scheme: dark;
+ color-scheme: dark;
 }
 ```
 
 ```css
 /* Caught when part of a comma-separated selector list */
-html, :root {
-  color-scheme: normal;
+html,
+:root {
+ color-scheme: normal;
 }
 ```
 
@@ -57,24 +58,24 @@ html, :root {
 ```css
 /* color-scheme on a custom component — not a framework root selector */
 .my-widget {
-  color-scheme: dark;
+ color-scheme: dark;
 }
 ```
 
 ```css
 /* Theme tokens on data-theme — fine as long as not color-scheme */
 [data-theme="dark"] {
-  --ifm-color-primary: #66b2ff;
-  --ifm-navbar-background-color: #1a1b26;
+ --ifm-color-primary: #66b2ff;
+ --ifm-navbar-background-color: #1a1b26;
 }
 ```
 
 ```css
 /* color-scheme inside a media query on a non-root selector — fine */
 @media (prefers-color-scheme: dark) {
-  .custom-code-block {
-    color-scheme: dark;
-  }
+ .custom-code-block {
+  color-scheme: dark;
+ }
 }
 ```
 
@@ -90,8 +91,9 @@ html, :root {
 ### ❌ Incorrect — comma-separated list includes a managed root
 
 ```css
-html, .wrapper {
-  color-scheme: dark;
+html,
+.wrapper {
+ color-scheme: dark;
 }
 ```
 
@@ -101,7 +103,7 @@ Even though `.wrapper` is not managed by Docusaurus, the `html` part triggers th
 
 ```css
 .theme-code-block pre {
-  color-scheme: dark;
+ color-scheme: dark;
 }
 ```
 
@@ -111,10 +113,10 @@ Even though `.wrapper` is not managed by Docusaurus, the `html` part triggers th
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/no-color-scheme-on-docusaurus-html-root": true
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/no-color-scheme-on-docusaurus-html-root": true,
+ },
 };
 ```
 

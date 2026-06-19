@@ -290,8 +290,10 @@ describe("sync-configs-rules-matrix automation", () => {
         expect(writes[0]?.encoding).toBe("utf8");
         expect(writes[0]?.contents).toContain("## Rules in this config");
         expect(writes[0]?.contents).toContain(
-            "| [`strict-rule`](https://example.test/docs/rules/strict-rule) | 🔧 | Strict-only rule. |"
+            "[`strict-rule`](https://example.test/docs/rules/strict-rule)"
         );
+        expect(writes[0]?.contents).toContain("🔧");
+        expect(writes[0]?.contents).toContain("Strict-only rule.");
     });
 
     it("fails check mode with an actionable sync command when config docs drift", async () => {

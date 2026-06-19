@@ -3,7 +3,7 @@ import type { AtRule, Node } from "postcss";
 import { isDefined, isFinite, setHas } from "ts-extras";
 
 /* eslint-disable @typescript-eslint/no-use-before-define -- this module keeps exported parsing utilities first and local helpers below for API readability */
-/* eslint-disable security/detect-unsafe-regex, sonarjs/slow-regex, regexp/no-super-linear-move -- media-query matcher regexes are constrained to short parser input and do not process unbounded attacker-controlled payloads */
+/* eslint-disable security/detect-unsafe-regex, regexp/no-super-linear-move -- media-query matcher regexes are constrained to short parser input and do not process unbounded attacker-controlled payloads */
 
 /** Default Docusaurus desktop/mobile breakpoint boundary in pixels. */
 export const docusaurusDesktopNavbarMinWidthPx = 997;
@@ -390,4 +390,4 @@ function toPixels(value: number, unit: SupportedLengthUnit): number {
 }
 
 /* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */
-/* eslint-enable security/detect-unsafe-regex, sonarjs/slow-regex, regexp/no-super-linear-move -- restore default regex safety checks outside this module */
+/* eslint-enable security/detect-unsafe-regex, regexp/no-super-linear-move -- restore default regex safety checks outside this module */

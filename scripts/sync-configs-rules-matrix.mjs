@@ -9,6 +9,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import {
+    format as formatWithPrettier,
+    resolveConfig as resolvePrettierConfig,
+} from "prettier";
+
 import { escapeMarkdownTableCell } from "./_internal/escape-markdown-table-cell.mjs";
 
 /**
@@ -187,6 +192,26 @@ const detectLineEnding = (markdown) =>
  */
 const normalizeMarkdownLineEndings = (markdown, lineEnding) =>
     markdown.replaceAll(/\r?\n/gv, lineEnding);
+
+/**
+ * @param {string} markdown
+ * @param {string} filePath
+ * @param {"\n" | "\r\n"} lineEnding
+ *
+ * @returns {Promise<string>}
+ */
+const formatMarkdown = async (markdown, filePath, lineEnding) => {
+    const prettierConfig = (await resolvePrettierConfig(filePath)) ?? {};
+
+    return normalizeMarkdownLineEndings(
+        await formatWithPrettier(markdown, {
+            ...prettierConfig,
+            filepath: filePath,
+            parser: "markdown",
+        }),
+        lineEnding
+    );
+};
 
 /**
  * @param {string} markdown
@@ -440,7 +465,11 @@ export const syncConfigDocs = async ({
             }),
             lineEnding
         );
-        const nextMarkdown = replaceSection(normalizedMarkdown, nextSection);
+        const nextMarkdown = await formatMarkdown(
+            replaceSection(normalizedMarkdown, nextSection),
+            configDocPath,
+            lineEnding
+        );
 
         if (nextMarkdown === normalizedMarkdown) {
             continue;

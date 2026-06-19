@@ -110,11 +110,16 @@ describe("sync-readme-rules-table automation", () => {
         expect(writes).toHaveLength(1);
         expect(writes[0]?.encoding).toBe("utf8");
         expect(writes[0]?.contents).toContain(
-            "| [`alpha-rule`](https://example.test/docs/rules/alpha-rule) | 🔧 | [🟢](./docs/rules/configs/docusaurus-recommended.md) [🛡️](./docs/rules/configs/docusaurus-docs-safe.md) [🟣](./docs/rules/configs/docusaurus-all.md) | Alpha rule. |"
+            "[`alpha-rule`](https://example.test/docs/rules/alpha-rule)"
         );
         expect(writes[0]?.contents).toContain(
-            "| [`zeta-rule`](https://example.test/docs/rules/zeta-rule) | — | [🟣](./docs/rules/configs/docusaurus-all.md) | Zeta rule. |"
+            "[🟢](./docs/rules/configs/docusaurus-recommended.md)"
         );
+        expect(writes[0]?.contents).toContain("Alpha rule.");
+        expect(writes[0]?.contents).toContain(
+            "[`zeta-rule`](https://example.test/docs/rules/zeta-rule)"
+        );
+        expect(writes[0]?.contents).toContain("Zeta rule.");
         expect(writes[0]?.contents).toContain("## Next");
     });
 
@@ -163,7 +168,7 @@ describe("sync-readme-rules-table automation", () => {
     it("reports synchronized READMEs without rewriting them", async () => {
         expect.hasAssertions();
 
-        const generatedSection = generateReadmeRulesSectionFromRules({
+        const rules = {
             "alpha-rule": {
                 docs: {
                     description: "Alpha rule.",
@@ -173,6 +178,39 @@ describe("sync-readme-rules-table automation", () => {
                 meta: {
                     fixable: true,
                 },
+            },
+        };
+        const formattedWrites: {
+            contents: string;
+            encoding: string;
+            filePath: string;
+        }[] = [];
+        await syncReadmeRulesTable({
+            readFileFn: () =>
+                Promise.resolve(
+                    [
+                        "# Repo",
+                        "",
+                        "## Rules",
+                        "",
+                        "stale table",
+                        "",
+                        "## Next",
+                        "",
+                        "tail",
+                    ].join("\n")
+                ),
+            readmeFilePath: "C:/repo/README.md",
+            rules,
+            writeChanges: true,
+            writeFileFn: (filePath, contents, encoding) => {
+                formattedWrites.push({
+                    contents,
+                    encoding,
+                    filePath,
+                });
+
+                return Promise.resolve();
             },
         });
         const writeSpy = vi.fn<
@@ -185,33 +223,16 @@ describe("sync-readme-rules-table automation", () => {
         const result = await syncReadmeRulesTable({
             readFileFn: () =>
                 Promise.resolve(
-                    [
-                        "# Repo",
-                        "",
-                        generatedSection.trimEnd(),
-                        "",
-                        "## Next",
-                        "",
-                        "tail",
-                    ].join("\n")
+                    formattedWrites[0]?.contents ??
+                        "formatted README fixture was not generated"
                 ),
             readmeFilePath: "C:/repo/README.md",
-            rules: {
-                "alpha-rule": {
-                    docs: {
-                        description: "Alpha rule.",
-                        recommended: true,
-                        url: "https://example.test/docs/rules/alpha-rule",
-                    },
-                    meta: {
-                        fixable: true,
-                    },
-                },
-            },
+            rules,
             writeChanges: true,
             writeFileFn: writeSpy,
         });
 
+        expect(formattedWrites).toHaveLength(1);
         expect(result).toStrictEqual({
             changed: false,
             readmeFilePath: "C:/repo/README.md",

@@ -20,9 +20,11 @@ function getDisabledStylelintRulesFromFile(
                     ?.split("*/", 1)[0]
                     ?.trim() ?? "";
 
-            for (const entry of commentBody
+            const disabledRules = commentBody
                 .split(",")
-                .map((item) => item.trim())) {
+                .map((item) => item.trim());
+
+            for (const entry of disabledRules) {
                 if (entry.length > 0) {
                     ruleNames.push(entry);
                 }

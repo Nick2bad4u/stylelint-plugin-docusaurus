@@ -27,22 +27,22 @@ The correct fix is almost always to increase selector specificity legitimately (
 ```css
 /* !important on a navbar class — bypasses the token cascade */
 .navbar__link {
-  color: red !important;
+ color: red !important;
 }
 ```
 
 ```css
 /* !important on a menu class */
 .menu__link--active {
-  font-weight: 700 !important;
-  background-color: var(--ifm-color-primary) !important;
+ font-weight: 700 !important;
+ background-color: var(--ifm-color-primary) !important;
 }
 ```
 
 ```css
 /* !important on a theme wrapper */
 .theme-doc-sidebar-container {
-  width: 280px !important;
+ width: 280px !important;
 }
 ```
 
@@ -51,21 +51,21 @@ The correct fix is almost always to increase selector specificity legitimately (
 ```css
 /* Use a wrapper scope to increase specificity instead */
 .my-layout .navbar__link {
-  color: red;
+ color: red;
 }
 ```
 
 ```css
 /* Override the token at the right scope */
 :root {
-  --ifm-menu-link-padding-horizontal: 16px;
+ --ifm-menu-link-padding-horizontal: 16px;
 }
 ```
 
 ```css
 /* !important on a project-local class — not Infima/Docusaurus */
 .my-custom-component {
-  display: flex !important;
+ display: flex !important;
 }
 ```
 
@@ -82,10 +82,10 @@ The correct fix is almost always to increase selector specificity legitimately (
 
 ```css
 .sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
+ position: absolute !important;
+ width: 1px !important;
+ height: 1px !important;
+ overflow: hidden !important;
 }
 ```
 
@@ -94,7 +94,7 @@ The correct fix is almost always to increase selector specificity legitimately (
 ```css
 /* Still flagged because .navbar__brand is an Infima selector */
 .custom-header .navbar__brand {
-  width: 160px !important;
+ width: 160px !important;
 }
 ```
 
@@ -103,7 +103,7 @@ The correct fix is almost always to increase selector specificity legitimately (
 ```css
 /* Override the token at root scope instead */
 [data-theme="dark"] {
-  --ifm-navbar-background-color: #1a1b26;
+ --ifm-navbar-background-color: #1a1b26;
 }
 ```
 
@@ -113,10 +113,10 @@ The correct fix is almost always to increase selector specificity legitimately (
 import { docusaurusPluginConfigs } from "stylelint-plugin-docusaurus";
 
 export default {
-  plugins: ["stylelint-plugin-docusaurus"],
-  rules: {
-    "docusaurus/no-important-on-infima-or-docusaurus-selector-overrides": true
-  }
+ plugins: ["stylelint-plugin-docusaurus"],
+ rules: {
+  "docusaurus/no-important-on-infima-or-docusaurus-selector-overrides": true,
+ },
 };
 ```
 
