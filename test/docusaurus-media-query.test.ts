@@ -18,7 +18,7 @@ describe("docusaurus-media-query helpers", () => {
                 "print and (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("does not treat negated desktop guards as providing a minimum width", () => {
@@ -29,7 +29,7 @@ describe("docusaurus-media-query helpers", () => {
                 "not all and (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("still recognizes non-negated top-level branches inside comma-separated media queries", () => {
@@ -40,7 +40,7 @@ describe("docusaurus-media-query helpers", () => {
                 "print, (min-width: 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBeTruthy();
+        ).toBe(true);
     });
 
     it("recognizes range-syntax min-width query (width >= 997px) as providing minimum width", () => {
@@ -51,15 +51,15 @@ describe("docusaurus-media-query helpers", () => {
                 "(width >= 997px)",
                 docusaurusDesktopNavbarMinWidthPx
             )
-        ).toBeTruthy();
+        ).toBe(true);
     });
 
     it("recognizes range-syntax max-width query (width <= 996px) as NOT providing minimum width", () => {
         expect.hasAssertions();
 
-        expect(
-            mediaQueryProvidesMinimumWidth("(width <= 996px)", 997)
-        ).toBeFalsy();
+        expect(mediaQueryProvidesMinimumWidth("(width <= 996px)", 997)).toBe(
+            false
+        );
     });
 
     describe(extractWidthBreakpointConstraints, () => {
@@ -185,7 +185,7 @@ describe("docusaurus-media-query helpers", () => {
                     { inclusive: true, kind: "max", pixels: 997 },
                     997
                 )
-            ).toBeFalsy();
+            ).toBe(false);
         });
 
         it("returns true for an inclusive min-width constraint equal to the threshold", () => {
@@ -196,7 +196,7 @@ describe("docusaurus-media-query helpers", () => {
                     { inclusive: true, kind: "min", pixels: 997 },
                     997
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("returns false for an inclusive min-width constraint below the threshold", () => {
@@ -207,7 +207,7 @@ describe("docusaurus-media-query helpers", () => {
                     { inclusive: true, kind: "min", pixels: 996 },
                     997
                 )
-            ).toBeFalsy();
+            ).toBe(false);
         });
 
         it("returns true for an exclusive min-width constraint whose floor+1 meets the threshold", () => {
@@ -219,7 +219,7 @@ describe("docusaurus-media-query helpers", () => {
                     { inclusive: false, kind: "min", pixels: 996 },
                     997
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("returns false for an exclusive min-width constraint whose floor+1 is below the threshold", () => {
@@ -230,7 +230,7 @@ describe("docusaurus-media-query helpers", () => {
                     { inclusive: false, kind: "min", pixels: 995 },
                     997
                 )
-            ).toBeFalsy();
+            ).toBe(false);
         });
     });
 
@@ -244,7 +244,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "min",
                     pixels: docusaurusDesktopNavbarMinWidthPx,
                 })
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("recognizes the canonical inclusive max-width 996px breakpoint", () => {
@@ -256,7 +256,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "max",
                     pixels: docusaurusMobileMaxWidthPx,
                 })
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("recognizes the exclusive max-width 997px breakpoint (width < 997px)", () => {
@@ -268,7 +268,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "max",
                     pixels: docusaurusDesktopNavbarMinWidthPx,
                 })
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("recognizes the exclusive min-width 996px breakpoint (width > 996px)", () => {
@@ -280,7 +280,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "min",
                     pixels: docusaurusMobileMaxWidthPx,
                 })
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("returns false for an inclusive min-width that is not the canonical value", () => {
@@ -292,7 +292,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "min",
                     pixels: 998,
                 })
-            ).toBeFalsy();
+            ).toBe(false);
         });
 
         it("returns false for an inclusive max-width that is not the canonical value", () => {
@@ -304,7 +304,7 @@ describe("docusaurus-media-query helpers", () => {
                     kind: "max",
                     pixels: 900,
                 })
-            ).toBeFalsy();
+            ).toBe(false);
         });
     });
 });

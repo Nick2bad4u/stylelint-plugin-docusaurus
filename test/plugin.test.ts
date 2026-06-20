@@ -37,7 +37,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         expect(Object.keys(rules)).toStrictEqual([...ruleNames]);
 
         for (const ruleId of ruleIds) {
-            expect(ruleId.startsWith("docusaurus/")).toBeTruthy();
+            expect(ruleId.startsWith("docusaurus/")).toBe(true);
         }
     });
 
@@ -47,7 +47,7 @@ describe("stylelint-plugin-docusaurus runtime scaffold", () => {
         const builtCjsPlugin =
             require("../dist/plugin.cjs") as BuiltCjsPluginModule;
 
-        expect(Array.isArray(builtCjsPlugin)).toBeTruthy();
+        expect(Array.isArray(builtCjsPlugin)).toBe(true);
         expect(builtCjsPlugin.docusaurusPluginConfigs).toBeDefined();
         expect(builtCjsPlugin.meta).toBeDefined();
         expect(builtCjsPlugin.rules).toBeDefined();

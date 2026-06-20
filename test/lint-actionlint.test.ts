@@ -26,7 +26,7 @@ describe("lint-actionlint wrapper", () => {
             repoRootPath: "C:/repo",
         });
 
-        expect(hasActionlintFlag(plan.userArgs, "-config-file")).toBeTruthy();
+        expect(hasActionlintFlag(plan.userArgs, "-config-file")).toBe(true);
         expect(plan.userArgs).not.toContain("C:/repo/ActionLintConfig.yaml");
         expect(plan.userArgs).not.toStrictEqual(
             expect.arrayContaining(["-shellcheck", ""])
@@ -39,16 +39,16 @@ describe("lint-actionlint wrapper", () => {
     it("treats help and version style invocations as pass-through mode", () => {
         expect.hasAssertions();
 
-        expect(isActionlintPassThroughMode(["-help"])).toBeTruthy();
-        expect(isActionlintPassThroughMode(["--version"])).toBeTruthy();
+        expect(isActionlintPassThroughMode(["-help"])).toBe(true);
+        expect(isActionlintPassThroughMode(["--version"])).toBe(true);
 
         const helpPlan = createActionlintExecutionPlan({
             rawArgs: ["-help"],
             repoRootPath: "C:/repo",
         });
 
-        expect(helpPlan.passThroughMode).toBeTruthy();
-        expect(helpPlan.useDefaultFiles).toBeFalsy();
+        expect(helpPlan.passThroughMode).toBe(true);
+        expect(helpPlan.useDefaultFiles).toBe(false);
         expect(helpPlan.targetFiles).toStrictEqual([]);
         expect(helpPlan.userArgs).toStrictEqual(["-help"]);
     });
@@ -121,14 +121,14 @@ describe("lint-actionlint wrapper", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
                 argvEntry: path.resolve("test", "lint-actionlint.test.ts"),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("resolves the repository root from the script location", () => {

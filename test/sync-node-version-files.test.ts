@@ -269,7 +269,7 @@ describe("sync-node-version-files script", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
@@ -279,7 +279,7 @@ describe("sync-node-version-files script", () => {
                 ),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("writes exact normalized content through the direct helper", async () => {

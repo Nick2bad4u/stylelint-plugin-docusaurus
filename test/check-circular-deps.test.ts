@@ -16,21 +16,21 @@ describe("check-circular-deps script", () => {
 
         const excludeRegExp = createMadgeExcludeRegExp();
 
-        expect(
-            excludeRegExp.test(path.join("src", ".cache", "file.ts"))
-        ).toBeTruthy();
+        expect(excludeRegExp.test(path.join("src", ".cache", "file.ts"))).toBe(
+            true
+        );
         expect(
             excludeRegExp.test(
                 path.join("docs", "docusaurus", ".docusaurus", "app.js")
             )
-        ).toBeTruthy();
-        expect(excludeRegExp.test(path.join("src", "styles.css"))).toBeTruthy();
-        expect(
-            excludeRegExp.test(path.join("src", "scache", "file.ts"))
-        ).toBeFalsy();
+        ).toBe(true);
+        expect(excludeRegExp.test(path.join("src", "styles.css"))).toBe(true);
+        expect(excludeRegExp.test(path.join("src", "scache", "file.ts"))).toBe(
+            false
+        );
         expect(
             excludeRegExp.test(path.join("src", "adocusaurus", "file.ts"))
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("builds Madge options from the repository root instead of the current cwd", () => {
@@ -144,13 +144,13 @@ describe("check-circular-deps script", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
                 argvEntry: path.resolve("test", "check-circular-deps.test.ts"),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });

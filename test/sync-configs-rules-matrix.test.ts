@@ -347,7 +347,7 @@ describe("sync-configs-rules-matrix automation", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
         expect(
             isDirectExecution({
                 argvEntry: path.resolve(
@@ -356,6 +356,6 @@ describe("sync-configs-rules-matrix automation", () => {
                 ),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });

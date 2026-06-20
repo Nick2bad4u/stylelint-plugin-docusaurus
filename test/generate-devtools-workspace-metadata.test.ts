@@ -163,7 +163,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
@@ -173,7 +173,7 @@ describe("generate-devtools-workspace-metadata helpers", () => {
                 ),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("serializes workspace metadata with normalized forward slashes", () => {

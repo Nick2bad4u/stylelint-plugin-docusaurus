@@ -12,7 +12,7 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("does not treat classes hidden inside :has(...) as positive scope anchors", () => {
@@ -23,7 +23,7 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("still treats positive wrapper pseudos such as :is(...) as scope anchors", () => {
@@ -34,7 +34,7 @@ describe("selector scope analysis", () => {
                 additionalAnchorClassNames: stableDocusaurusThemeClassNames,
                 includeGlobal: true,
             })
-        ).toBeTruthy();
+        ).toBe(true);
     });
 
     it("returns true immediately when ancestorHasScopeAnchor option is true", () => {
@@ -43,7 +43,7 @@ describe("selector scope analysis", () => {
         // The shortcut on line ~88 exits early without scanning the selector
         expect(
             selectorListHasScopeAnchor("h2", { ancestorHasScopeAnchor: true })
-        ).toBeTruthy();
+        ).toBe(true);
     });
 
     it("returns true immediately when ancestorHasScopeAnchor is true even for complex selectors", () => {
@@ -53,31 +53,27 @@ describe("selector scope analysis", () => {
             selectorListHasScopeAnchor("div > span + p ~ ul", {
                 ancestorHasScopeAnchor: true,
             })
-        ).toBeTruthy();
+        ).toBe(true);
     });
 
     it("treats an id selector as a meaningful scope anchor", () => {
         expect.hasAssertions();
 
         // An id selector that is NOT in rootOnlyIgnoredIdNames should count as anchor
-        expect(
-            selectorListHasScopeAnchor("#my-custom-section h2")
-        ).toBeTruthy();
+        expect(selectorListHasScopeAnchor("#my-custom-section h2")).toBe(true);
     });
 
     it("does not treat an id inside :not() as a scope anchor", () => {
         expect.hasAssertions();
 
-        expect(selectorListHasScopeAnchor(":not(#my-section) h2")).toBeFalsy();
+        expect(selectorListHasScopeAnchor(":not(#my-section) h2")).toBe(false);
     });
 
     it("treats an attribute selector as a meaningful scope anchor", () => {
         expect.hasAssertions();
 
         // [data-custom] is not in rootOnlyIgnoredAttributeNames → it IS a valid anchor
-        expect(
-            selectorListHasScopeAnchor("[data-custom='foo'] h2")
-        ).toBeTruthy();
+        expect(selectorListHasScopeAnchor("[data-custom='foo'] h2")).toBe(true);
     });
 
     it("does not treat an attribute in additionalIgnoredAttributeNames as a scope anchor", () => {
@@ -87,19 +83,19 @@ describe("selector scope analysis", () => {
             selectorListHasScopeAnchor("[data-color-mode] h2", {
                 additionalIgnoredAttributeNames: new Set(["data-color-mode"]),
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 
     it("returns false for an unparseable selector", () => {
         expect.hasAssertions();
 
         // ParseSelectorList returns undefined for ":::" → selectorListHasScopeAnchor returns false
-        expect(selectorListHasScopeAnchor(":::")).toBeFalsy();
+        expect(selectorListHasScopeAnchor(":::")).toBe(false);
     });
 
     it("returns false for a plain element selector with no anchor", () => {
         expect.hasAssertions();
 
-        expect(selectorListHasScopeAnchor("h2")).toBeFalsy();
+        expect(selectorListHasScopeAnchor("h2")).toBe(false);
     });
 });

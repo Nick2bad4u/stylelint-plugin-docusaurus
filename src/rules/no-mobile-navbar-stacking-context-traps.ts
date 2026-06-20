@@ -19,8 +19,6 @@ import {
     selectorTrailingCompoundHasClass,
 } from "../_internal/selector-parser-utils.js";
 
-/* eslint-disable @typescript-eslint/no-use-before-define -- This file keeps hoisted helper declarations in module-sorted order to satisfy the repository's ordering rules. */
-
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
 const ruleName = createRuleName("no-mobile-navbar-stacking-context-traps");
@@ -213,8 +211,6 @@ function splitWhitespaceSeparatedTokens(value: string): readonly string[] {
 
     return tokens;
 }
-
-/* eslint-enable @typescript-eslint/no-use-before-define -- Helper block ends here. */
 
 /**
  * Rule implementation for avoiding navbar properties that can trap the mobile

@@ -73,7 +73,7 @@ function findRootDataThemeSignal(selectorText: string): string | undefined {
 function findWrappedGlobalThemeClassSignal(
     selector: Readonly<ParsedSelector>
 ): string | undefined {
-    let resolvedSignal: string | undefined = undefined;
+    let resolvedSignal: string | undefined;
 
     selector.walkClasses((selectorClassNode) => {
         if (isDefined(resolvedSignal)) {

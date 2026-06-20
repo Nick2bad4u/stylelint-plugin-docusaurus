@@ -132,7 +132,7 @@ function getPreferredScope(
 function resolveDocusaurusThemeOverrideContext(
     mediaRule: Readonly<AtRule>
 ): DocusaurusThemeOverrideContext | undefined {
-    let resolvedContext: DocusaurusThemeOverrideContext | undefined = undefined;
+    let resolvedContext: DocusaurusThemeOverrideContext | undefined;
 
     mediaRule.walkDecls((declaration) => {
         if (isDefined(resolvedContext)) {

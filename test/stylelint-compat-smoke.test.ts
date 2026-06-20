@@ -236,13 +236,13 @@ describe("stylelint compatibility smoke script", () => {
                 currentImportUrl:
                     "file:///C:/repo/scripts/stylelint-compat-smoke.mjs",
             })
-        ).toBeTruthy();
+        ).toBe(true);
         expect(
             isDirectExecution({
                 argvEntry: "C:/repo/test/stylelint-compat-smoke.test.ts",
                 currentImportUrl:
                     "file:///C:/repo/scripts/stylelint-compat-smoke.mjs",
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });

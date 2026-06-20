@@ -140,7 +140,7 @@ describe("sync-peer-stylelint-range script", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
@@ -150,6 +150,6 @@ describe("sync-peer-stylelint-range script", () => {
                 ),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });

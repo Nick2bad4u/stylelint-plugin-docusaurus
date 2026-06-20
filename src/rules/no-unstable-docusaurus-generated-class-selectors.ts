@@ -15,8 +15,6 @@ import {
 } from "../_internal/selector-parser-utils.js";
 import { isCssModuleRoot } from "../_internal/source-file-context.js";
 
-/* eslint-disable @typescript-eslint/no-use-before-define -- This file keeps hoisted helper declarations in module-sorted order to satisfy the repository's ordering rules. */
-
 const { report, ruleMessages, validateOptions } = stylelint.utils;
 
 const ruleName = createRuleName(
@@ -137,8 +135,6 @@ function isGeneratedHashSuffix(suffix: string): boolean {
 
     return containsUppercaseLetterOrDigit;
 }
-
-/* eslint-enable @typescript-eslint/no-use-before-define -- Helper block ends here. */
 
 /**
  * Rule implementation for discouraging brittle Docusaurus generated class

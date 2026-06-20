@@ -73,25 +73,25 @@ describe("source-file-context helpers", () => {
         it("returns true for a .module.css path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/Button.module.css")).toBeTruthy();
+            expect(isCssModuleFilePath("src/Button.module.css")).toBe(true);
         });
 
         it("returns true for a .module.scss path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/Button.module.scss")).toBeTruthy();
+            expect(isCssModuleFilePath("src/Button.module.scss")).toBe(true);
         });
 
         it("returns false for a plain .css path", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath("src/global.css")).toBeFalsy();
+            expect(isCssModuleFilePath("src/global.css")).toBe(false);
         });
 
         it("returns false for undefined", () => {
             expect.hasAssertions();
 
-            expect(isCssModuleFilePath(undefined)).toBeFalsy();
+            expect(isCssModuleFilePath(undefined)).toBe(false);
         });
     });
 
@@ -103,7 +103,7 @@ describe("source-file-context helpers", () => {
                 from: "src/Button.module.css",
             });
 
-            expect(isCssModuleRoot(root)).toBeTruthy();
+            expect(isCssModuleRoot(root)).toBe(true);
         });
 
         it("returns false when the root was parsed from a plain .css file", () => {
@@ -113,7 +113,7 @@ describe("source-file-context helpers", () => {
                 from: "src/global.css",
             });
 
-            expect(isCssModuleRoot(root)).toBeFalsy();
+            expect(isCssModuleRoot(root)).toBe(false);
         });
     });
 

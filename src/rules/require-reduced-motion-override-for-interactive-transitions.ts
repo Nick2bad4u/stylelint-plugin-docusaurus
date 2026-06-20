@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define -- helper functions are defined below the public API for readability */
 /* eslint-disable security/detect-unsafe-regex, regexp/no-super-linear-move -- interactive-pseudo and universal-selector regexes operate on short, controlled selector-string input */
 import type { AtRule, Declaration, Root, Rule } from "postcss";
 import type { Pseudo } from "postcss-selector-parser";
@@ -375,5 +374,4 @@ const rule: StylelintPluginRule<boolean, undefined, typeof messages> =
 
 export default rule;
 
-/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */
 /* eslint-enable security/detect-unsafe-regex, regexp/no-super-linear-move -- restore default regex safety checks outside this module */

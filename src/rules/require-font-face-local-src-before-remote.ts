@@ -49,8 +49,8 @@ type SrcAnalysis = Readonly<{
 
 /** Find the first occurrence index of `local()` and `url()` in a src value. */
 function analyzeSrcValue(srcValue: string): SrcAnalysis {
-    let firstLocalIndex: number | undefined = undefined;
-    let firstUrlIndex: number | undefined = undefined;
+    let firstLocalIndex: number | undefined;
+    let firstUrlIndex: number | undefined;
 
     for (const match of srcValue.matchAll(localFunctionPattern)) {
         // MatchAll returns matches in order; first match is at the lowest index
@@ -69,7 +69,7 @@ function analyzeSrcValue(srcValue: string): SrcAnalysis {
 function validateFontFaceSrc(
     fontFaceAtRule: Readonly<AtRule>
 ): "missingLocal" | "remoteBeforeLocal" | undefined {
-    let violation: "missingLocal" | "remoteBeforeLocal" | undefined = undefined;
+    let violation: "missingLocal" | "remoteBeforeLocal" | undefined;
 
     fontFaceAtRule.walkDecls(/^src$/iv, (decl) => {
         const { firstLocalIndex, firstUrlIndex } = analyzeSrcValue(decl.value);

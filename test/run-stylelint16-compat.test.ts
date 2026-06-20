@@ -251,7 +251,7 @@ describe("run-stylelint16-compat wrapper", () => {
                 currentImportUrl:
                     "file:///C:/repo/scripts/run-stylelint16-compat.mjs",
             })
-        ).toBeTruthy();
+        ).toBe(true);
 
         expect(
             isDirectExecution({
@@ -259,6 +259,6 @@ describe("run-stylelint16-compat wrapper", () => {
                 currentImportUrl:
                     "file:///C:/repo/scripts/run-stylelint16-compat.mjs",
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });

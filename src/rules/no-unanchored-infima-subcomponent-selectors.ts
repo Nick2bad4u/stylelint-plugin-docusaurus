@@ -57,7 +57,7 @@ function findUnanchoredInfimaSelector(
     }
 
     for (const selector of getSelectors(parsedSelectorList)) {
-        let targetedClassName: string | undefined = undefined;
+        let targetedClassName: string | undefined;
 
         for (const cssClassName of getClassNamesOutsideGlobal(selector)) {
             if (!isTargetedInfimaSubcomponentClassName(cssClassName)) {

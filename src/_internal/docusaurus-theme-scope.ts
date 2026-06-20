@@ -14,7 +14,6 @@ import {
     stringSplit,
 } from "ts-extras";
 
-/* eslint-disable @typescript-eslint/no-use-before-define -- recursive selector utilities and public API layout intentionally reference local helpers declared later */
 import {
     getLeadingSimpleSelectorNodes,
     getSelectors,
@@ -81,8 +80,7 @@ export function findLegacyThemeColorModeSelector(
         return undefined;
     }
 
-    let resolvedLegacySelector: ".theme-dark" | ".theme-light" | undefined =
-        undefined;
+    let resolvedLegacySelector: ".theme-dark" | ".theme-light" | undefined;
 
     parsedSelectorList.walkClasses((cssClassNode) => {
         if (isDefined(resolvedLegacySelector)) {
@@ -330,7 +328,7 @@ function getColorModeFromLeadingNodes(
     options: LeadingColorModeOptions
 ): DocusaurusColorMode | undefined {
     let hasRecognizedRootNode = false;
-    let resolvedColorMode: DocusaurusColorMode | undefined = undefined;
+    let resolvedColorMode: DocusaurusColorMode | undefined;
 
     for (const selectorNode of leadingNodes) {
         if (selectorNode.type === "comment") {
@@ -451,7 +449,7 @@ function getColorModeFromPseudoFunction(
         return undefined;
     }
 
-    let resolvedColorMode: DocusaurusColorMode | undefined = undefined;
+    let resolvedColorMode: DocusaurusColorMode | undefined;
 
     for (const nestedNode of pseudoNode.nodes) {
         if (nestedNode.type !== "selector") {
@@ -580,5 +578,3 @@ function isStandaloneThemeScopeParsedSelector(
 
     return hasMeaningfulNode;
 }
-
-/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */

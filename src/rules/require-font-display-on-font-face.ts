@@ -61,7 +61,7 @@ const defaultAllowedValues: readonly string[] = [
 function findFontDisplayValue(
     fontFaceAtRule: Readonly<AtRule>
 ): string | undefined {
-    let foundValue: string | undefined = undefined;
+    let foundValue: string | undefined;
 
     fontFaceAtRule.walkDecls("font-display", (decl) => {
         foundValue = decl.value.trim().toLowerCase();

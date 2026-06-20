@@ -7,9 +7,6 @@ import selectorParser, {
 } from "postcss-selector-parser";
 import { isDefined, isEmpty, safeCastTo, setHas } from "ts-extras";
 
-/* eslint-disable @typescript-eslint/no-use-before-define -- parser helpers are intentionally layered for public API readability despite recursive references */
-/* eslint-disable @typescript-eslint/consistent-return -- selector-parser walk callbacks intentionally return false to stop traversal early */
-
 /** Parsed individual selector used by multiple Docusaurus selector helpers. */
 export type ParsedSelector = Selector;
 /** Parsed selector-list root used by multiple Docusaurus selector helpers. */
@@ -289,10 +286,10 @@ export function getTrailingSimpleSelectorNodes(
             break;
         }
 
-        trailingNodes.unshift(selectorNode);
+        trailingNodes.push(selectorNode);
     }
 
-    return trailingNodes;
+    return trailingNodes.toReversed();
 }
 
 /** Collect type selectors outside CSS Modules `:global(...)` wrappers. */
@@ -764,6 +761,3 @@ function trailingSimpleSelectorNodeHasMatchingClass(
             selectorTrailingCompoundHasClass(nestedNode, predicate)
     );
 }
-
-/* eslint-enable @typescript-eslint/consistent-return -- restore default callback return checks outside this module */
-/* eslint-enable @typescript-eslint/no-use-before-define -- restore default helper-order checks outside this module */

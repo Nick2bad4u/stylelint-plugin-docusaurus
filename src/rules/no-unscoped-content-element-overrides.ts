@@ -66,7 +66,7 @@ function findUnscopedContentElementSelector(
             continue;
         }
 
-        let contentElementName: string | undefined = undefined;
+        let contentElementName: string | undefined;
 
         for (const typeName of getTypeNamesOutsideGlobal(selector)) {
             if (!isDocusaurusContentElementName(typeName)) {

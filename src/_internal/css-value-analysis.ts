@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define -- function declarations are intentionally grouped below exports for discoverability in this small analysis helper */
 import { isDefined } from "ts-extras";
 
 /**
@@ -172,7 +171,7 @@ function skipParenthesizedFunction(
 /** Replace quoted strings and block comments with whitespace placeholders. */
 function stripCssStringsAndComments(value: string): string {
     let sanitizedValue = "";
-    let activeQuote: "'" | '"' | undefined = undefined;
+    let activeQuote: "'" | '"' | undefined;
     let index = 0;
 
     while (index < value.length) {
@@ -256,8 +255,6 @@ function stripCssStringsAndComments(value: string): string {
 
     return sanitizedValue;
 }
-
-/* eslint-enable @typescript-eslint/no-use-before-define -- restore default ordering checks outside this module */
 
 /** Try to consume one named CSS function call at the current character index. */
 function tryConsumeNamedFunctionCall(

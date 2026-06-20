@@ -93,7 +93,7 @@ function findMissingHtmlPrefixSelector(selectorList: string):
 
         let bareAttributeMatch:
             | (typeof relevantAttributeMatches)[number]
-            | undefined = undefined;
+            | undefined;
 
         for (const attributeMatch of relevantAttributeMatches) {
             if (attributeMatch.kind !== "bare") {

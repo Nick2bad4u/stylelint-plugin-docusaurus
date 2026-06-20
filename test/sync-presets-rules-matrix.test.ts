@@ -66,7 +66,7 @@ describe("sync-presets-rules-matrix legacy alias", () => {
                 argvEntry: scriptPath,
                 currentImportUrl: scriptUrl,
             })
-        ).toBeTruthy();
+        ).toBe(true);
         expect(
             isDirectExecution({
                 argvEntry: path.resolve(
@@ -75,6 +75,6 @@ describe("sync-presets-rules-matrix legacy alias", () => {
                 ),
                 currentImportUrl: scriptUrl,
             })
-        ).toBeFalsy();
+        ).toBe(false);
     });
 });
