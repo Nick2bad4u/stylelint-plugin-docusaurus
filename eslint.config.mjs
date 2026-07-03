@@ -52,9 +52,23 @@ const config = [
     },
 
     {
+        files: ["docs/docusaurus/sidebars.ts"],
+        rules: {
+            "security/detect-non-literal-fs-filename": "off",
+        },
+    },
+
+    {
         files: ["**/*.md"],
         rules: {
             "remark/remark": "off",
+        },
+    },
+
+    {
+        files: ["docs/docusaurus/site-docs/**/*.md", "docs/rules/**/*.md"],
+        rules: {
+            "markdown/no-multiple-h1": "off",
         },
     },
 
@@ -66,12 +80,24 @@ const config = [
     },
 
     {
+        files: ["**/*.toml"],
+        name: "Local Stable TOML Formatting",
+        rules: {
+            // Tombi 1.1.7 formats the same TOML differently on Windows and Linux.
+            "tombi/tombi": "off",
+        },
+    },
+
+    {
         files: ["src/**/*.ts"],
         rules: {
+            "@typescript-eslint/no-unnecessary-condition": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
+            "@typescript-eslint/no-unsafe-type-assertion": "off",
             "@typescript-eslint/restrict-plus-operands": "off",
             "@typescript-eslint/restrict-template-expressions": "off",
             complexity: "off",
+            "import-x/extensions": "off",
             "import-x/max-dependencies": "off",
             "no-duplicate-imports": "off",
             "no-undef-init": "off",
@@ -97,9 +123,18 @@ const config = [
     },
 
     {
+        files: ["src/_internal/plugin-constants.ts"],
+        rules: {
+            "etc-misc/sort-array": "off",
+            "perfectionist/sort-arrays": "off",
+        },
+    },
+
+    {
         files: ["test/**/*.ts"],
         rules: {
             "canonical/no-barrel-import": "off",
+            "import-x/extensions": "off",
             "no-duplicate-imports": "off",
             "test-signal/no-tautological-length-assertions": "off",
             "test-signal/no-weak-existence-assertions": "off",

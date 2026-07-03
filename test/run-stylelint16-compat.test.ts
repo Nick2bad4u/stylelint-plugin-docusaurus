@@ -10,6 +10,12 @@ import {
     runStylelint16Compat,
 } from "../scripts/run-stylelint16-compat.mjs";
 
+const isErrorLike = (value: unknown): value is Readonly<{ message: string }> =>
+    typeof value === "object" &&
+    value !== null &&
+    "message" in value &&
+    typeof value.message === "string";
+
 describe("run-stylelint16-compat wrapper", () => {
     it("builds before installing Stylelint 16 and running the smoke check", () => {
         expect.hasAssertions();
@@ -195,7 +201,7 @@ describe("run-stylelint16-compat wrapper", () => {
 
         const aggregateError = thrownError as AggregateError;
         const messages = aggregateError.errors.map((item: unknown) =>
-            item instanceof Error ? item.message : String(item)
+            isErrorLike(item) ? item.message : String(item)
         );
 
         expect(aggregateError.message).toContain(

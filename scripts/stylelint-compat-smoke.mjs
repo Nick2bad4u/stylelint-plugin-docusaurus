@@ -706,8 +706,7 @@ html[data-theme='dark'] .DocSearch {
  * @param {Readonly<{
  *     argv?: readonly string[];
  *     loadBuiltPluginSurfaceFn?:
- *         | (() => Promise<BuiltPluginSurface>)
- *         | undefined;
+ *         (() => Promise<BuiltPluginSurface>) | undefined;
  *     loadStylelintFn?: (() => Promise<StylelintLike>) | undefined;
  *     logger?: InfoLogger | undefined;
  *     stylelintRuntimeVersion?: string | undefined;

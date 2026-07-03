@@ -321,7 +321,7 @@ export function parseSelectorList(
     try {
         // Postcss-selector-parser currently exposes sync AST parsing via astSync.
         // This helper is intentionally synchronous for rule hot-path usage.
-        // eslint-disable-next-line n/no-sync
+        // eslint-disable-next-line n/no-sync -- Selector parsing is synchronous by API design here.
         return selectorParser().astSync(selectorList);
     } catch {
         return undefined;

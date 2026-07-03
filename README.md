@@ -6,14 +6,14 @@ Stylelint plugin scaffold for Docusaurus-focused CSS rules, shareable configs, a
 
 ## Table of contents
 
-1. [Installation](#installation)
-2. [Quick start](#quick-start)
-3. [Exports](#exports)
-4. [Configs](#configs)
-5. [Rules](#rules)
-6. [Docusaurus docs CSS guardrails](#docusaurus-docs-css-guardrails)
-7. [Documentation](#documentation)
-8. [Contributors ✨](#contributors-)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Exports](#exports)
+- [Configs](#configs)
+- [Rules](#rules)
+- [Docusaurus docs CSS guardrails](#docusaurus-docs-css-guardrails)
+- [Documentation](#documentation)
+- [Contributors ✨](#contributors-)
 
 ## Installation
 
