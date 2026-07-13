@@ -22,7 +22,10 @@ type ParsedLength = Readonly<{
 }>;
 
 /** Supported CSS length units for lightweight media-query parsing. */
-type SupportedLengthUnit = "em" | "px" | "rem";
+type SupportedLengthUnit =
+    | "em"
+    | "px"
+    | "rem";
 
 /** Media types that are compatible with normal screen-width gating logic. */
 const screenCompatibleMediaTypes: ReadonlySet<string> = new Set([

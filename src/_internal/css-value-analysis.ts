@@ -171,7 +171,10 @@ function skipParenthesizedFunction(
 /** Replace quoted strings and block comments with whitespace placeholders. */
 function stripCssStringsAndComments(value: string): string {
     let sanitizedValue = "";
-    let activeQuote: "'" | '"' | undefined;
+    let activeQuote:
+        | "'"
+        | '"'
+        | undefined;
     let index = 0;
 
     while (index < value.length) {

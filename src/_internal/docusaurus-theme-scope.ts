@@ -71,16 +71,20 @@ export const requiredIfmColorPrimaryScaleVariables: readonly [
 /**
  * Detect the first legacy class-based color-mode selector token in a selector.
  */
-export function findLegacyThemeColorModeSelector(
-    selector: string
-): ".theme-dark" | ".theme-light" | undefined {
+export function findLegacyThemeColorModeSelector(selector: string):
+    | ".theme-dark"
+    | ".theme-light"
+    | undefined {
     const parsedSelectorList = parseSelectorList(selector);
 
     if (!isDefined(parsedSelectorList)) {
         return undefined;
     }
 
-    let resolvedLegacySelector: ".theme-dark" | ".theme-light" | undefined;
+    let resolvedLegacySelector:
+        | ".theme-dark"
+        | ".theme-light"
+        | undefined;
 
     parsedSelectorList.walkClasses((cssClassNode) => {
         if (isDefined(resolvedLegacySelector)) {

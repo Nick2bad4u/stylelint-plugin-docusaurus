@@ -66,10 +66,14 @@ function analyzeSrcValue(srcValue: string): SrcAnalysis {
 }
 
 /** Validate the `src` declaration value in one `@font-face` block. */
-function validateFontFaceSrc(
-    fontFaceAtRule: Readonly<AtRule>
-): "missingLocal" | "remoteBeforeLocal" | undefined {
-    let violation: "missingLocal" | "remoteBeforeLocal" | undefined;
+function validateFontFaceSrc(fontFaceAtRule: Readonly<AtRule>):
+    | "missingLocal"
+    | "remoteBeforeLocal"
+    | undefined {
+    let violation:
+        | "missingLocal"
+        | "remoteBeforeLocal"
+        | undefined;
 
     fontFaceAtRule.walkDecls(/^src$/iv, (decl) => {
         const { firstLocalIndex, firstUrlIndex } = analyzeSrcValue(decl.value);
