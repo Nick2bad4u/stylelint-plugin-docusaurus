@@ -1,4 +1,5 @@
 import * as nodeFs from "node:fs";
+import packageJson from "stylelint-plugin-docusaurus/package.json" with { type: "json" };
 import { describe, expect, it } from "vitest";
 
 const stylelintConfigFilePath = "stylelint.config.mjs";
@@ -54,12 +55,12 @@ describe("docs stylelint guardrails", () => {
     it("keeps docs guardrail scripts wired into package scripts and release verification", () => {
         expect.hasAssertions();
 
-        const packageJsonContents = nodeFs.readFileSync("package.json", "utf8");
-
-        expect(packageJsonContents).toContain(
-            '"test:docs-guardrails": "vitest run test/stylelint-docs-guardrails.test.ts"'
+        expect(packageJson.scripts["test:docs-guardrails"]).toBe(
+            "npx vitest run test/stylelint-docs-guardrails.test.ts"
         );
-        expect(packageJsonContents).toContain("npm run test:docs-guardrails");
+        expect(packageJson.scripts["release:verify"]).toContain(
+            "npm run test:docs-guardrails"
+        );
     });
 
     it("keeps stylelint config delegated to shared config", () => {
