@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
     createCompatibilityCheckCommands,
     getNpmCommand,
+    getPackedTarballFilename,
     getWindowsCommandShell,
     isDirectExecution,
     runStylelint16Compat,
@@ -17,6 +18,8 @@ describe("run-stylelint16-compat wrapper", () => {
             createCompatibilityCheckCommands({
                 nodeCommand: "node",
                 npmCommand: "npm",
+                packedPluginPath:
+                    "/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
                 platform: "linux",
                 repositoryRootPath: "/repo",
                 runtimeDirectoryPath: "/temp/runtime",
@@ -32,12 +35,24 @@ describe("run-stylelint16-compat wrapper", () => {
             },
             {
                 args: [
+                    "pack",
+                    "--ignore-scripts",
+                    "--pack-destination",
+                    "/temp/runtime",
+                ],
+                command: "npm",
+                repositoryRootPath: "/repo",
+                shell: false,
+            },
+            {
+                args: [
                     "install",
                     "--ignore-scripts",
                     "--no-audit",
                     "--no-fund",
                     "--package-lock=false",
                     "stylelint@^16",
+                    "/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
                 ],
                 command: "npm",
                 repositoryRootPath: "/temp/runtime",
@@ -70,13 +85,35 @@ describe("run-stylelint16-compat wrapper", () => {
 
         const commands = createCompatibilityCheckCommands({
             npmCommand: "npm.cmd",
+            packedPluginPath:
+                "C:/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
             platform: "win32",
             runtimeDirectoryPath: "C:/temp/runtime",
         });
 
-        expect(commands[1]?.shell).toBe(true);
-        expect(commands[1]?.args).not.toContain("--legacy-peer-deps");
-        expect(commands[1]?.args).not.toContain("--force");
+        expect(commands[2]?.shell).toBe(true);
+        expect(commands[2]?.args).not.toContain("--legacy-peer-deps");
+        expect(commands[2]?.args).not.toContain("--force");
+    });
+
+    it("derives safe npm pack filenames", () => {
+        expect.hasAssertions();
+
+        expect(
+            getPackedTarballFilename({
+                name: "stylelint-plugin-docusaurus",
+                version: "2.0.4",
+            })
+        ).toBe("stylelint-plugin-docusaurus-2.0.4.tgz");
+        expect(
+            getPackedTarballFilename({
+                name: "@scope/plugin",
+                version: "1.2.3-beta.1",
+            })
+        ).toBe("scope-plugin-1.2.3-beta.1.tgz");
+        expect(() =>
+            getPackedTarballFilename({ name: "../plugin", version: "1.0.0" })
+        ).toThrow("valid npm package name");
     });
 
     it("removes the isolated project when the smoke check fails", async () => {
@@ -92,6 +129,13 @@ describe("run-stylelint16-compat wrapper", () => {
                 nodeCommand: "node",
                 npmCommand: "npm",
                 platform: "linux",
+                readFileFn: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            name: "stylelint-plugin-docusaurus",
+                            version: "2.0.4",
+                        })
+                    ),
                 repositoryRootPath: "/repo",
                 rmFn: (targetPath) => {
                     removedPaths.push(String(targetPath));
@@ -103,7 +147,7 @@ describe("run-stylelint16-compat wrapper", () => {
                         `${input.command} ${input.args.join(" ")}`
                     );
 
-                    if (executedCommands.length === 3) {
+                    if (executedCommands.length === 4) {
                         throw new Error("simulated smoke failure");
                     }
                 },
@@ -125,7 +169,7 @@ describe("run-stylelint16-compat wrapper", () => {
         expect(writtenPaths).toStrictEqual([
             path.join("/temp/runtime", "package.json"),
         ]);
-        expect(executedCommands).toHaveLength(3);
+        expect(executedCommands).toHaveLength(4);
         expect(removedPaths).toStrictEqual(["/temp/runtime"]);
     });
 
@@ -135,6 +179,13 @@ describe("run-stylelint16-compat wrapper", () => {
         await expect(
             runStylelint16Compat({
                 mkdtempFn: () => Promise.resolve("/temp/runtime"),
+                readFileFn: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            name: "stylelint-plugin-docusaurus",
+                            version: "2.0.4",
+                        })
+                    ),
                 rmFn: () => Promise.reject(new Error("cleanup failed")),
                 runCommandFn: () => {
                     throw new Error("smoke failed");

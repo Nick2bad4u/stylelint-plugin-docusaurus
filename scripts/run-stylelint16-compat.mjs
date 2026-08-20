@@ -7,7 +7,7 @@
 // @ts-check
 
 import { spawnSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
@@ -62,10 +62,45 @@ export const isDirectExecution = ({ argvEntry, currentImportUrl }) =>
     typeof argvEntry === "string" && toFileHref(argvEntry) === currentImportUrl;
 
 /**
+ * Resolve the deterministic tarball name produced by `npm pack`.
+ *
+ * @param {unknown} packageMetadata - Parsed package metadata.
+ *
+ * @returns {string} Packed tarball filename.
+ */
+export function getPackedTarballFilename(packageMetadata) {
+    if (typeof packageMetadata !== "object" || packageMetadata === null) {
+        throw new TypeError("Expected package metadata to be an object.");
+    }
+
+    const name = Reflect.get(packageMetadata, "name");
+    const version = Reflect.get(packageMetadata, "version");
+
+    if (
+        typeof name !== "string" ||
+        !/^(?:@[a-z0-9._~-]+\/)?[a-z0-9._~-]+$/u.test(name)
+    ) {
+        throw new TypeError("Expected a valid npm package name.");
+    }
+
+    if (
+        typeof version !== "string" ||
+        !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/u.test(
+            version
+        )
+    ) {
+        throw new TypeError("Expected a valid npm package version.");
+    }
+
+    return `${name.replace(/^@/u, "").replace("/", "-")}-${version}.tgz`;
+}
+
+/**
  * @param {Readonly<{
  *     nodeCommand?: string;
  *     npmCommand?: string;
  *     platform?: string;
+ *     packedPluginPath: string;
  *     repositoryRootPath?: string;
  *     runtimeDirectoryPath: string;
  *     stylelintCompatSmokeScriptPath?: string;
@@ -77,6 +112,7 @@ export const createCompatibilityCheckCommands = ({
     nodeCommand = process.execPath,
     npmCommand = getNpmCommand(),
     platform = process.platform,
+    packedPluginPath,
     repositoryRootPath: targetRepositoryRootPath = repositoryRootPath,
     runtimeDirectoryPath,
     stylelintCompatSmokeScriptPath:
@@ -93,12 +129,24 @@ export const createCompatibilityCheckCommands = ({
         },
         {
             args: [
+                "pack",
+                "--ignore-scripts",
+                "--pack-destination",
+                runtimeDirectoryPath,
+            ],
+            command: npmCommand,
+            repositoryRootPath: targetRepositoryRootPath,
+            shell: shouldUseWindowsShell,
+        },
+        {
+            args: [
                 "install",
                 "--ignore-scripts",
                 "--no-audit",
                 "--no-fund",
                 "--package-lock=false",
                 "stylelint@^16",
+                packedPluginPath,
             ],
             command: npmCommand,
             repositoryRootPath: runtimeDirectoryPath,
@@ -179,6 +227,7 @@ export function runCommand({
  *     nodeCommand?: string;
  *     npmCommand?: string;
  *     platform?: string;
+ *     readFileFn?: (path: string, encoding: "utf8") => Promise<string>;
  *     repositoryRootPath?: string;
  *     rmFn?: typeof rm;
  *     runCommandFn?: typeof runCommand;
@@ -193,6 +242,7 @@ export async function runStylelint16Compat({
     nodeCommand = process.execPath,
     npmCommand = getNpmCommand(),
     platform = process.platform,
+    readFileFn = readFile,
     repositoryRootPath: targetRepositoryRootPath = repositoryRootPath,
     rmFn = rm,
     runCommandFn = runCommand,
@@ -215,9 +265,21 @@ export async function runStylelint16Compat({
             "utf8"
         );
 
+        const packageMetadata = JSON.parse(
+            await readFileFn(
+                join(targetRepositoryRootPath, "package.json"),
+                "utf8"
+            )
+        );
+        const packedPluginPath = join(
+            runtimeDirectoryPath,
+            getPackedTarballFilename(packageMetadata)
+        );
+
         for (const command of createCompatibilityCheckCommands({
             nodeCommand,
             npmCommand,
+            packedPluginPath,
             platform,
             repositoryRootPath: targetRepositoryRootPath,
             runtimeDirectoryPath,

@@ -12,10 +12,12 @@ export function isDirectExecution(input: {
     readonly argvEntry?: string | undefined;
     readonly currentImportUrl: string;
 }): boolean;
+export function getPackedTarballFilename(packageMetadata: unknown): string;
 export function createCompatibilityCheckCommands(input: {
     readonly nodeCommand?: string | undefined;
     readonly npmCommand?: string | undefined;
     readonly platform?: string | undefined;
+    readonly packedPluginPath: string;
     readonly repositoryRootPath?: string | undefined;
     readonly runtimeDirectoryPath: string;
     readonly stylelintCompatSmokeScriptPath?: string | undefined;
@@ -30,6 +32,8 @@ export function runStylelint16Compat(input?: {
     readonly nodeCommand?: string | undefined;
     readonly npmCommand?: string | undefined;
     readonly platform?: string | undefined;
+    readonly readFileFn?:
+        ((path: string, encoding: "utf8") => Promise<string>) | undefined;
     readonly repositoryRootPath?: string | undefined;
     readonly rmFn?: typeof import("node:fs/promises").rm;
     readonly runCommandFn?: typeof runCommand;
