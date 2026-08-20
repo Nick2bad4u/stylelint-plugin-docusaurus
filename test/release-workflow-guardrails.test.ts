@@ -88,6 +88,36 @@ describe("release automation guardrails", () => {
         expect(releaseWorkflow).not.toContain("packMetadata[0]");
     });
 
+    it("keeps workflow dependency setup script-free and checksum-locked", () => {
+        expect.hasAssertions();
+
+        for (const workflow of [
+            releaseWorkflow,
+            continuousIntegrationWorkflow,
+            documentationWorkflow,
+        ]) {
+            expect(workflow).not.toMatch(/npm ci(?! --ignore-scripts)/v);
+        }
+
+        expect(continuousIntegrationWorkflow).toContain(
+            'run: "npm run test:coverage:ci"'
+        );
+        expect(packageMetadata.scripts["test:coverage:ci"]).toBe(
+            "vitest run --coverage --reporter=github-actions --reporter=dot --reporter=junit --outputFile=test-report.junit.xml --silent"
+        );
+
+        for (const workflow of [
+            releaseWorkflow,
+            continuousIntegrationWorkflow,
+        ]) {
+            expect(workflow).toContain(
+                'working-directory: ".github/actionlint"'
+            );
+            expect(workflow).toContain("go build -mod=readonly -trimpath");
+            expect(workflow).not.toContain("go install");
+        }
+    });
+
     it("builds documentation inspectors from lockfile-pinned dependencies", () => {
         expect.hasAssertions();
 
