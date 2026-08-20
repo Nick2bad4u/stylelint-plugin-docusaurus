@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -66,5 +67,22 @@ describe("npm pack metadata normalization", () => {
                 currentImportUrl: scriptUrl,
             })
         ).toBe(false);
+    });
+
+    it("rejects CLI-provided filesystem paths", () => {
+        expect.hasAssertions();
+
+        const result = spawnSync(
+            process.execPath,
+            ["scripts/npm-pack-metadata.mjs", "../outside.json"],
+            {
+                encoding: "utf8",
+            }
+        );
+
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toContain(
+            "This release helper does not accept filesystem paths."
+        );
     });
 });

@@ -74,6 +74,11 @@ describe("release automation guardrails", () => {
         expect(releaseWorkflow).toContain('if [ "$remote_tag_status" -ne 2 ]');
         expect(releaseWorkflow).toContain("overwrite_files: false");
         expect(releaseWorkflow).toContain("node scripts/npm-pack-metadata.mjs");
+        expect(releaseWorkflow).toContain("npm ci --ignore-scripts");
+        expect(releaseWorkflow).not.toContain("npm install-scripts run");
+        expect(releaseWorkflow).not.toContain(
+            'node scripts/npm-pack-metadata.mjs "$pack_metadata_path"'
+        );
         expect(releaseWorkflow).not.toContain("packMetadata[0]");
     });
 });

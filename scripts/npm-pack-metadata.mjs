@@ -15,6 +15,25 @@ import { pathToFileURL } from "node:url";
 export const isRecord = (value) => typeof value === "object" && value !== null;
 
 /**
+ * Extract package entries from supported npm pack metadata shapes.
+ *
+ * @param {unknown} metadata - Parsed `npm pack --json` output.
+ *
+ * @returns {unknown[]} Package metadata entries.
+ */
+function extractPackageEntries(metadata) {
+    if (Array.isArray(metadata)) {
+        return metadata;
+    }
+
+    if (isRecord(metadata)) {
+        return Object.values(metadata);
+    }
+
+    return [];
+}
+
+/**
  * Normalize npm 11's array-shaped and npm 12's package-keyed object-shaped `npm
  * pack --json` output to one safe tarball filename.
  *
@@ -23,11 +42,7 @@ export const isRecord = (value) => typeof value === "object" && value !== null;
  * @returns {string} The tarball filename.
  */
 export function resolvePackedTarballFilename(metadata) {
-    const packageEntries = Array.isArray(metadata)
-        ? metadata
-        : isRecord(metadata)
-          ? Object.values(metadata)
-          : [];
+    const packageEntries = extractPackageEntries(metadata);
 
     if (packageEntries.length !== 1 || !isRecord(packageEntries[0])) {
         throw new TypeError(
@@ -86,11 +101,18 @@ export function isDirectExecution({
 }
 
 if (isDirectExecution()) {
-    const metadataPath = process.argv[2];
-
-    if (typeof metadataPath !== "string" || metadataPath.length === 0) {
-        throw new TypeError("Usage: node scripts/npm-pack-metadata.mjs <path>");
+    if (process.argv.length > 2) {
+        throw new TypeError(
+            "This release helper does not accept filesystem paths."
+        );
     }
+
+    const metadataPath = resolve(
+        process.cwd(),
+        "temp",
+        "release-assets",
+        "npm-pack.json"
+    );
 
     process.stdout.write(await readPackedTarballFilename(metadataPath));
 }
