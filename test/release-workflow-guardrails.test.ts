@@ -11,6 +11,11 @@ const documentationWorkflow = readFileSync(
     "utf8"
 );
 const packageManifest = readFileSync("package.json", "utf8");
+const packageMetadata = JSON.parse(packageManifest) as {
+    allowScripts: Readonly<Record<string, boolean>>;
+    devDependencies: Readonly<Record<string, string>>;
+    scripts: Readonly<Record<string, string>>;
+};
 const stylelintCompatibilityWrapper = readFileSync(
     "scripts/run-stylelint16-compat.mjs",
     "utf8"
@@ -81,5 +86,24 @@ describe("release automation guardrails", () => {
             'node scripts/npm-pack-metadata.mjs "$pack_metadata_path"'
         );
         expect(releaseWorkflow).not.toContain("packMetadata[0]");
+    });
+
+    it("builds documentation inspectors from lockfile-pinned dependencies", () => {
+        expect.hasAssertions();
+
+        expect(packageMetadata.scripts["build:eslint-inspector"]).toBe(
+            'npx @eslint/config-inspector build --outDir "docs/docusaurus/static/eslint-inspector" --base "/stylelint-plugin-docusaurus/eslint-inspector/"'
+        );
+        expect(packageMetadata.scripts["build:stylelint-inspector"]).toBe(
+            'npx stylelint-config-inspector build --outDir "docs/docusaurus/static/stylelint-inspector" --base "/stylelint-plugin-docusaurus/stylelint-inspector/"'
+        );
+        expect(
+            packageMetadata.devDependencies["@eslint/config-inspector"]
+        ).toBe("^3.3.0");
+        expect(
+            packageMetadata.devDependencies["stylelint-config-inspector"]
+        ).toBe("^2.3.5");
+        expect(packageMetadata.allowScripts["esbuild@0.28.2"]).toBe(true);
+        expect(packageManifest).not.toContain("@latest");
     });
 });
