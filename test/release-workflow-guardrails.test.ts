@@ -13,15 +13,28 @@ const documentationWorkflow = readFileSync(
 const packageManifest = readFileSync("package.json", "utf8");
 const packageMetadata = JSON.parse(packageManifest) as {
     allowScripts: Readonly<Record<string, boolean>>;
+    devEngines: {
+        packageManager: {
+            name: string;
+            onFail: string;
+            version: string;
+        };
+    };
     devDependencies: Readonly<Record<string, string>>;
+    packageManager: string;
     scripts: Readonly<Record<string, string>>;
 };
+const documentationPackageMetadata = JSON.parse(
+    readFileSync("docs/docusaurus/package.json", "utf8")
+) as Pick<typeof packageMetadata, "devEngines" | "packageManager">;
 const stylelintCompatibilityWrapper = readFileSync(
     "scripts/run-stylelint16-compat.mjs",
     "utf8"
 );
 
 const shellVariable = (name: string) => `${String.fromCodePoint(36)}{${name}}`;
+const countOccurrences = (content: string, value: string) =>
+    content.split(value).length - 1;
 
 describe("release automation guardrails", () => {
     it("does not bypass dependency resolution or package verification", () => {
@@ -115,6 +128,54 @@ describe("release automation guardrails", () => {
             );
             expect(workflow).toContain("go build -mod=readonly -trimpath");
             expect(workflow).not.toContain("go install");
+        }
+    });
+
+    it("uses the exact selected npm release in every contributor and workflow path", () => {
+        expect.hasAssertions();
+
+        const expectedPackageManager = "npm@12.0.2";
+        const expectedVersion = "12.0.2";
+
+        for (const metadata of [
+            packageMetadata,
+            documentationPackageMetadata,
+        ]) {
+            expect(metadata.packageManager).toBe(expectedPackageManager);
+            expect(metadata.devEngines.packageManager).toEqual({
+                name: "npm",
+                onFail: "error",
+                version: expectedVersion,
+            });
+        }
+
+        for (const workflow of [
+            releaseWorkflow,
+            continuousIntegrationWorkflow,
+            documentationWorkflow,
+        ]) {
+            const setupCount = countOccurrences(
+                workflow,
+                'name: "Setup Node.js"'
+            );
+
+            expect(setupCount).toBeGreaterThan(0);
+            expect(
+                countOccurrences(workflow, "package-manager-cache: false")
+            ).toBe(setupCount);
+            expect(
+                countOccurrences(
+                    workflow,
+                    `run: "npm install --global npm@${expectedVersion} --ignore-scripts"`
+                )
+            ).toBe(setupCount);
+            expect(
+                countOccurrences(
+                    workflow,
+                    'working-directory: "${{ runner.temp }}"'
+                )
+            ).toBeGreaterThanOrEqual(setupCount);
+            expect(workflow).not.toContain('cache: "npm"');
         }
     });
 

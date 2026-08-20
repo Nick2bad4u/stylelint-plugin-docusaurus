@@ -108,8 +108,11 @@ jobs:
               with:
                   node-version-file: ".node-version"
                   registry-url: "${{ env.NPM_REGISTRY_URL }}"
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
+                  package-manager-cache: false
+
+            - name: "Install npm"
+              working-directory: "${{ runner.temp }}"
+              run: "npm install --global npm@12.0.2 --ignore-scripts"
 
             - name: "Install dependencies"
               run: |
