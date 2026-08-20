@@ -271,7 +271,17 @@ export function normalizeStylelintRuntime(runtimeCandidate) {
  * @returns {Promise<StylelintLike>}
  */
 async function loadStylelintRuntime({
-    importModuleFn = () => import("stylelint"),
+    importModuleFn = () => {
+        const runtimeRoot = process.env["STYLELINT_RUNTIME_ROOT"];
+        const runtimeRequire =
+            typeof runtimeRoot === "string" && runtimeRoot.length > 0
+                ? createRequire(
+                      pathToFileURL(resolve(runtimeRoot, "package.json"))
+                  )
+                : createRequire(import.meta.url);
+
+        return import(pathToFileURL(runtimeRequire.resolve("stylelint")).href);
+    },
 } = {}) {
     const importedModule = await importModuleFn();
 
@@ -288,7 +298,13 @@ async function loadStylelintRuntime({
  */
 function getStylelintRuntimeVersion({
     readFileSyncFn = readFileSync,
-    requireFn = createRequire(import.meta.url),
+    requireFn = (() => {
+        const runtimeRoot = process.env["STYLELINT_RUNTIME_ROOT"];
+
+        return typeof runtimeRoot === "string" && runtimeRoot.length > 0
+            ? createRequire(pathToFileURL(resolve(runtimeRoot, "package.json")))
+            : createRequire(import.meta.url);
+    })(),
 } = {}) {
     const stylelintPackageJsonPath = requireFn.resolve(
         "stylelint/package.json"

@@ -827,9 +827,6 @@ docs/docusaurus/stylelintcache
 node_modules/
 node_modules_backup/
 
-# NPM
-.npmrc
-
 # OhMyPosh
 !.vscode/OhMyPosh-Atomic-Custom.json
 
