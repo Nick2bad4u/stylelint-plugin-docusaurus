@@ -3,28 +3,26 @@ import { describe, expect, it } from "vitest";
 
 import {
     createCompatibilityCheckCommands,
-    createRestoreDependenciesCommand,
     getNpmCommand,
+    getPackedTarballFilename,
     getWindowsCommandShell,
     isDirectExecution,
     runStylelint16Compat,
 } from "../scripts/run-stylelint16-compat.mjs";
 
-const isErrorLike = (value: unknown): value is Readonly<{ message: string }> =>
-    typeof value === "object" &&
-    value !== null &&
-    "message" in value &&
-    typeof value.message === "string";
-
 describe("run-stylelint16-compat wrapper", () => {
-    it("builds before installing Stylelint 16 and running the smoke check", () => {
+    it("builds and tests Stylelint 16 in an isolated project", () => {
         expect.hasAssertions();
 
         expect(
             createCompatibilityCheckCommands({
                 nodeCommand: "node",
                 npmCommand: "npm",
+                packedPluginPath:
+                    "/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
                 platform: "linux",
+                repositoryRootPath: "/repo",
+                runtimeDirectoryPath: "/temp/runtime",
                 stylelintCompatSmokeScriptPath:
                     "/repo/scripts/stylelint-compat-smoke.mjs",
             })
@@ -32,16 +30,32 @@ describe("run-stylelint16-compat wrapper", () => {
             {
                 args: ["run", "build"],
                 command: "npm",
+                repositoryRootPath: "/repo",
+                shell: false,
+            },
+            {
+                args: [
+                    "pack",
+                    "--ignore-scripts",
+                    "--pack-destination",
+                    "/temp/runtime",
+                ],
+                command: "npm",
+                repositoryRootPath: "/repo",
                 shell: false,
             },
             {
                 args: [
                     "install",
-                    "--no-save",
-                    "--legacy-peer-deps",
+                    "--ignore-scripts",
+                    "--no-audit",
+                    "--no-fund",
+                    "--package-lock=false",
                     "stylelint@^16",
+                    "/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
                 ],
                 command: "npm",
+                repositoryRootPath: "/temp/runtime",
                 shell: false,
             },
             {
@@ -50,12 +64,16 @@ describe("run-stylelint16-compat wrapper", () => {
                     "--expect-stylelint-major=16",
                 ],
                 command: "node",
+                environment: {
+                    STYLELINT_RUNTIME_ROOT: "/temp/runtime",
+                },
+                repositoryRootPath: "/repo",
                 shell: false,
             },
         ]);
     });
 
-    it("creates a Windows-aware restore install command", () => {
+    it("uses Windows-native npm invocation without weakening resolution", () => {
         expect.hasAssertions();
 
         expect(getNpmCommand("win32")).toBe("npm.cmd");
@@ -64,56 +82,60 @@ describe("run-stylelint16-compat wrapper", () => {
                 COMSPEC: "custom-cmd.exe",
             })
         ).toBe("custom-cmd.exe");
-        expect(
-            createRestoreDependenciesCommand({
-                npmCommand: "npm.cmd",
-                platform: "win32",
-            })
-        ).toStrictEqual({
-            args: [
-                "install",
-                "--ignore-scripts",
-                "--no-audit",
-                "--no-fund",
-                "--legacy-peer-deps",
-            ],
-            command: "npm.cmd",
-            shell: true,
+
+        const commands = createCompatibilityCheckCommands({
+            npmCommand: "npm.cmd",
+            packedPluginPath:
+                "C:/temp/runtime/stylelint-plugin-docusaurus-2.0.4.tgz",
+            platform: "win32",
+            runtimeDirectoryPath: "C:/temp/runtime",
         });
+
+        expect(commands[2]?.shell).toBe(true);
+        expect(commands[2]?.args).not.toContain("--legacy-peer-deps");
+        expect(commands[2]?.args).not.toContain("--force");
     });
 
-    it("restores manifests and dependencies even when the smoke check fails", async () => {
+    it("derives safe npm pack filenames", () => {
         expect.hasAssertions();
 
-        const copiedFiles: string[] = [];
-        const restoredFiles: string[] = [];
+        expect(
+            getPackedTarballFilename({
+                name: "stylelint-plugin-docusaurus",
+                version: "2.0.4",
+            })
+        ).toBe("stylelint-plugin-docusaurus-2.0.4.tgz");
+        expect(
+            getPackedTarballFilename({
+                name: "@scope/plugin",
+                version: "1.2.3-beta.1",
+            })
+        ).toBe("scope-plugin-1.2.3-beta.1.tgz");
+        expect(() =>
+            getPackedTarballFilename({ name: "../plugin", version: "1.0.0" })
+        ).toThrow("valid npm package name");
+    });
+
+    it("removes the isolated project when the smoke check fails", async () => {
+        expect.hasAssertions();
+
         const executedCommands: string[] = [];
         const removedPaths: string[] = [];
-        let invocationIndex = 0;
-        const tempBackupDirectory = "/temp/stylelint16-backup";
+        const writtenPaths: string[] = [];
 
         await expect(
             runStylelint16Compat({
-                copyFileFn: (sourcePath, destinationPath) => {
-                    copiedFiles.push(
-                        `${String(sourcePath)}->${String(destinationPath)}`
-                    );
-
-                    return Promise.resolve();
-                },
-                cpFn: (sourcePath, destinationPath) => {
-                    restoredFiles.push(
-                        `${String(sourcePath)}->${String(destinationPath)}`
-                    );
-
-                    return Promise.resolve();
-                },
-                mkdtempFn: () => Promise.resolve(tempBackupDirectory),
+                mkdtempFn: () => Promise.resolve("/temp/runtime"),
                 nodeCommand: "node",
                 npmCommand: "npm",
-                packageJsonPath: "/repo/package.json",
-                packageLockJsonPath: "/repo/package-lock.json",
                 platform: "linux",
+                readFileFn: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            name: "stylelint-plugin-docusaurus",
+                            version: "2.0.4",
+                        })
+                    ),
                 repositoryRootPath: "/repo",
                 rmFn: (targetPath) => {
                     removedPaths.push(String(targetPath));
@@ -124,131 +146,65 @@ describe("run-stylelint16-compat wrapper", () => {
                     executedCommands.push(
                         `${input.command} ${input.args.join(" ")}`
                     );
-                    invocationIndex += 1;
 
-                    if (invocationIndex === 3) {
+                    if (executedCommands.length === 4) {
                         throw new Error("simulated smoke failure");
                     }
                 },
                 stylelintCompatSmokeScriptPath:
                     "/repo/scripts/stylelint-compat-smoke.mjs",
                 tmpDirectoryPath: "/temp",
-                windowsCommandShell: "cmd.exe",
+                writeFileFn: (targetPath) => {
+                    if (typeof targetPath !== "string") {
+                        throw new TypeError("Expected a string fixture path.");
+                    }
+
+                    writtenPaths.push(targetPath);
+
+                    return Promise.resolve();
+                },
             })
         ).rejects.toThrow("simulated smoke failure");
 
-        expect(copiedFiles).toStrictEqual([
-            `/repo/package.json->${path.join(tempBackupDirectory, "package.json")}`,
-            `/repo/package-lock.json->${path.join(tempBackupDirectory, "package-lock.json")}`,
+        expect(writtenPaths).toStrictEqual([
+            path.join("/temp/runtime", "package.json"),
         ]);
-        expect(restoredFiles).toStrictEqual([
-            `${path.join(tempBackupDirectory, "package.json")}->/repo/package.json`,
-            `${path.join(tempBackupDirectory, "package-lock.json")}->/repo/package-lock.json`,
-        ]);
-        expect(executedCommands).toStrictEqual([
-            "npm run build",
-            "npm install --no-save --legacy-peer-deps stylelint@^16",
-            "node /repo/scripts/stylelint-compat-smoke.mjs --expect-stylelint-major=16",
-            "npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps",
-        ]);
-        expect(removedPaths).toStrictEqual([tempBackupDirectory]);
+        expect(executedCommands).toHaveLength(4);
+        expect(removedPaths).toStrictEqual(["/temp/runtime"]);
     });
 
-    it("preserves the original smoke failure when cleanup also fails", async () => {
-        expect.hasAssertions();
-
-        const executedCommands: string[] = [];
-        let invocationIndex = 0;
-
-        let thrownError: unknown = undefined;
-
-        try {
-            await runStylelint16Compat({
-                copyFileFn: () => Promise.resolve(),
-                cpFn: () => Promise.resolve(),
-                mkdtempFn: () => Promise.resolve("/temp/stylelint16-backup"),
-                nodeCommand: "node",
-                npmCommand: "npm",
-                packageJsonPath: "/repo/package.json",
-                packageLockJsonPath: "/repo/package-lock.json",
-                platform: "linux",
-                repositoryRootPath: "/repo",
-                rmFn: () => Promise.resolve(),
-                runCommandFn: (input) => {
-                    executedCommands.push(
-                        `${input.command} ${input.args.join(" ")}`
-                    );
-                    invocationIndex += 1;
-
-                    if (invocationIndex === 3) {
-                        throw new Error("simulated smoke failure");
-                    }
-
-                    if (invocationIndex === 4) {
-                        throw new Error("simulated restore failure");
-                    }
-                },
-                stylelintCompatSmokeScriptPath:
-                    "/repo/scripts/stylelint-compat-smoke.mjs",
-                tmpDirectoryPath: "/temp",
-                windowsCommandShell: "cmd.exe",
-            });
-        } catch (error) {
-            thrownError = error;
-        }
-
-        expect(thrownError).toBeInstanceOf(AggregateError);
-
-        const aggregateError = thrownError as AggregateError;
-        const messages = aggregateError.errors.map((item: unknown) =>
-            isErrorLike(item) ? item.message : String(item)
-        );
-
-        expect(aggregateError.message).toContain(
-            "cleanup encountered additional errors"
-        );
-        expect(messages).toContain("simulated smoke failure");
-        expect(messages).toContain(
-            "Failed to restore dependencies after the Stylelint 16 compatibility check."
-        );
-
-        expect(executedCommands).toStrictEqual([
-            "npm run build",
-            "npm install --no-save --legacy-peer-deps stylelint@^16",
-            "node /repo/scripts/stylelint-compat-smoke.mjs --expect-stylelint-major=16",
-            "npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps",
-        ]);
-    });
-
-    it("surfaces cleanup failures even when the compatibility check succeeds", async () => {
+    it("reports both smoke and cleanup failures", async () => {
         expect.hasAssertions();
 
         await expect(
             runStylelint16Compat({
-                copyFileFn: () => Promise.resolve(),
-                cpFn: () => Promise.resolve(),
-                mkdtempFn: () => Promise.resolve("/temp/stylelint16-backup"),
-                nodeCommand: "node",
-                npmCommand: "npm",
-                packageJsonPath: "/repo/package.json",
-                packageLockJsonPath: "/repo/package-lock.json",
-                platform: "linux",
-                repositoryRootPath: "/repo",
-                rmFn: () => {
-                    throw new Error("simulated temp cleanup failure");
+                mkdtempFn: () => Promise.resolve("/temp/runtime"),
+                readFileFn: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            name: "stylelint-plugin-docusaurus",
+                            version: "2.0.4",
+                        })
+                    ),
+                rmFn: () => Promise.reject(new Error("cleanup failed")),
+                runCommandFn: () => {
+                    throw new Error("smoke failed");
                 },
-                runCommandFn: () => {},
-                stylelintCompatSmokeScriptPath:
-                    "/repo/scripts/stylelint-compat-smoke.mjs",
-                tmpDirectoryPath: "/temp",
-                windowsCommandShell: "cmd.exe",
+                writeFileFn: () => Promise.resolve(),
             })
-        ).rejects.toThrow(
-            "Failed to remove temporary backup directory: /temp/stylelint16-backup"
-        );
+        ).rejects.toMatchObject({
+            errors: [
+                expect.objectContaining({ message: "smoke failed" }),
+                expect.objectContaining({
+                    message: expect.stringContaining(
+                        "Failed to remove temporary compatibility project"
+                    ),
+                }),
+            ],
+        });
     });
 
-    it("exposes a direct-execution guard so imports do not trigger the wrapper", () => {
+    it("exposes a direct-execution guard", () => {
         expect.hasAssertions();
 
         expect(
@@ -258,10 +214,12 @@ describe("run-stylelint16-compat wrapper", () => {
                     "file:///C:/repo/scripts/run-stylelint16-compat.mjs",
             })
         ).toBe(true);
-
         expect(
             isDirectExecution({
-                argvEntry: "C:/repo/test/run-stylelint16-compat.test.ts",
+                argvEntry: path.resolve(
+                    "test",
+                    "run-stylelint16-compat.test.ts"
+                ),
                 currentImportUrl:
                     "file:///C:/repo/scripts/run-stylelint16-compat.mjs",
             })

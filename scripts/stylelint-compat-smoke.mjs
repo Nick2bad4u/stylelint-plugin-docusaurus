@@ -15,18 +15,13 @@
 import { isDeepStrictEqual } from "node:util";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 
 import pc from "picocolors";
 
 const expectedStylelintMajorArgumentPrefix = "--expect-stylelint-major=";
-const builtPluginModuleUrl = new URL("../dist/plugin.js", import.meta.url);
-const builtPluginCjsPath = fileURLToPath(
-    new URL("../dist/plugin.cjs", import.meta.url)
-);
-
 /** @param {string} value */
 const isWindowsAbsolutePath = (value) => /^[A-Za-z]:[\\/]/u.test(value);
 
@@ -190,6 +185,15 @@ function toRecord(value) {
     return isRecord(value) ? value : {};
 }
 
+/** @returns {NodeJS.Require} */
+function createRuntimeRequire() {
+    const runtimeRoot = process.env["STYLELINT_RUNTIME_ROOT"];
+
+    return typeof runtimeRoot === "string" && runtimeRoot.length > 0
+        ? createRequire(pathToFileURL(resolve(runtimeRoot, "package.json")))
+        : createRequire(import.meta.url);
+}
+
 /**
  * @param {unknown} value
  *
@@ -271,7 +275,11 @@ export function normalizeStylelintRuntime(runtimeCandidate) {
  * @returns {Promise<StylelintLike>}
  */
 async function loadStylelintRuntime({
-    importModuleFn = () => import("stylelint"),
+    importModuleFn = () => {
+        const runtimeRequire = createRuntimeRequire();
+
+        return import(pathToFileURL(runtimeRequire.resolve("stylelint")).href);
+    },
 } = {}) {
     const importedModule = await importModuleFn();
 
@@ -288,7 +296,7 @@ async function loadStylelintRuntime({
  */
 function getStylelintRuntimeVersion({
     readFileSyncFn = readFileSync,
-    requireFn = createRequire(import.meta.url),
+    requireFn = createRuntimeRequire(),
 } = {}) {
     const stylelintPackageJsonPath = requireFn.resolve(
         "stylelint/package.json"
@@ -401,16 +409,25 @@ function createSurfaceSnapshot(candidate) {
  * @returns {Promise<BuiltPluginSurface>}
  */
 async function loadBuiltPluginSurface({
-    // eslint-disable-next-line no-unsanitized/method -- builtPluginModuleUrl is an internal fixed file URL under this repository
-    importModuleFn = () => import(builtPluginModuleUrl.href),
-    requireFn = createRequire(import.meta.url),
+    importModuleFn,
+    requireFn = createRuntimeRequire(),
 } = {}) {
     try {
+        const packageRootPath = dirname(
+            requireFn.resolve("stylelint-plugin-docusaurus/package.json")
+        );
+        const builtPluginModuleUrl = pathToFileURL(
+            join(packageRootPath, "dist", "plugin.js")
+        );
+        const loadModule =
+            importModuleFn ??
+            // eslint-disable-next-line no-unsanitized/method -- packageRootPath is resolved from this package's fixed export
+            (() => import(builtPluginModuleUrl.href));
         const builtPluginModule =
             /** @type {Readonly<Record<string, unknown>>} */ (
-                await importModuleFn()
+                await loadModule()
             );
-        const builtPluginCjs = requireFn(builtPluginCjsPath);
+        const builtPluginCjs = requireFn("stylelint-plugin-docusaurus");
 
         return {
             builtPluginCjs,
