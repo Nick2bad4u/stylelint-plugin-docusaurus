@@ -13,6 +13,7 @@ const documentationWorkflow = readFileSync(
 const packageManifest = readFileSync("package.json", "utf8");
 const packageMetadata = JSON.parse(packageManifest) as {
     allowScripts: Readonly<Record<string, boolean>>;
+    devDependencies: Readonly<Record<string, string>>;
     devEngines: {
         packageManager: {
             name: string;
@@ -20,7 +21,6 @@ const packageMetadata = JSON.parse(packageManifest) as {
             version: string;
         };
     };
-    devDependencies: Readonly<Record<string, string>>;
     packageManager: string;
     scripts: Readonly<Record<string, string>>;
 };
@@ -142,7 +142,7 @@ describe("release automation guardrails", () => {
             documentationPackageMetadata,
         ]) {
             expect(metadata.packageManager).toBe(expectedPackageManager);
-            expect(metadata.devEngines.packageManager).toEqual({
+            expect(metadata.devEngines.packageManager).toStrictEqual({
                 name: "npm",
                 onFail: "error",
                 version: expectedVersion,
@@ -172,7 +172,7 @@ describe("release automation guardrails", () => {
             expect(
                 countOccurrences(
                     workflow,
-                    'working-directory: "${{ runner.temp }}"'
+                    `working-directory: "${shellVariable("{ runner.temp }")}"`
                 )
             ).toBeGreaterThanOrEqual(setupCount);
             expect(workflow).not.toContain('cache: "npm"');
