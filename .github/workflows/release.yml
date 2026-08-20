@@ -183,12 +183,13 @@ jobs:
                   fi
 
             - name: "Install Actionlint"
+              working-directory: ".github/actionlint"
               env:
                   GOBIN: "${{ runner.temp }}/actionlint-bin"
               run: |
                   set -euo pipefail
                   mkdir -p "$GOBIN"
-                  go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+                  go build -mod=readonly -trimpath -o "$GOBIN/actionlint" github.com/rhysd/actionlint/cmd/actionlint
                   echo "$GOBIN" >> "$GITHUB_PATH"
 
             - name: "Verify package"
